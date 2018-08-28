@@ -1,0 +1,40 @@
+# Basics of Statistical Learning (STAT432)
+
+## Course Logistics
+
+### Faculty:
+
+Prof. Ruoqing Zhu (rqzhu@illinois.edu):
+Office: 116D Illini Hall; Office hours: Wed, Thu 11 AM - 12 PM
+https://teazrq.github.io/stat432
+
+### TA:
+Runmin Wang: rwang52@illinois.edu
+Austin Warner: awarner5@illinois.edu
+Office hours: Tue 4 PM - 5 PM, Thu 3:30 PM - 4:30 PM
+
+### Book:
+Required: Introduction to Statistical Learning with examples in R
+Recommended: Elements of Statistical Learning
+
+### Project:
+Identify a data set and submit 1 page proposal through Compass. Submission period: 10 - 26 Nov
+
+## Learning Problems
+
+### Supervised Learning
+
+- We have a label for each row of data set. Eg: Image (data) is associated with a digit (label).
+- Rotation features in handwritten digit recognition makes classification easier.
+
+### Unsupervised Learning
+
+Example 1: Given the gene elevations/depressions (green => low, red => high), classify the gene expressions.
+Application: Identify common patterns in women with breast cancer. Assumption: Same breast cancer type => Similar gene expression
+
+Example 2: Compressive sensing.
+Methodology: Matrix decomposition + L1 penalty.
+Application: Detecting moving object (separate from background noise) from set of images.
+
+Methodology 3: Graphical models.
+Application: Detecting network connectivity of multiple regions of brain. Helps in detecting ALS / Parkinson's digit.
