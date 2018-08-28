@@ -1,0 +1,14 @@
+# Session 1
+
+Statistics is the study of variation in output.
+
+Monte Carlo methods:
+One form of Monte Carlo methods: P(event) = (number of times the simulated event is favorable) / (total number of trials)
+
+Resampling methods:
+- We have only one sample. We cannot sample again from the population.
+- Sampling repeatedly from the sample that's available - resampling.
+
+Optimization:
+- Linear regression: least square
+- Maximum likelihood estimation
