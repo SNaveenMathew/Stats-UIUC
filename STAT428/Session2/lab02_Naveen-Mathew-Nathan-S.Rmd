@@ -1,0 +1,58 @@
+---
+title: "Lab 2"
+author: "Naveen Mathew Nathan S."
+output: html_document
+---
+
+#### 1. Changing the author field and file name.
+
+##### (a) Change the `author:` field on the Rmd document from Your Name Here to your own name.
+
+##### (b) Rename this file to "lab02_YourHameHere.Rmd", where YourNameHere is changed to your own name.
+
+#### 2. Data practice
+
+In class we imported the survey data using the `read.table()` function.  (Note: on Homework 1 you'll be asked to use the `read.csv()` function instead.)
+
+This is the code we used:
+
+```{r}
+survey <- read.table("http://www.andrew.cmu.edu/user/achoulde/94842/data/survey_data.csv", header=TRUE, sep=",") 
+```
+
+##### (a) How many survey respondents are from MISM or Other?
+
+```{r}
+mean(survey$Program == "MSIM" | survey$Program == "Other")
+```
+
+##### (b) What % of survey respondents are from PPM?
+
+```{r}
+mean(survey$Program == "PPM")
+```
+
+#### 3. Index practice
+
+##### (a) Use $ notation to pull the OperatingSystem column from the survey data
+
+```{r}
+print(survey$OperatingSystem)
+```
+
+##### (b) Do the same thing with [,] notation, referring to OperatingSystem by name
+
+```{r}
+print(survey[, "OperatingSystem"])
+```
+
+##### (c) Repeat part (b), this time referring to OperatingSystem by column number
+
+```{r}
+# Identifying the index
+print(which(colnames(survey) == "OperatingSystem"))
+print(survey[, 4])
+```
+
+
+

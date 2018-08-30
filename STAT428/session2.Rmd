@@ -1,0 +1,8 @@
+# Session 2
+
+Good functions to use:
+
+- `plyr::transform` -> Creates a new data frame with mentioned data transformations appended to the given data frame. This is equivalent to data_frame$NewCol <- transformation(data_frame$OldCol)
+- `plyr::mapvalues` -> Assigns particular value to different levels of a factor and removes unused levels
+- `typeof` -> Base data type of the variable (Eg: x <- 10; class(x); # "numeric", typeof(x); # "double")
+- column names can be avoided if we use `with()`

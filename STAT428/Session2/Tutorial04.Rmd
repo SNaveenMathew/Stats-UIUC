@@ -1,0 +1,369 @@
+---
+title: Tutorial 4 - Basic cleaning, loops, apply functions
+
+font-family: Gill Sans
+---
+
+### Contents
+
+- A common data cleaning task
+- If-else statements
+- For/while loops to iterate over data
+- `apply()`, `lapply()`, `sapply()`, `tapply()`
+- `with()` to specify scope
+
+###A common problem
+
+- One of the most common problems you'll encounter when importing manually-entered data is inconsistent data types within columns
+
+- For a simple example, let's look at `TVhours` column in a messy version of the survey data from Tutorial 2
+
+```{r}
+survey.messy <- read.csv("http://www.andrew.cmu.edu/user/achoulde/94842/data/survey_messy.csv", header=TRUE)
+survey.messy$TVhours
+```
+
+###What's happening?
+```{r}
+str(survey.messy)
+```
+- Several of the entries have non-numeric values in them (they contain strings)
+
+- As a result, `TVhours` is being imported as `factor`
+
+###Attempt at a fix
+- What if we just try to cast it back to numeric?
+
+```{r}
+tv.hours.messy <- survey.messy$TVhours
+tv.hours.messy
+as.numeric(tv.hours.messy)
+```
+
+###That didn't work...
+```{r, eval = FALSE}
+tv.hours.messy
+as.numeric(tv.hours.messy)
+```
+```{r, echo = FALSE}
+# Show this output, but not this code
+head(tv.hours.messy, 40)
+head(as.numeric(tv.hours.messy), 40)
+```
+
+
+
+- This just converted all the values into the integer-coded levels of the factor
+
+- Not what we wanted!
+
+###Something that does work
+
+- Consider the following simple example
+
+```{r}
+num.vec <- c(3.1, 2.5)
+as.factor(num.vec)
+as.numeric(as.factor(num.vec))
+as.numeric(as.character(as.factor(num.vec)))
+```
+
+> If we take a number that's being coded as a factor and *first* turn it into a `character` string, *then* converting the string to a numeric gets back the number
+
+###Back to the corrupted TVhours column
+
+```{r}
+as.character(tv.hours.messy)
+as.numeric(as.character(tv.hours.messy))
+typeof(as.numeric(as.character(tv.hours.messy)))  # Success!! (Almost...)
+```
+
+###A small improvement
+
+- All the corrupted cells now appear as `NA`, which is R's missing indicator
+
+- We can do a little better by cleaning up the vector once we get it to `character` form
+
+```{r}
+tv.hours.strings <- as.character(tv.hours.messy)
+tv.hours.strings
+```
+
+###Deleting non-numeric (or .) characters 
+```{r}
+tv.hours.strings
+# Use gsub() to replace everything except digits and '.' with a blank ""
+gsub("[^0-9.]", "", tv.hours.strings) 
+```
+
+###The final product
+```{r}
+tv.hours.messy[1:30]
+tv.hours.clean <- as.numeric(gsub("[^0-9.]", "", tv.hours.strings))
+tv.hours.clean
+```
+- As a last step, we should go through and figure out if any of the `NA` values should really be `0`.  
+  - This step is not shown here.
+
+###Rebuilding our data
+```{r}
+survey <- transform(survey.messy, TVhours = tv.hours.clean)
+str(survey)
+```
+
+- **Success!**
+
+###A different approach
+
+- We can also handle this problem by setting `stringsAsFactors = FALSE` when importing our data.
+
+```{r}
+survey.messy <- read.csv("http://www.andrew.cmu.edu/user/achoulde/94842/data/survey_messy.csv", header=TRUE, stringsAsFactors=FALSE)
+str(survey.messy)
+```
+
+- Now everything is a `character` instead of a `factor`
+
+###One-line cleanup 
+
+- Let's clean up the `TVhours` column and cast it to numeric all in one command
+
+```{r}
+survey <- transform(survey.messy, 
+                    TVhours = as.numeric(gsub("[^0-9.]", "", TVhours)))
+str(survey)
+```
+
+###What about all those other `character` variables?
+
+```{r}
+table(survey[["Program"]])
+table(as.factor(survey[["Program"]]))
+```
+
+- Having factors coded as characters may be OK for many parts of our analysis
+
+###To be safe, let's fix things
+```{r}
+# Figure out which columns are coded as characters
+chr.indexes <- sapply(survey, FUN = is.character)
+chr.indexes
+# Re-code all of the character columns to factors
+survey[chr.indexes] <- lapply(survey[chr.indexes], FUN = as.factor)
+```
+
+###Here's the outcome
+```{r}
+str(survey)
+```
+
+- **Success!**
+
+###Another common problem
+
+- On Homework 2 you'll learn how to wrangle with another common problem
+
+- When data is entered manually, misspellings and case changes are very common
+
+- E.g., a column showing life support mechanism may look like,
+
+```{r}
+life.support <- as.factor(c("dialysis", "Ventilation", "Dialysis", "dialysis", "none", "None", "nnone", "dyalysis", "dialysis", "ventilation", "none"))
+summary(life.support)
+```
+###
+```{r}
+summary(life.support)
+```
+
+- This factor has 8 levels even though it should have 3 (dialysis, ventilation, none)
+
+- We can fix many of the typos by running spellcheck in Excel before importing data, or by changing the values on a case-by-case basis later
+
+- There's a faster way to fix just the capitalization issue (this is an exercise on Homework 2)
+
+
+###What are all these [l/s/t/]apply() functions?
+
+- These are all efficient ways of applying a function to margins of an array or elements of a list
+
+- Before we talk about the details of `apply()` and its relatives, we should first understand loops
+
+- **loops** are ways of iterating over data
+
+- The `apply()` functions can be thought of as good *alternatives* to loops 
+
+###For loops: a pair of examples
+```{r}
+for(i in 1:4) {
+  print(i)
+}
+
+phrase <- "Good Night, "
+for(word in c("and", "Good", "Luck")) {
+  phrase <- paste(phrase, word)
+  print(phrase)
+}
+```
+
+###For loops: syntax
+
+> A **for loop** executes a chunk of code for every value of an **index variable** in an **index set**
+
+- The basic syntax takes the form
+
+```{r, eval=FALSE}
+# for(index.variable in index.set) {
+#   code to be repeated at every value of index.variable
+# }
+```
+
+- The index set is often a vector of integers, but can be more general
+
+###Example
+```{r}
+index.set <- list(name="Michael", weight=185, is.male=TRUE) # a list
+for(i in index.set) {
+  print(c(i, typeof(i)))
+}
+```
+
+###Example: Calculate sum of each column
+```{r}
+fake.data <- matrix(rnorm(500), ncol=5) # create fake 100 x 5 data set
+head(fake.data,2) # print first two rows
+
+col.sums <- numeric(ncol(fake.data)) # variable to store running column sums
+for(i in 1:nrow(fake.data)) {
+  col.sums <- col.sums + fake.data[i,] # add ith observation to the sum
+}
+col.sums
+
+colSums(fake.data) # A better approach (see also colMeans())
+```
+
+###while loops
+
+- **while loops** repeat a chunk of code while the specified condition remains true
+
+```{r, eval=FALSE}
+day <- 1
+num.days <- 365
+while(day <= num.days) {
+  day <- day + 1
+}
+```
+
+- We won't really be using while loops in this class
+
+- Just be aware that they exist, and that they may become useful to you at some point in your analytics career
+
+###The various apply() functions
+
+Command | Description
+--------|------------
+`apply(X, MARGIN, FUN)` | Obtain a vector/array/list by applying `FUN` along the specified `MARGIN` of an array or matrix `X`
+`lapply(X, FUN)` | Obtain a list by applying `FUN` to the elements of a list `X`
+`sapply(X, FUN)` | Simplified version of `lapply`.  Returns a vector/array instead of list.
+`tapply(X, INDEX, FUN)` | Obtain a table by applying `FUN` to each combination of the factors given in `INDEX`  
+
+- These functions are (good!) alternatives to loops
+
+- They are typically *more efficient* than loops (often run considerably faster on large data sets)
+
+- Take practice to get used to, but make analysis easier to debug and less prone to error when used effectively
+
+- You can always type `example(function)` to get code examples (E.g., `example(apply)`)
+
+###Example: apply()
+```{r}
+colMeans(fake.data)
+apply(fake.data, MARGIN=2, FUN=mean) # MARGIN = 1 for rows, 2 for columns
+# Function that calculates proportion of vector indexes that are > 0
+propPositive <- function(x) mean(x > 0)
+apply(fake.data, MARGIN=2, FUN=propPositive) 
+```
+
+###Example: lapply(), sapply()
+```{r}
+lapply(survey, is.factor) # Returns a list
+sapply(survey, FUN = is.factor) # Returns a vector with named elements
+```
+
+###Example: apply(), lapply(), sapply()
+```{r}
+apply(cars, 2, FUN=mean) # Data frames are arrays
+lapply(cars, FUN=mean) # Data frames are also lists
+sapply(cars, FUN=mean) # sapply() is just simplified lapply()
+```
+
+
+###Example: tapply()
+
+- Think of `tapply()` as a generalized form of the `table()` function
+
+```{r}
+library(MASS)
+# Get a count table, data broken down by Origin and DriveTrain
+table(Cars93$Origin, Cars93$DriveTrain)
+
+# Calculate average MPG.City, broken down by Origin and Drivetrain
+tapply(Cars93$MPG.city, INDEX = Cars93[c("Origin", "DriveTrain")], FUN=mean)
+```
+
+###Example: tapply()
+
+- Let's get the average horsepower by car `Origin` and `Type`
+
+```{r}
+tapply(Cars93[["Horsepower"]], INDEX = Cars93[c("Origin", "Type")], FUN=mean)
+```
+
+- What's that `NA` doing there?
+
+```{r}
+any(Cars93$Origin == "non-USA" & Cars93$Type == "Large")
+```
+
+- None of the non-USA manufacturers produced Large cars!
+
+###Example: using tapply() to mimic table()
+
+- Here's how one can use `tapply()` to produce the same output as the `table()` function
+
+```{r}
+library(MASS)
+# Get a count table, data broken down by Origin and DriveTrain
+table(Cars93$Origin, Cars93$DriveTrain)
+
+# This one may take a moment to figure out...
+tapply(rep(1, nrow(Cars93)), INDEX = Cars93[c("Origin", "DriveTrain")], FUN=sum) 
+```
+
+###with()
+
+- Thus far we've repeatedly typed out the data frame name when referencing its columns
+
+- This is because the data variables don't exist in our working environment
+
+- Using **with**`(data, expr)` lets us specify that the code in `expr` should be evaluated in an environment that contains the elements of `data` as variables
+
+```{r}
+with(Cars93, table(Origin, Type))
+```
+
+###Example: with()
+
+```{r}
+any(Cars93$Origin == "non-USA" & Cars93$Type == "Large")
+with(Cars93, any(Origin == "non-USA" & Type == "Large")) # Same effect!
+```
+
+```{r}
+with(Cars93, tapply(Horsepower, INDEX = list(Origin, Type), FUN=mean))
+```
+
+- Using with() makes code simpler, easier to read, and easier to debug
+
+### Next 
+- Complete [**Lab 4**](http://isle.heinz.cmu.edu/94-842/lab04/) 

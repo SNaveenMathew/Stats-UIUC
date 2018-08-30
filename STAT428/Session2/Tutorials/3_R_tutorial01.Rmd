@@ -1,0 +1,305 @@
+---
+title: Tutorial 01- R Programming basics
+output:
+  html_document:
+    theme: readable
+    toc: no
+font-family: Gill Sans
+---
+
+Adapted from [here](http://www.andrew.cmu.edu/user/achoulde/)
+
+###Basics:
+- Everything we'll do comes down to applying **functions** to **data**
+
+- **Data**:  things like 7, "seven", $7.000$, the matrix $\left[ \begin{array}{ccc} 7 & 7 & 7 \\ 7 & 7 & 7\end{array}\right]$
+
+- **Functions**: things like $\log{}$, $+$ (two arguments), $<$ (two), $\mod{}$ (two), `mean` (one)
+
+> A function is a machine which turns input objects (**arguments**) into an output object (**return value**), possibly with **side effects**, according to a definite rule
+
+###Data building blocks
+
+You'll encounter different kinds of data types
+
+- **Booleans** Direct binary values: `TRUE` or `FALSE` in R
+- **Integers**: whole numbers (positive, negative or zero)
+- **Characters** fixed-length blocks of bits, with special coding;
+**strings** = sequences of characters
+- **Floating point numbers**: a fraction (with a finite number of bits) times an exponent, like $1.87 \times {10}^{6}$
+- **Missing or ill-defined values**: `NA`, `NaN`, etc.
+
+
+###Operators (functions)
+You can use R as a very, very fancy calculator
+
+Command | Description
+--------|-------------
+`+,-,*,\` | add, subtract, multiply, divide
+`^` | raise to the power of
+`%%` | remainder after division (ex: `8 %% 3 = 2`)
+`( )` | change the order of operations
+`log(), exp()` | logarithms and exponents (ex: `log(10) = 2.302`)
+`sqrt()` | square root
+`round()` | round to the nearest whole number (ex: `round(2.3) = 2`)
+`floor(), ceiling()` | round down or round up 
+`abs()` | absolute value
+###
+
+```{r}
+7 + 5 # Addition
+7 - 5 # Subtraction
+7 * 5 # Multiplication
+7 ^ 5 # Exponentiation
+```
+###
+```{r}
+7 / 5 # Division
+7 %% 5 # Modulus
+7 %/% 5 # Integer division 
+```
+
+###Operators cont'd.
+  **Comparisons** are also binary operators; they take two objects, like numbers, and give a Boolean
+```{r}
+7 > 5
+7 < 5
+7 >= 7
+7 <= 5
+```
+###
+  ```{r}
+7 == 5
+7 != 5
+```
+
+###Boolean operators
+  Basically "and" and "or":
+  
+```{r}
+(5 > 7) & (6*7 == 42)
+(5 > 7) | (6*7 == 42)
+```
+
+<small>(will see special doubled forms, `&&` and `||`, later)</small>
+  
+  
+###  More types
+  
+- `typeof()` function returns the type
+
+- `is.`_foo_`()` functions return Booleans for whether the argument is of type _foo_
+
+- `as.`_foo_`()` (tries to) "cast" its argument to type _foo_ --- to translate it sensibly into a _foo_-type value
+
+<small>**Special case**: `as.factor()` will be important later for telling R when numbers are actually encodings and not numeric values.  (E.g., 1 = High school grad; 2 = College grad; 3 = Postgrad) </small>
+###
+  ```{r}
+typeof(7)
+is.numeric(7)
+is.na(7)
+```
+###  
+  ```{r}
+is.character(7)
+is.character("7")
+is.character("seven")
+is.na("seven")
+```
+  
+###Variables
+  
+  We can give names to data objects; these give us **variables**
+  
+  A few variables are built in:
+```{r}
+pi
+```
+
+Variables can be arguments to functions or operators, just like constants:
+```{r}
+pi*10
+cos(pi)
+```
+
+###Assignment operator
+Most variables are created with the **assignment operator**, `<-` or `=`  
+
+```{r}
+time.factor <- 12
+time.factor
+time.in.years = 2.5
+time.in.years * time.factor
+```
+###
+The assignment operator also changes values:
+```{r}
+time.in.months <- time.in.years * time.factor
+time.in.months
+time.in.months <- 45
+time.in.months
+```
+###
+  
+- Using names and variables makes code: easier to design, easier to debug, less prone to bugs, easier to improve,  and easier for others to read
+
+- Avoid "magic constants"; use named variables
+
+- Use descriptive variable names
+  - Good: `num.students <- 35`
+  - Bad: `ns <- 35 `
+
+  
+  
+###  The workspace
+  What names have you defined values for?
+```{r}
+ls()
+```
+
+Getting rid of variables:
+```{r}
+rm("time.in.months")
+ls()
+```
+
+###First data structure: vectors
+  
+- Group related data values into one object, a **data structure**
+  
+- A **vector** is a sequence of values, all of the same type
+
+- `c()` function returns a vector containing all its arguments in order
+```{r}
+students <- c("Sean", "Louisa", "Frank", "Farhad", "Li")
+midterm <- c(80, 90, 93, 82, 95)
+```
+
+- Typing the variable name at the prompt causes it to display
+
+```{r}
+students
+```
+
+###Indexing
+- `vec[1]` is the first element, `vec[4]` is the 4th element of `vec`
+```{r}
+students
+students[4]
+```
+- `vec[-4]` is a vector containing all but the fourth element
+```{r}
+students[-4]
+```
+
+
+###Vector arithmetic
+  
+Operators apply to vectors "pairwise" or "elementwise":
+```{r}
+final <- c(78, 84, 95, 82, 91) # Final exam scores
+midterm # Midterm exam scores
+midterm + final # Sum of midterm and final scores
+(midterm + final)/2 # Average exam score
+course.grades <- 0.4*midterm + 0.6*final # Final course grade
+course.grades
+```
+
+###Pairwise comparisons
+Is the final score higher than the midterm score?
+```{r}
+midterm 
+final
+final > midterm
+```
+
+Boolean operators can be applied elementwise:
+```{r}
+(final < midterm) & (midterm > 80)
+```
+
+###Functions on vectors
+Command | Description
+--------|------------
+`sum(vec)` | sums up all the elements of `vec`
+`mean(vec)` | mean of `vec`
+`median(vec)` | median of `vec`
+`min(vec), max(vec)` | the largest or smallest element of `vec`
+`sd(vec), var(vec)` | the standard deviation and variance of `vec`
+`length(vec)` | the number of elements in `vec`
+`pmax(vec1, vec2), pmin(vec1, vec2)` | example: `pmax(quiz1, quiz2)` returns the higher of quiz 1 and quiz 2 for each student
+`sort(vec)` | returns the `vec` in sorted order
+`order(vec)` | returns the index that sorts the vector `vec`
+`unique(vec)` | lists the unique elements of `vec`
+`summary(vec)` | gives a five-number summary  
+`any(vec), all(vec)` | useful on Boolean vectors
+
+###Functions on vectors
+```{r}
+course.grades
+mean(course.grades) # mean grade
+median(course.grades)
+sd(course.grades) # grade standard deviation
+```
+
+###More functions on vectors
+```{r}
+sort(course.grades)
+max(course.grades) # highest course grade
+min(course.grades) # lowest course grade
+```
+###Referencing elements of vectors
+```{r}  
+students
+```
+  
+  Vector of indices:
+```{r}
+students[c(2,4)]
+```
+
+Vector of negative indices
+```{r}
+students[c(-1,-3)]
+```
+
+###More referencing
+
+`which()` returns the `TRUE` indexes of a Boolean vector:
+```{r}
+course.grades
+a.threshold <- 90 # A grade = 90% or higher
+course.grades >= a.threshold # vector of booleans
+a.students <- which(course.grades >= a.threshold) # Applying which() 
+a.students
+students[a.students] # Names of A students
+```
+
+###Named components
+  
+You can give names to elements or components of vectors
+```{r}
+students
+names(course.grades) <- students # Assign names to the grades
+names(course.grades)
+course.grades[c("Sean", "Frank","Li")] # Get final grades for 3 students
+```
+Note the labels in what R prints; these are not actually part of the value
+
+###Useful RStudio tips
+Keystroke | Description
+----------|-------------
+`<tab>` | autocompletes commands and filenames, and lists arguments for functions. Highly useful!
+`<up>` | cycle through previous commands in the console prompt
+`<ctrl-up>` | lists history of previous commands matching an unfinished one
+`<ctrl-enter>` | paste current line from source window to console. Good for trying things out ideas from a source file.
+`<ESC>` | as mentioned, abort an unfinished command and get out of the + prompt
+
+<br>
+
+
+## Checkpoint: 
+Complete lab01 to check your understanding. 
+
+
+
