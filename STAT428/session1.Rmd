@@ -1,14 +1,21 @@
-# Session 1
+# Statistical Computing (I decided to drop the course after the first session; I have worked on all topics in the past)
 
 Statistics is the study of variation in output.
 
-Monte Carlo methods:
+## Monte Carlo methods:
 One form of Monte Carlo methods: P(event) = (number of times the simulated event is favorable) / (total number of trials)
 
-Resampling methods:
+## Resampling methods:
 - We have only one sample. We cannot sample again from the population.
 - Sampling repeatedly from the sample that's available - resampling.
 
-Optimization:
+## Optimization:
 - Linear regression: least square
 - Maximum likelihood estimation
+
+## Prescribed Text:
+Statistical computing with R
+
+
+## Note:
+I will be reading the book even though I dropped the course. I will try to update the notes here.

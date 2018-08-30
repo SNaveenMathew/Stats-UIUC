@@ -1,0 +1,27 @@
+---
+title: "Stat 432 Homework 00"
+author: "Your name"
+date: "Aug 26, 2018"
+output: html_document
+---
+
+# Question 1
+
+We perform a linear model as asked in the assignment. 
+
+```{r}
+set.seed(1)
+x = rnorm(100)
+y = 0.5*x + 1 + rnorm(100)
+lm(y ~ x)
+```
+
+The coefficients are $\beta_0 = 0.9623$ and $\beta_1 = 0.4989$.
+
+# Question 2
+
+To visualize the data, we use the following plot:
+
+```{r fig.width=4.5, fig.height=4.5}
+plot(y ~ x, xlab = "Input", ylab = "Output", main = "A simple plot", pch = 19)
+```

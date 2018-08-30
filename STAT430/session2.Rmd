@@ -1,0 +1,60 @@
+Tick data: [link](https://www.investopedia.com/terms/t/tick.asp)
+
+Market sell and buy, limit sell and buy (only buy or sell when price is better - at least as good as the price we have)
+
+Natural tendency is to sell at higher price and buy at lower price.
+
+Mechanics of moving price up and down: buy => price decreases, sell => price increases.
+
+\( \delta p_t \) is the change in price
+
+Imbalance at T:
+\(\theta_T = \sum{t=1,T}{b_t}\)
+
+\(b_t\) is \(b_{t-1}\) if price does not change. It is \(-1\) if price decreases. Else it is \(1\)
+
+Tick imblanace bar accumulates \(b_t\) from t=1 to T
+
+Volume imbalance bar accumulates \(b_t \times v_t\) from t=1 to T
+
+Frequent trading, market makers make sure that the tick imbalance is not high.
+
+Trading data can be viewed as price vs ticks, not necessarily price vs time. Time window is used to calculate max_price, min_price, etc. Different time windows are used in general.
+
+Averaging over the window can be used to calculate \(E[T] = E_0[\theta _t]/(P[b_t=1] - P[b_t=-1])\). This is the expectation of window size. However, it is difficult to estimate because of the low values of tick imbalance bar for any window size
+
+Large orders from large traders are split into multiple small orders with smaller ticks. There are possibilities of ticks from other traders in between that may have opposite sign. If the accumulated value over a time period is large, then we may be able to identify large traders.
+
+- In practice calculate \(E_0[T]\) as exponentially weighted average over T values from prior bars
+- P[b_t=1] as exponentially weighted average of proportion of buy ticks from prior bars
+
+Try to sample more when there is uncertainty (lower number of windows)
+
+\(v_t\) is always positive. It does not depend on sell or buy
+
+We can get structured data from tick (unstructured) data. Eg: bars from ticks
+
+- Reducing sample size will increase training set size, but this may not always lead to better results using ML
+- Use samples with more 'informative' features
+
+Methods for sampling:
+
+- Use fixed step size
+- Sample randomly from U[a,b]
+- Other methods
+
+For the up-side:
+
+\(S_t^+\) is used to capture (and accumulate) upward movement. When \(S_t^+\) is larger than h, reset \(S_t^+\)
+
+Initial value of \(S_t^+\) is 0.
+
+Similar idea can be considered for the down side.
+
+\(S_t=max(S_t+, S_t^-)\)
+
+1 bp = 1 base point = $0.0001
+
+Tolerance = 4000 => change of $0.4 will lead to trigger
+
+Based on tolerance if we set triggers, we can identify windows between triggers and get features from the window and setup a supervised learning problem
