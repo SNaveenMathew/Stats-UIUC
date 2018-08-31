@@ -1,0 +1,65 @@
+---
+title: "Session 3"
+author: "Naveen Mathew Nathan S."
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+# Session 3
+
+`optim` function can be used to optimize a known funcitonal form of parameters.
+
+Parameters should be the first parameter of the function that is passed to `optim`
+
+## Linear Regression
+
+```{r, eval = FALSE, echo = TRUE}
+# eval = FALSE only generates the code without running it
+# echo = FALSE removes the code chunk from the report itself!
+loss <- function(b, X, Y) {
+  return(((Y - X %*% b)^2)/length(Y))
+}
+```
+
+Scope of a variable in a function is only within the funciton. Global values will not be changed unless we use <<-
+
+```{r}
+a = 1:10
+
+changea <- function(a) {
+  a <- a + 1
+  return (a)
+}
+
+changea(a)
+a
+
+changea1 <- function(a) {
+  a <<- a + 1
+  return (a)
+}
+
+changea1(a)
+a
+
+changea2 <- function(env) {
+  env$a <- env$a + 1
+  return (env$a)
+}
+
+changea2(env = environment())
+a
+
+changea3 <- function(b) {
+  a <- a+1
+  return(a)
+}
+
+changea3(b = 1:5) # Picks up 'a' from the previous level environment and computes the function
+```
+
+- To list all objects in current environment: `ls()`
+- To remove an object from current environment: `rm('variablename')`
+
+- `foreach` package creates a copy of the environment in each worker node
