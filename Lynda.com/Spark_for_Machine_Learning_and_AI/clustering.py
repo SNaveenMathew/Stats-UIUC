@@ -29,4 +29,11 @@ vectorized_cluster_df = vectorAssembler.transform(cluster_df)
 
 # K-means clustering
 kmeans = KMeans().setK(3).setSeed(1)
-kmeans_model = kmeans.
+kmeans_model = kmeans.fit(vectorized_cluster_df)
+km_centers = kmeans_model.clusterCenters()
+
+# Hierarchical clustering (Bisecting K-means)
+from pyspark.ml.clustering import BisectingKMeans
+bkmeans = BisectingKMeans().setK(3).setSeed(1)
+bk_model = bkmeans.fit(vectorized_cluster_df)
+bk_centers = bk_model.fit(vectorized_cluster_df)
