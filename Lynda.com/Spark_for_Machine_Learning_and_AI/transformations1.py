@@ -21,7 +21,7 @@ features_df = spark.createDataFrame([
 print(features_df.take(1))
 
 # Reading the data set
-emp_df = spark.read.csv("./Exercise Files/Ch01/01_04/employee.txt", header=True)
+emp_df = spark.read.csv("./Exercise_Files/Ch01/01_04/employee.txt", header=True)
 
 # Examining the data frame
 print(emp_df.schema)
@@ -32,14 +32,14 @@ print(emp_df.columns)
 print(emp_df.take(5))
 
 # Number of rows
-print(emp_df.count())
+# print(emp_df.count())
 
 # Sampling
 sample_df = emp_df.sample(False, 0.1) # Takes approx 10% sample
 
 # Filtering
 emp_mgr_df = emp_df.filter("salary >= 100000")
-print(emp_mgr_df.count())
+# print(emp_mgr_df.count())
 
 # Choosing one column
 print(emp_mgr_df.select("salary").show())
@@ -58,7 +58,7 @@ print(normalized_features_df.take(1))
 from pyspark.ml.feature import StandardScaler
 
 feature_scaler = StandardScaler(inputCol = "features", outputCol = "scaled_features", withStd = True, withMean = True)
-std_model = feature_scale.fit(features_df)
+std_model = feature_scaler.fit(features_df)
 scaled_feature_df = std_model.transform(features_df)
 print(scaled_feature_df.take(1))
 
@@ -69,8 +69,9 @@ b_data = [(900.0,), (-100.0,), (132.0,)]
 b_df = spark.createDataFrame(b_data, ["features"])
 b_df.show()
 
-bucketizer = Bucketizer(splits = splits, inputcompile = "features", outputCol = "bucketized_features")
-bucketed_df = bucketizer.transform(features_df)
+bucketizer = Bucketizer(splits = splits, inputCol = "features", outputCol = "bucketized_features")
+bucketed_df = bucketizer.transform(b_df)
+bucketed_df.show()
 
 # Text tokenization
 from pyspark.ml.feature import Tokenizer
@@ -81,7 +82,7 @@ sentence_df = spark.createDataFrame([
     (3, "Also supports pipelines")
 ], ["id", "sentence"])
 
-sent_tokenizer = Tokenizer(intpuCol = "sentneces", outputCol = "words")
+sent_tokenizer = Tokenizer(inputCol = "sentence", outputCol = "words")
 sent_tokenized_df = sent_tokenizer.transform(sentence_df)
 
 print(sent_tokenized_df.show())
