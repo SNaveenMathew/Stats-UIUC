@@ -1,0 +1,34 @@
+0.57 +_ 0.274
+
+0.57 +_ 0.263
+
+0.57 +- 0.231
+
+88 + qt(0.05, 24) * 2 # 84.57824
+dt((83-88)/(10/5), 24) # 0.02187564
+
+chisq.test()
+
+df <- data.frame(c1 = c(15,8,1), c2=c(32,29,20), c3=c(18,23,25), c4=c(5,18,22))
+chisq.test(x = df) # p-value = 0.0001366 -> not independent
+
+0.53 +_ 0.05164641 # 0.260286083009/10 * qt(p = 0.975, df = 99)
+
+Actual      Positive          | Negative
+            
+Predicted   
+Positive    True positive 95  | False positive 5
+
+Negative    False negative    | True negative
+
+dt(5/(4/sqrt(14)), df = 13) # beta = 0.0003913545 One sided test as alternative hypothesis is mu > 0
+power = 1-0.0003913545
+
+for(n in 2:200) {
+  print(c(n, (5-0)/(4/sqrt(n)) > qt(0.9, n-1)))
+}
+
+
+dt((0.48-0.44)/((0.48*0.52)/50), 2499)
+
+dt((713/1484 - 0.5)/((713/1484 * 771/1484)/sqrt(1484)), df = 1483)
