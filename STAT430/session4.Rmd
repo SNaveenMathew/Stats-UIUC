@@ -1,0 +1,38 @@
+# Session 4:
+
+0 is starting time point, 1 is end time point of the feature window
+
+Overlap between (t_i,0, t_i,1) and (t_j,0, t_j,1) => y_i not IID. We can skip bars that have overlap by postponing the bars. This leads to loss of information.
+
+# Concurrent at time t
+
+At least one common return between y_i and y_j. How many y_i and y_j cross (t-1, t).
+
+Number of concurrent labels can be counted for a particular (t-1, t)
+
+This leads to a matrix with T (tick bars) rows and i columns. i_max = I = number of feature bars
+
+Concurrence at time t can be calculated using c_t = \sum_{i=1}^{I}{1_{t,i}} -> rowsum of the matrix
+
+Uniqueness of label i at time t: u_{t,i} = 1_{t,i}/c_t -> colsum of the matrix.
+
+Average uniqueness of label i: Average of uniqueness over all t. Higher uniqueness => lower degree of overlap between that label and other labels
+
+For time series data the overlap will be very large => very small uniqueness (see histogram)
+
+## Bagging:
+
+Sample with replacement => 2/3 unique levels, some will overlap
+
+If K < I non-overlapping features => as we sample K times, we will have very few unique labels
+
+## Sequential bootstrap
+\delta_j is average probability of sampling from label j
+
+Steps:
+
+If label 2 is selected, calculate uniqueness of label 2 with label 1, label 2, ..., label I. It is uniqueness of 2nd label given that 2nd label is already sampled
+
+Since we are doing resampling with replacement, we may end up sampling (with) a vector of labels in 1 iteration. So some labels can be sampled more number of times than the number of iterations
+
+Improves uniqueness of samples

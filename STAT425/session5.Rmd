@@ -1,0 +1,53 @@
+# Session 5
+
+## Full model
+
+```{r}
+library(faraway)
+data("savings")
+print(head(savings))
+full_model <- lm(sr ~ ., data = savings)
+print(summary(full_model))
+```
+
+F-statistic DOF: p, n-p'
+
+## Reduced model
+```{r}
+r_model1 <- lm(sr ~ dpi + ddpi, data = savings)
+print(summary(r_model1))
+```
+
+dpi seems to be significant now at \(\alpha = 0.1\), whereas it was insignificant in the full model
+
+## Model selection
+
+```{r}
+print(anova(r_model1, full_model))
+```
+
+The F-test p-value is less than \(\alpha\). This suggests that the full model is required
+
+## F-stat extension
+
+F-stat of regression is equivalent to testing \(\pmb{\beta} = \pmb{0}\)
+
+```{r}
+null_model <- lm(sr ~ 1, data = savings)
+print(anova(null_model, r_model1))
+print(summary(r_model1))
+```
+
+F = t^2
+```{r}
+model2 <- lm(sr ~ ddpi, data = savings)
+summary(model2)
+```
+
+Observe that \(F-stat = {t-stat_{ddpi}}^2\)
+
+```{r}
+
+```
+
+## Session 6

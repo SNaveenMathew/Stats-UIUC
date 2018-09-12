@@ -1,0 +1,39 @@
+# Session 5
+
+## K-means
+
+```{r}
+data("iris")
+library(ggplot2)
+set.seed(1)
+model <- kmeans(x = iris[, 1:4], centers = 3, nstart = 10000)
+plot(iris[, c(1,3)], col = model$cluster, pch = 20)
+table(model$cluster, iris$Species)
+```
+
+### Issues with k-means:
+
+#### Variable selection:
+```{r}
+model <- kmeans(x = iris[, 3:4], centers = 3, nstart = 10000)
+plot(iris[, c(3,4)], col = model$cluster, pch = 20)
+table(model$cluster, iris$Species)
+```
+
+Previous model was built using all the variables, yet it performs worse than k-means with just 2 variables.
+
+#### Choosing k:
+
+If research question is clear, we can define the number of clusters before running k-means
+
+Otherwise: Plot #clusters vs tot.withinss and choose the "elbow" point
+
+```{r}
+wss <- c()
+for(k in 2:10) {
+  model <- kmeans(x = iris[, 3:4], centers = k, nstart = 10000)
+  wss <- c(wss, model$tot.withinss)
+}
+
+plot(2:10, wss, type = 'l')
+```

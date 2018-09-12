@@ -1,0 +1,41 @@
+# Hierarchical clustering
+
+Treat each (n) point as individual clusters. Combine 2 clusters: most reasonable is to choose the closest points and put them together in 1 cluster. Now we have n-1 clusters. Again, combine the 2 closest clusters. Repeat till 1 cluster. For this, we need to define the "distance" between two groups of points. Combine the clusters that have minimum distance defined by:
+
+- Complete linkage: max(all distances between individual points)
+- Single linkage: min(all distances between individual points)
+- Average linkage: average(all distances between individual points)
+
+We can run hierarchical clustering by knowing only the pairwise distances. We don't need the original matrix of points. Hierarchical clustering does not construct the cluster means => we just have to pass the dissimilarity matrix (Euclidean distance matrix). Diagonal, symmetric matrix => only $\frac{n \times (n-1)}{2}$ values required
+
+## Visualization: Dendrogram
+
+Dendrogram: First points that are combined into 1 cluster will be in the bottom of the dendrogram. Dendrogram plots height of the split vs splits. Use `hclust` package in R for constructing and visualizing hierarchical clustering.
+
+## Iris example
+
+```{r warning = FALSE, message = FALSE}
+library(cluster)
+data(iris)
+dissimilarity_matrix <- dist(iris[, 1:4])
+hierarchical_model_complete <- hclust(dissimilarity_matrix, method = "complete")
+plot(hierarchical_model_complete) ## Looks like 4 clusters
+hierarchical_model_average <- hclust(dissimilarity_matrix, method = "average")
+plot(hierarchical_model_average, hang = -1) ## Looks like 3 clusters
+```
+
+
+## Visualization: Another
+
+```{r}
+library(ape)
+plot(as.phylo(hierarchical_model_average), type = "unrooted", cex = 0.6, no.margin = TRUE)
+```
+
+
+## Heatmap
+
+Higher value => Red
+Lower value => Yellow
+
+Not very useful if I don't order the variables correctly. We need to identify groups of rows and groups of columns.

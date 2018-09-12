@@ -1,0 +1,55 @@
+## Random variable
+
+Random variable: ({V}, {pdf/cdf/pmf})
+
+Definition: \(X ~ f \) where \(f\) is the probability density/mass function or define \(X ~ F\) in terms of the cdf
+
+Therefore, \(F(x) = \int_{-\infty}^{x}{f(y) dy}\)
+
+## Generating random variables
+
+Generate a sequence of numbers from a specified distribution. Output is random (sample). Hence generating a random variable is a Monte Carlo method. Each element in the random sample follows the same distribution. Also, each element in the random sample is generated independently.
+
+## Generating random sample from Normal distribution
+
+`rnorm(n)` is used to generate random sample of length `n` from `Normal(0,1)`.
+
+- rnorm
+- pnorm => F
+- dnorm => f
+- qnorm => quantiles
+
+`R` has functions to compute F, f and quantiles for most distributions:
+
+- Exponential
+- Binomial
+- ...
+
+```{r}
+set.seed(1) # Makes sure that the experiment is repeatable
+# Don't set a seed if the output should be truly random
+x <- rnorm(n = 1000, mean = 0, sd = 1)
+plot(ecdf(x), col = 'red')
+points(x = x, y = pnorm(x), pch = '.', col = 'green')
+legend("topright", legend = c("Empirical CDF", "Actual N(0,1) CDF"), col = c("red", "green"))
+```
+
+Algorithm that computationally generates random numbers is 'predictable' for a fixed seed. Hence, the random numbers that are generated computationally are 'pseud-random'
+
+Uniform random number generation is sufficient to generate 
+
+Congruential algorithms are iterative algorithms:
+
+\(u_{i+1} = (a \times u_{i} + c) mod m\)
+
+Ideally m should be large so that there is enough change to generate numbers between 0, m-1
+
+Choosing a, c and m appropriately will make the algorithm better
+
+For `randu` function, \(m~2^{16}\), but it was later discovered that the numbers were not really random - they were lying in finite number of hyperplanes
+
+## Generating any distribution:
+
+If \(X ~ (F, f)\) and \(U ~ Unif(0,1)\), then \(F^{-1}(U) ~ X(F, f)\)
+
+Proof: P(F^{-1}(U) <= y) = P(U <= F(y)) = F(Y), therefore Y ~ F^{-1}(U)
