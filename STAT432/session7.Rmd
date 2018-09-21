@@ -3,7 +3,7 @@ x <- matrix(data = 0, nrow = 100, ncol = 100)
 x[1:50, 1:50] <- x[51:100, 51:100] <- 1
 x[x==0] <- -1
 heatmap(x = x, Rowv = NA, Colv = NA, revC = FALSE)
-y <- x[sample(n = nrow(x), replace = FALSE), sample(n = ncol(x), replace = FALSE)]
+y <- x[sample(x = nrow(x), replace = FALSE), sample(x = ncol(x), replace = FALSE)]
 plot(y)
 heatmap(x = y, Rowv = NA, Colv = NA, revC = FALSE)
 heatmap(x = y, revC = FALSE)

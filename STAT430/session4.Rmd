@@ -36,3 +36,59 @@ If label 2 is selected, calculate uniqueness of label 2 with label 1, label 2, .
 Since we are doing resampling with replacement, we may end up sampling (with) a vector of labels in 1 iteration. So some labels can be sampled more number of times than the number of iterations
 
 Improves uniqueness of samples
+
+## Some other weights:
+
+1) More weightage to labels with large absolute return
+
+2) Labels with new observations should be given more weight (more weight to recent observations)
+
+
+# Fractionally differentiated features
+
+## Stationarity
+
+Parameters are independent of time (mean(t), variance(t), covariance(t, t-j) = f(j)) => weak stationarity
+
+Strict stationarity: (X_t, X_{t+j_1}, ... , X_{t_j}) has the same joint distribution for all t.
+
+H0: Process is non-stationary. Process has unit root
+
+H1: Process is stationary, no unit root
+
+PP test and ADF test have low power when the processes are stationary, but close to non-stationary. Eg: alpha = 0.95
+
+Use efficient unit root test
+urca::ur.ers
+
+Stationarity tests:
+
+KPSS test
+
+H0: Process is stationary
+
+H1: Process is non-stationary
+
+
+Typical situation:
+
+Price series: non-stationary but has memory
+
+Log returns: stationary but has no memory
+
+=> Fractionally differentiated features
+
+(1-B)^d for d not necessarily an integer
+
+If d is integer, then the coefficients drop to 0 after a point
+
+However, if d is not integer, then we can retain lot of memory by setting smaller d.
+
+d=0 => price series itself (non-stationary, ADF test insignificant)
+d=1 => price difference series (stationary, ADF test significant)
+
+Choose d such that d_min leads to stationary process in ADF test
+
+Fractional differentiated features are just an option. They may not be the best!
+
+If stationarity test (KPSS, etc) and non-stationarity test (ADF, PP, ERS, etc) don't match, there may be structure breaks in the data.
