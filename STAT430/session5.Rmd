@@ -1,0 +1,26 @@
+No information leakage even if info from test set is used for sequential bootstrap: only used for updating probability. Information is not used for creating features or outcome variable.
+
+Using `parallel` in R:
+
+```{r}
+library(parallel)
+cc <- makeCluster(detectCores() - 1)
+clusterExport(cc, c("functionnames"))
+clusterEvalQ(cc, {gc()})
+stopCluster()
+```
+
+Random forest for reducing correlation between trees:
+
+Bagging uses all features for creating splits for all trees => correlation between trees is high. Random forest randomly selects features for building a tree. Hence, the correlation between trees reduces - without increasing the variance too much. Random forest will not necessarily exhibit lower bias than individual decision trees.
+
+Boosting only keeps estimators that are better than acceptance threshold (random guess). Bagging averages over all models. Boosting gives more weight for misclassified examples, less weight for correctly classified examples.
+
+Financial data: bagging is preferred because boosting tends to overfit in practice.
+
+Purged k-fold CV: Drop examples from training set that overlap with examples in test set - don't take advantage of information leakage
+
+We do purging in k-fold CV because one/many of the k-folds will have some part of the test set in the past and some part of the train set in the future. In such cases we should avoid information leakage from past set and future train set.
+
+1) If train set is in the past, we can stop with just purging and no embargo
+2) If some part of the test set is in the past, we should use purging + embargo

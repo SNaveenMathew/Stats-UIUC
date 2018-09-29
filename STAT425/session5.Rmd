@@ -50,4 +50,5 @@ Observe that \(F-stat = {t-stat_{ddpi}}^2\)
 
 ```
 
-## Session 6
+## 24th Sep
+

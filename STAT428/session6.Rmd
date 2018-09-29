@@ -1,0 +1,19 @@
+# Monte Carlo integration:
+
+$\hat{\theta} = \int_{a}^{b}{G(x).1.dx}$ for uniform density $= \sum$
+
+For indefinite integral, eg: $\int_{1}^{\infty}{\frac{1}{x^2(x+sin(x))}} = \int_{1}^{M}{f(x)} + \int_{M}^{\infty}{f(x)}$
+
+$$\int_{M}^{\infty}{f(x)} < \int_{M}^{\infty}{\frac{1}{x^2}} = \frac{1}{M}$$
+
+Choose M large enough that the unbounded integral changes to bounded integral. Then perform Monte Carlo integration
+
+Using $f(\frac{x_1 + x_2}{2})$ is better than using $f(x_1)$ or $f(x_2)$ because error in value of integral is of the order of $(\Delta x)^2$ as $\Delta x \to 0$
+
+Monte Carlo integration is equivalent to adding up areas of rectangles
+
+# Importance sampling:
+
+Variance can be lower than standard Monte Carlo if we choose f(x) that is close to g(x) where f(x) is known:
+
+$$ \hat\theta = \frac{\sum_{i=1}^{n}{\frac{g(x_i)}{f(x_i)} f(x_i)}}{n} $$
