@@ -1,0 +1,75 @@
+# Monte Carlo integration summary:
+
+## From uniform
+
+$\theta = \int_A{g(x).1.dx}$ can be calculated by sampling from uniform distribution and calculating $E_1[g(x)] = \hat\theta = \frac{\sum_{i=1}^{m}{g(x_i)}}{m}$
+
+$$\hat{se}(\theta) = \frac{sd(g(x))}{\sqrt{m}}$$
+
+## From other distribution similar to g:
+
+$\theta = \int_A{\frac{g(x)}{f(x)}.f(x).dx}$ can be calculated by sampling from $f$ and calculating $E_f[\frac{g(x)}{f(x)}] = \hat\theta = \frac{\sum_{i=1}^{m}{\frac{g(x_i)}{f(x_i)}}}{m}$
+
+$$\hat{se}(\theta) = \frac{sd(\frac{g(x)}{f(x)})}{\sqrt{m}}$$
+
+## Importance sampling:
+
+$\theta = \int_A{\frac{g(x).f(x)}{\phi(x)}.\phi(x).dx}$ can be calculated by sampling from $\phi$ and calculating $E_\phi[\frac{g(x).f(x)}{\phi(x)}] = \hat\theta = \frac{\sum_{i=1}^{m}{\frac{g(x_i).f(x_i)}{\phi(x_i)}}}{m}$
+
+$$\hat{se}(\theta) = \frac{sd(\frac{g(x).f(x)}{\phi(x)})}{\sqrt{m}}$$
+
+### Importance sampling example:
+
+$$\theta = \int_0^1{e^{-x}.\frac{1}{1+x^2}}dx$$
+
+#### Configuration 0
+Let $\phi(x) = 1$ for simulating random variables. This is same as uniform distribution. 
+
+
+#### Configuration 1
+Let $\phi(x) = e^{-x}$ for simulating random variables. This is an exponential distribution with $lambda = 1$. Let $g(x) = \frac{1}{1+x^2}, f(x) = 1$.
+
+However, exponential distribution samples will take values > 1. Therefore, we use $\frac{f(x)g(x)}{\phi(x)}.I_{[0,1]}(x)$ as the numerator. 36.79% of the cases will be outside $[0, 1]$. Therefore, we can truncate the importance sampling function as:
+
+$$\phi(x) = \frac{e^{-x}.I_{[0,1]}(x)}{\int_0^1e^{-x}.dx} = \frac{e^{-x}.I_{[0,1]}(x)}{1-e^{-1}}$$
+
+#### Configuration 2
+Let $\phi(x) = \frac{1}{\pi.(1+x^2)}$ for simulating random variables. This is a standard Cauchy distribution. Let $g(x) = e^{-x}, f(x) = 1$.
+
+However, Cauchy distribution samples will take values > 1 and < 0. Therefore, we use
+
+$$\phi(x) = \frac{\frac{1}{\pi.(1+x^2)}.I_{[0,1]}(x)}{\int_0^1\frac{1}{\pi.(1+x^2)}}$$
+
+<br></br>
+
+## Stratified Sampling:
+
+Divide the support into smaller groups and apply simple Monte Carlo on each strata.
+
+$$\theta = \int_a^b{g(x)dx} = \int_a^{b_1}{g(x)dx} + \int_{b_1}^{b_2}{g(x)dx} + ... + \int_{b_n}^b{g(x)dx}$$
+
+Therefore, $\hat\theta = \sum_{i=1}^{n+1}{\hat\theta_{i}}$, where $\hat\theta_i = \int_{b_{i-1}}^{b_i}{g(x)dx} = \sum_{j=1}^{m_i}{\frac{g(x_j)}{m_i}}$, where $b_0 = a$ and $b_{n+1} = b$
+
+Apply importance sampling instead of simple Monte Carlo to reduce variance.
+
+<br></br>
+
+## Antithetic variables:
+
+If X, Y are negatively correlated, $\frac{cov(X + Y)}{2} = \frac{1}{4}(var(X) + var(Y) + 2.cov(X,Y))$
+
+### How to generate negatively correlated variables?
+
+#### Inversion:
+U ~ Unif(0, 1)
+V = 1 - U
+
+#### Symmetry:
+
+If f is symmetric and X ~ f, we can generated antithetic variables by using $f \sim X$ and $g(\mu-X) \sim 2\mu-X$ and use the same sampled uniform random example to calculate $F^{-1}(x)$ and $G^{-1}(x)$ using same example
+
+Choose a $\phi(x)$, calculate $F^{-1}(U)$ and $F^{-1}(B)$ and use the generated samples for calculating the mean
+
+#### Requirement
+
+$\int h(x)f(x) dx$ such that $h(x)$ is a monotone
