@@ -1,0 +1,54 @@
+Tree can predict in presenece of missing values by using surrogate models built based on correlation with variable that has missing values.
+
+## Impurity:
+
+Uncertainty in predicting outcome
+
+### Gini (CART):
+
+$$Gini = \sum_{i=1}^{K}p_i(1-p_i) = 1 - \sum_{i=1}^{K}p_i^2$$
+
+If for some k, we have $p_k = 1$, then $p_i = 0\ \forall i \ne k$
+
+$Score = Gini(A) - \frac{|A_L|}{|A|}Gini(A_L) - \frac{|A_R|}{|A|}Gini(A_R)$
+
+Larger => More benefit by splitting
+
+Since A does not change in a split, we have $min\Bigg(\frac{|A_L|}{|A|}Gini(A_L) + \frac{|A_R|}{|A|}Gini(A_R)\Bigg)$
+
+Try this for all different variables and all different cut points to calculate score. Choose the variable-knot combination with largest score.
+
+### Variance
+
+$$Var(A) = \frac{1}{|A|}\sum_{i = 1}^{n}(x_i - \bar{x})^2$$
+
+### Shannon entropy (ID3/C4.5):
+
+$$Entropy(A) = -\sum_{i=1}^{K}p_ilog(p_i)$$
+
+
+Similar to histogram estimator because for 'similar' examples we predict the same value (mean of training outcomes of 'similar' examples). Similar: fall in the same node of the tree
+
+## Splitting on categorical variable:
+
+If there are C factor levels, there are $2^{C-1}-1$ ways of splitting into 2 groups. If C > 10, the package splits into 2 subsets randomly. If C > 53, the package does not work.
+
+## Comparing histogram estimator and CART:
+
+CART puts more splits in areas where the function changes drastically and lesser splits in areas where the function has small curvature.
+
+Let us assume we have an underlying function that has small curvature. Let us assume we have a histogram estimator and a CART. Benefit of splitting more in histogram estimator: reduction in bias, but at the cost of increase in variance. Since the underlying function curvature is small, reduction in bias may not cancel increase in variance. Therefore, CART splits are better.
+
+Let us assume we have an underlying function that has large curvature. Let us assume we have a histogram estimator and a CART. Benefit of splitting more in histogram estimator: reduction in bias, but at the cost of increase in variance. CART already has smaller bias because of finer splits.
+
+This means that CART usually has better performance (bias-variance tradeoff) than kernel methods such as histogram estimator. CART can be considered as method with adaptive kernel
+
+## Penalized:
+
+$$C_\alpha(T) = \sum_{all terminal nodes A of T}|A|.Gini(A) + \alpha |T| = $$
+
+## Bagging:
+
+Bootstrap (sampling) aggregation: Build CART on each bootstrap sample and average the predictions (do not average the models, just average the predictions).
+
+It is known that CART is very unstable. By performing bootstrap sampling and averaging, the variance will be reduced (each bootstrap sample is independent, therefore their model predictions will not be highly correlated)

@@ -46,9 +46,15 @@ summary(model2)
 
 Observe that \(F-stat = {t-stat_{ddpi}}^2\)
 
-```{r}
 
+## Trying Box-Cox transformation
+
+```{r}
+library(MASS)
+bc <- boxcox(model2)
 ```
 
-## 24th Sep
+```{r}
+bc$x[which.max(bc$y)]
+```
 
