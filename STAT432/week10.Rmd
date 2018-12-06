@@ -45,10 +45,34 @@ This means that CART usually has better performance (bias-variance tradeoff) tha
 
 ## Penalized:
 
-$$C_\alpha(T) = \sum_{all terminal nodes A of T}|A|.Gini(A) + \alpha |T| = $$
+$$C_\alpha(T) = \sum_{all\ terminal\ nodes\ A\ of\ T}|A|.Gini(A) + \alpha |T|$$
 
 ## Bagging:
 
 Bootstrap (sampling) aggregation: Build CART on each bootstrap sample and average the predictions (do not average the models, just average the predictions).
 
 It is known that CART is very unstable. By performing bootstrap sampling and averaging, the variance will be reduced (each bootstrap sample is independent, therefore their model predictions will not be highly correlated)
+
+If $\hat{f}$ is independent, $var(\frac{1}{B}\sum\hat{f}(x)) = \frac{1}{B}var(\hat{f}(x))$
+
+## Random Forest:
+
+Ho's method: To remove correlation, we select random subset of features to build trees
+
+Random forest: Select only `mtry` variables for each split (different from Ho's method which uses subset of features for the whole tree). This leads to less correlation between $\hat{f}$
+
+Node size is the (minimum) sample size at each terminal node
+
+Main tuning parameters are node size and mtry. Ntree should be sufficiently large if p is large and mtry is small because total number of combinations of trees is very large
+
+Prediction: $\hat{f}(x) = \frac{1}{B}\sum_{b=1}{B}\hat{f_b}(x) = \frac{1}{B}\sum_{b=1}^{B}\frac{\sum_{i=1}^{n}I(x_i \in A_b)y_i}{\sum_{i=1}^{n}I(x_i \in A_b)} = \frac{\sum_{i=1}^{n}w_iy_i}{\sum_{i=1}^{n}w_i}$
+
+Points in same split have higher weights. If model does not split on a variable, then the kernel weight for a test example does not depend on that variable - advantageous compared to Gaussian kernel which gives equal importance to all dimensions. This way random forest reduces dimensions in kernel perspective.
+
+### Variable importance:
+
+Out-of-bag data: data left out while performing bootstrap sampling. This will be used as testing data for the tree - can be used to estimate test error.
+
+From the oob set, choose a variable $X_j$ and replace the values with random noise. Compute the predictions of random forest. Calculate the change in error.
+
+$VI_{bj} = \frac{Err_j^b}{Err_0^b} - 1, Err_j^b\text{ is oob error after randomizing }X_j; Err_0^b\text{ is oob error wihtout randomizing the predictor}$
