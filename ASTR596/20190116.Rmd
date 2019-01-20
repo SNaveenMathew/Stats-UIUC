@@ -1,0 +1,18 @@
+David Spergel (Science 2015)
+
+Early time - Cosmological perturbation theory (CMB) - linear regime
+Late time - non-linear N-Body simulation
+
+Lambda CDM model - standard model of cosmology
+
+# Missing satellite problem:
+
+sub-halos in (CDM - cold dark matter) simulation not found in observations
+
+- Strong lensing characterized by Einstein ring
+- Thin lens approximation used based on distance between distant star - lensing object - light receiver
+
+# Identification of gravitational lensing
+
+- Flux ratio anomalies
+- Gravitational imaging (focus of this seminar)
