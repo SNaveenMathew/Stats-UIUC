@@ -1,0 +1,95 @@
+---
+title: "Untitled"
+output: pdf_document
+---
+
+Score approach:
+
+```{r}
+prop.test(x = 0, n = 25, correct = F)$conf.int
+```
+
+Clopper-Pearson "exact" approach (16.6.1):
+
+```{r}
+binom.test(x = 0, n = 25)$conf.int
+```
+
+# Random vector
+
+Z = $(Z_1, Z_2, ..., Z_m)$ where $Z_i$ are random variables
+
+Mean vector:
+$E(Z) = E(Z_1), E(Z_2), ..., E(Z_m)$
+
+Covariance matrix:
+$cov(Z) = (cov(Z_i, Z_j))$
+
+# Multiple parameters:
+
+Likelihood: $l(\beta)$, log-likelihood: $L(\beta)$
+
+MLE: $\hat\beta = argmax(L(\beta))$
+
+Score vector: $u(\beta) = \nabla L(\beta)$
+
+Information matrix: $J(\beta) = -E(\nabla^2 L(\beta)) = -E(\frac{\partial^2 L(\beta)}{\partial L(\beta_i) \partial L(\beta_j)})$
+
+Inverse information matrix $J^{-1}(\beta)$ is asymptotic covariance matrix of $\hat\beta$
+
+Score vector has 0 mean: $E(u(\beta)) = 0$ under mild conditions
+
+$cov(u(\beta)) = J(\beta)$
+
+# Testing
+
+$H_0: \beta = \beta_0, H_a: \beta \neq \beta_0$
+
+Wald test:
+
+$(\hat\beta-\beta_0)^TJ(\hat\beta)(\hat\beta-\beta_0) \sim_{H_0} \chi^2_{df}$
+
+from $z_w = \frac{\hat\beta-\beta_0}{1/\sqrt{2\hat\beta}}$
+
+$\implies z_w^2 = \frac{(\hat\beta-\beta_0)^2}{1/2\hat\beta} = (\hat\beta-\beta_0)2\hat\beta(\hat\beta-\beta_0)$ 
+
+Likelihood-ratio test:
+$-2(L(\beta_0)-L(\hat\beta)) \sim_{H_0} \chi^2_{df}$
+
+Score test:
+From $Z_s = \frac{u(\beta_0)-0}{\sqrt{2\beta_0}} \implies Z_s^2 = \frac{u(\beta_0)^2}{2\beta_0}$
+
+Translates to $u(\beta_0)^T J^{-1}(\beta) u(\beta_0) \sim_{H_0} \chi^2_{df}$
+
+
+Wald statistic:
+
+$\frac{\hat\beta_k - \beta_{k0}}{SE(\hat\beta_k)} ~ N(0,1)$
+
+# Multinomial inference:
+
+`n` independent observations of `c` possible categories as outcomes, let $n_j$ be number of observed in category j, $\pi_j$ bet unknown probability of category j.
+
+$\sum n_j = n, \sum pi_j = 1$
+
+Joint density: $\prod_{j=1}^{c} \pi_j^{n_j}$
+
+Log likelihood: $\sum n_j log(\pi_j) \implies \hat\pi_j = n_j/n$'
+
+# Testing multinomial hypothesis:
+
+$H_0: \pi_j = \pi_{j0}, j = 1, 2, ..., c; H_a: otherwise$
+
+Likelihood ratio :
+
+$G^2 = -2 ln(\Lambda) = 2\sum n_j ln(n_j/\mu_j) \sim_{H_0} \chi^2_{c-1}$ because if c-1 parameters are known, the other parameter is just 1 - sum(others)
+
+$G^2$ of the form $2 \sum observed * ln(observed/expected)$
+
+Score approach gives Pearson chisquare test:
+
+$X^2 = \sum \frac{(n_j-\mu_j)^2}{\mu_j} ~ \chi^2_{c-1}$ is of the form $\frac{(observed-expected)^2}{expected}$
+
+$G^2$ and $X^2$ are asymtotically equivalent, but $G^2$ converges slower than $X^2$. Approximation tends to be poor if n/c < 5
+
+# Example: Benford's law

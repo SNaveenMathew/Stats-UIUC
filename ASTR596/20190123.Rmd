@@ -1,0 +1,3 @@
+Pixel data is sent as input to GNG. Growing neural gas output is fed to hierarchical clustering - forms patches of pixels. The result contains morphology, color, intensity of pixels, etc.
+
+Connected component labelling is used to put clusters together to form bigger structures.
