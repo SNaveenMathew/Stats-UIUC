@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Tests for equality of proportions"
 output: pdf_document
 ---
 
