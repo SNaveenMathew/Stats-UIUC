@@ -91,5 +91,3 @@ Score approach gives Pearson chisquare test:
 $X^2 = \sum \frac{(n_j-\mu_j)^2}{\mu_j} ~ \chi^2_{c-1}$ is of the form $\frac{(observed-expected)^2}{expected}$
 
 $G^2$ and $X^2$ are asymtotically equivalent, but $G^2$ converges slower than $X^2$. Approximation tends to be poor if n/c < 5
-
-# Example: Benford's law

@@ -1,5 +1,103 @@
 ---
-title: "Untitled"
+title: "Contingency Table"
 output: pdf_document
 ---
 
+# Example: Benford's law
+
+Observed:
+
+\begin{center}
+ \begin{tabular}{| c | c | c | c | c | c | c | c | c | c |} 
+ \hline
+ \textbf{Digit} & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\ [0.5 ex]
+ \hline
+ \textbf{Frequency} & 26 & 7 & 9 & 6 & 4 & 1 & 2 & 5 & 0 \\ [1ex] 
+ \hline
+\end{tabular}
+\end{center}
+
+n = 60
+
+Benford's law:
+$p(X = d) = log_{10}(1+\frac{1}{d})$
+
+Expected:
+
+```{r}
+expected <- 60 * log(1 + 1/(1:9))
+observed <- c(26, 7, 9, 6, 4, 1, 2, 5, 0)
+print(expected)
+```
+
+```{r Likelihood_ratio_test}
+G2 <- 2 * sum(observed * ifelse(observed > 0, log(observed/expected), 0))
+print(G2)
+```
+
+```{r Pearson_chi-sq_test}
+chisq.test(x = observed, p = expected/sum(expected))
+```
+
+$E(n(x = 9)) < 5 \implies Warning$
+
+
+# Contingency table
+
+X has I categories, Y has J categories.
+
+Contingency table:
+
+[Contingency table](cont_table.png)
+
+$\pi_{ij} = P(X\ in\ row\ i,\ Y\ in\ column\ j)$
+
+$\pi_{i+} = \sum_{j}P(X\ in\ row\ i,\ Y\ in\ column\ j) = P(X\ in\ row\ i)$
+
+$\pi_{+j} = \sum_{i}P(X\ in\ row\ i,\ Y\ in\ column\ j) = P(Y\ in\ column\ j)$
+
+Conditional probability: $\pi_{j|i} = \frac{pi_{ij}}{\pi_{i+}}$ sum to 1 over j, no necessarily over i.
+
+X = true status (yes/no)
+
+Y = test result (positive, negative)
+
+$\pi_{1|1} = p(positive|yes) = sensitivity$
+
+$\pi_{2|2} = p(negative|no) = specificity$
+
+Types of errors:
+- (No, positive) -> false positive
+- (Yes, negative) -> false negative
+
+## Descriptive statistics
+
+$n_{ij}$ is observed number in ith row, jth column
+
+Margins: $n_{i+} = \sum_j n_{ij}$, $n_{+j} = \sum_i n_{ij}$
+
+$p_{ij} = \frac{n_{ij}}{n}$
+
+$p_{i+} = \sum_j p_{ij}$ estimates $\pi_{i+}$
+
+$p_{+j} = \sum_i p_{ij}$ estimates $\pi_{+j}$
+
+$p_{j|i} = \frac{p_{ij}}{p_{i+}} = \frac{n_{ij}}{n_{i+}}$ estimates $\pi_{j|i}$
+
+Independence:
+
+$\pi_{ij} = \pi_{i+} \pi_{+j} \implies \pi_{j|i} = \frac{\pi_{i+} \pi_{+j}}{\pi_{i+}} = \pi_{+j} \forall i,j$. That means knowing X tells us nothing about Y
+
+If X is not random: $\pi_{j|i} = \pi_{+j} \forall i,j$ is called homogeneity.
+
+# Sampling models
+
+Possible joint distribution for counts in I x J table:
+
+**Poisson**
+
+$Y_{ij} = count\ in\ cell\ (i,j) \sim Poisson(\mu_{ij})$ with $Y_{ij}$s indepedent.
+
+**Multinomial**
+
+$N_{ij} = count\ in\ cell\ (i,j)$; $\{N_{ij}\} \sim multinomial(n, \{\pi_{ij}\})$
