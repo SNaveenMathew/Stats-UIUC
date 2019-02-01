@@ -1,0 +1,92 @@
+---
+title: "Tests of homogeneity"
+output: pdf_document
+---
+
+## Estimate of relative risk:
+
+$$\hat\theta = \frac{n_{11}n_{22}}{n_{12}n_{21}}$$
+
+**Properties of odds ratio:**
+
+- Interchanging rows or columns changes $\theta$ to $1/\theta$
+- Interchanging X and Y does not change $\theta$ - helps in prospective and retrospective studies
+- Multiplying a row or column by constant (oversampling) does not change $\hat\theta$
+- $\theta = RR \frac{1-\pi_2}{1-\pi_1}$ (rare events => column 1 is rare. Then $\theta \sim RR$)
+
+**Remark:**
+
+- Prospective study: allows $\pi_1 - \pi_2$, RR and $\theta$ to be estimated
+- Retrospective study: only $\theta$ can be estimated (no control over X)
+
+# Conditional Association
+
+Add third category Z. How does relationship between X and Y change over different levels of Z?
+
+Eg: X = placebo vs drug, Y = cure/not, Z = age (old/young)
+
+Z is called stratification variable. In observational studies, Z is called confounding variable. Each level of Z has a **partial table** in X and Y. Level of association in each partial table is **conditional association**.
+
+**Marginal table** sums over all levels of Z. This leads to **marginal association** (ignoring Z).
+
+## Ratios:
+
+$$\theta_{ijk}$$ = expected count in row i, col j, table k
+
+**Conditional odds ratio:**
+
+$$\theta_{XY(k)} = \frac{\mu_{11k}\mu_{22k}}{}$$
+
+**Marginal odds ratio:**
+
+$$\theta_{XY(k)} = \frac{\mu_{11k}\mu_{22k}}{}$$
+
+Conditional association may exist, but marginal association may not exist.
+
+- Eg: X = gene allele from mother, Y = gene allele from father, Z = phenotype. If phenotype is dominant, it rules out the case of X and Y both being recessive.
+
+Marginal association buy no conditional association
+
+- Eg: UC Berkeley graduate school admissions
+
+Simpson's paradox: conditional is in one direction, marginal is in opposite direction
+
+- Eg: Florida multiple murder cases (death penalty)
+
+**Conditional independence given Z=k**
+
+$\theta_{XY(k)} = 1$ for all k, then X, Y are conditionally independent given Z. Not same as marginal independence.
+
+$$\pi_{ijk} = \frac{\pi_{i+k} \pi_{+jk}}{\pi_{++k}}$$
+
+Homogeneous association over Z: $\theta_{XY(1)} = \theta_{XY(2)} = ... = \theta_{XY(K)}$
+
+# R example:
+
+```{r}
+deathpenalty <- read.table("deathpenalty.txt")
+
+# Releveling
+deathpenalty <- transform(deathpenalty,
+                          DeathPenalty = relevel(DeathPenalty, "Yes"),
+                          Defendant = relevel(Defendant, "White"),
+                          Victim = relevel(Victim, "White"))
+dp <- xtabs(Freq ~ Defendant + DeathPenalty + Victim, data=deathpenalty)
+print(dp)
+print(addmargins(dp))
+
+# Flat format
+dpflat <- ftable(DeathPenalty ~ Victim + Defendant, data=dp)
+print(dpflat)
+
+# Proportions table
+print(prop.table(dpflat))
+
+# Conditional odds ratios:
+print(dp[1,1,1] * dp[2,2,1] / (dp[1,2,1] * dp[2,1,1])) # white victim
+print(dp[1,1,2] * dp[2,2,2] / (dp[1,2,2] * dp[2,1,2])) # black victim
+
+# Marginal odds ratio:
+mdp <- xtabs(Freq ~ Defendant + DeathPenalty, data=deathpenalty)
+print(mdp[1,1] * mdp[2,2] / (mdp[1,2] * mdp[2,1]))
+```

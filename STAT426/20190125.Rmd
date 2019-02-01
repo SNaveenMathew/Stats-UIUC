@@ -98,6 +98,6 @@ Possible joint distribution for counts in I x J table:
 
 $Y_{ij} = count\ in\ cell\ (i,j) \sim Poisson(\mu_{ij})$ with $Y_{ij}$s indepedent.
 
-**Multinomial**
+**Multinomial (fixed total n)**
 
 $N_{ij} = count\ in\ cell\ (i,j)$; $\{N_{ij}\} \sim multinomial(n, \{\pi_{ij}\})$

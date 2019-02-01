@@ -1,0 +1,80 @@
+---
+title: "Sampling models"
+output: pdf_document
+---
+
+# Sampling models
+
+**Independent multinomial model**
+
+In Poisson case, conditioning on table total makes it multinomial. However, since the total of all cells should be n (fixed), there is dependence in the multinomial model.
+
+Instead, assume row totals to be $n_i = n_{i+}$ (fixed)
+
+$\{N_{1j}\} \sim multinomial(n_1, \{1pi_{j|1}\})$
+...
+$\{N_{Ij}\} \sim multinomial(n_I, \{1pi_{j|I}\})$
+
+Columns are dependent as the total should be n, but the rows are independent.
+
+Eg: When J = 2, this is independent binomial sampling.
+
+$N_{11} \sim binomial(n_1, \pi_{1|1} = \pi_1)$
+
+$N_{21} \sim binomial(n_2, \pi_{1|2} = \pi_2)$
+
+$N_{11}$ and $N_{21}$ are independent. Homogeneity $\implies \pi_1 = \pi_2 = ... = \pi_I$
+
+**Hypergeometric**
+
+Both row totals and column totals are fixed.
+
+## Examples
+
+X = seat belt use (yes/no)
+Y = result of accident (fatal/non-fatal)
+
+- Use all accidents last year: Poisson (total in the table is random)
+- Sample a fixed number `n` of accidents: Multinomial (row totals are not fixed, but overall total is fixed)
+- Sample a fixed number $n_1$ of seat belts used, $n_2$ of seat belts not used: Independent multinomial (binomial)
+
+# Terminologies
+
+## Case-control study
+
+Categories of Y variable have fixed counts ($n_{+j}$ is fixed). Often **retrospective** -> X determined from past conditions. Eg: identifying causes of a disease.
+
+## Prospective study
+
+Enroll people in the study and track their progress over time
+
+- **Clinical trial**: X randomly assigned
+- **Cohort study**: X chosen by subject
+
+(use independent multinomial in each case)
+
+## Cross section study
+
+Sample from a population and record (X,Y) for each.
+
+Use multinomial when n is fixed.
+
+Clinical trial is experimental (X assigned by investigator) -> may allow causal inference; case-control, cohort and cross-sectional are observational (X not controlled by investigator)
+
+# Comparing proportions
+
+Let us assume independent binomial model (row totals: $n_1, n_2$ are fixed) in 2x2 contingency table:
+
+## Measuring in-homogeneity (dependence)
+
+- difference of proportions: $\pi_1 - \pi_2$
+- relative risk (used in study of causes of disease): $\pi_1/\pi_2$
+- odds ratio: $\theta = \frac{\pi_1/(1-\pi_1)}{\pi_2/(1-\pi_2)}$ from odds $\Omega = \frac{\pi}{1+\pi}; \pi = \frac{\Omega}{1+\Omega}$; odds ($\Omega$) is non-decreasing function of probability ($\pi$)
+
+Odds ratio is also used in multinomial model:
+
+$$\theta = \frac{\pi_{1|1}/\pi_{2|1}}{\pi_{1|2}/\pi_{2|2}} = \frac{\pi_{11}\pi_{22}}{\pi_{12}\pi_{21}}$$
+
+This ratio is also called 'cross product ratio'. Can also be used in Poisson model as:
+
+$$\theta = \frac{\mu_{11} \mu_{22}}{\mu_{12} \mu_{21}}$$
