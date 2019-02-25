@@ -1,0 +1,93 @@
+---
+title: "Generalized Linear Models - Count Response"
+output: pdf_document
+---
+
+# Count Response
+
+What if there is no maximum count? Cannot use binomial because maximum is defined by N => Poisson distribution
+
+$Y_i \sim Poisson(\mu(x_i)); E(Y_i) = \mu(x_i); var(Y_i) = \mu(x_i)$
+
+Canonical link:
+
+$ln(\mu(x_i)) = \beta_0 + \beta_1 x_1 + ... + beta_p x_p$
+
+For one variable case: $\mu(x) = e^\alpha (e^\beta)^x$. Allows to model increase, decrease and independence with x.
+
+## Example
+
+```{r}
+horseshoe <- read.table("horseshoe.txt", header = T)
+head(horseshoe)
+```
+
+Modeling $Y_i$ = number of male salellites by female i and $x_i$ = width (cm) of female i
+
+```{r}
+plot(satell ~ width, data = horseshoe)
+model <- glm(satell ~ width, family = poisson, data = horseshoe)
+summary(model)
+```
+
+$\frac{\mu(x+1)}{\mu(x)} = e^\beta = e^{0.164} = 1.18$
+
+# Rate model
+
+$\mu_i = \lambda_i t_i$ where $\lambda_i$ is the rate parameter (unknown), but $t_i$ is known.
+
+$t_i$ can be time / population / area / volume / ... such that $lambda$ is the rate parameter.
+
+$log\lambda_i = \beta_0 + \beta_1 x_1 + ... + \beta_p x_p$
+
+$log\mu_i = log\lambda_i + logt_i$, $logt_i$ is an offset to the linear predictor.
+
+## Example
+
+```{r}
+tc <- read.table("traincollisions.txt", header = T)
+head(tc)
+```
+
+$Y_i$ = number of collisions between trains and road vehicles
+
+```{r}
+model <- glm(TrRd ~ I(Year - 1975), offset = log(KM), family = poisson, data = tc)
+summary(model)
+```
+
+Rate of collisions is decreasing per year
+
+```{r}
+plot(1000*TrRd/KM ~ Year, data = tc)
+curve(1000*predict(model, data.frame(Year = x, KM = 1), type = "response"), add = TRUE)
+```
+
+# Poisson log linear models in 2x2 table
+
+$$\{Y_{ij}\} \sim indep.\ Poisson(\{\mu_{ij}\})$$
+
+\begin{center}
+ \begin{tabular}{|c | c | c |}
+ \hline
+ &x_2=1&x_2=0\\ [0.5 ex]
+ \hline
+ x_1=1&$\mu_{11}$&$\mu_{12}$\\
+ \hline
+ x_1=0&$\mu_{21}$&$\mu_{22}$\\
+ \hline
+\end{tabular}
+\end{center}
+
+Row 1: $x_1=1$, Row 2: $x_1=0$, Column 1: $x_2=1$, Column 2: $x_2=0$
+
+Log linear model: $ln(\mu_i) = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_1x_2$
+
+Plugging in values from the table:
+
+- $ln\mu_{11} = \beta_0 + \beta_1 + \beta_2 + \beta_3$
+- $ln\mu_{12} = \beta_0 + \beta_1$
+- $ln\mu_{21} = \beta_0 + \beta_2$
+- $ln\mu_{22} = \beta_0$
+
+Odds ratio: $ln\theta = ln\mu_{11} + ln\mu_{22} - ln\mu_{12} - ln\mu_{21} = \beta_3$

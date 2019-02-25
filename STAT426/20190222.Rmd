@@ -1,0 +1,65 @@
+---
+title: "Example: GLM"
+output: pdf_document
+---
+
+## Example
+
+```{r}
+snoreheart <- read.table("snoreheart.txt", header = T)
+snorefit <- glm(cbind(Disease, NoDisease) ~ Snoring, data = snoreheart, family = "binomial")
+print(summary(snorefit))
+print(deviance(snorefit))
+print(df.residual(snorefit))
+print(1 - pchisq(deviance(snorefit), df.residual(snorefit)))
+```
+
+We cannot reject the null hypothesis that the model is sufficient.
+
+```{r}
+new_scores <- c(0, 2, 4, 6) # Last score was 5 in the original data set
+snorefit2 <- glm(cbind(Disease, NoDisease) ~ new_scores, data = snoreheart, family = "binomial")
+print(deviance(snorefit2))
+print(df.residual(snorefit2))
+print(1 - pchisq(deviance(snorefit2), df.residual(snorefit2)))
+```
+
+We reject the null hypothesis that the model is sufficient.
+
+## Nested model comparison
+
+Consider GLMs $M_0$ and $M_1$ with $M_0$ nested within $M_1$ (every distribution in $M_0$ is also in $M_1$, but not vice versa)
+
+Therefore, $\mu$ is more restricted under $M_0$ than under $M_1$.
+
+Let $\hat\mu_0$ be MLE of $M_0$ and $\hat\mu_1$ be MLE of $M_1$.
+
+$H_0$: $M_0$ true vs $H_1$: $M_1$ true, but not $M_0$
+
+LRT chi-squared statistic: $-2(L(\hat\mu_0; y)-L(\hat\mu_1; y)) = -2(L(\hat\mu_0;y)-L(y;y))-(-2(L(\hat\mu_1;y)-L(y;y))) = D(y; \hat\mu_0)-D(y; \hat\mu_1)$
+
+Deviance decreases as the model becomes larger. Similar to sum of squares in linear regression.
+
+df = effective number of parameters in $M_1$ - effective number of parameters in $M_0$
+
+Reject $H_0$ if $G^2(M_0|M_1)=D(y; \hat\mu_0)-D(y; \hat\mu_1) > \chi^2_{df}(\alpha)$
+
+Assuming $M_1$ is not too close to the saturated model, the approximation holds true even if the counts are less than 5.
+
+## Profile likelihood CIs
+
+If Wald CIs are not reliable, 
+
+$M_0(\beta_0) =$ same model, except $\beta$ is fixed at $\beta_0$, df = 1
+
+Then LRT tests $H_0: \beta = \beta_0; H_a: \beta \neq \beta_0$
+
+Looks like this should be repeated for each value of $\beta_0$, but there are computational simplifications that can be used with just one $\beta_0$
+
+## Example
+
+```{r}
+horseshoe <- read.table("horseshoe.txt", header = T)
+model <- glm(satell ~ color + spine + width + weight, family = poisson, data = horseshoe)
+summary(model)
+```

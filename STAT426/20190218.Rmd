@@ -1,0 +1,64 @@
+---
+title: "Information Matrix and GLM"
+output: pdf_document
+---
+
+## Fisher information matrix
+
+$I = \frac{\partial^2L(\beta)}{\partial\beta_h\partial\beta_j}$
+
+For GLM, $I = X^TWX$, $w_i = (\frac{\partial\mu_i}{\partial\eta})^2\frac{1}{var(Y_i)}$
+
+## Example: Logistic regression
+
+$\mu_i = E(Y_i) = n_i\pi_i; var(Y_i) = n_i\pi_i(1-\pi_i)$
+
+$\frac{\partial\mu_i}{\partial\eta_i} = \frac{\partial\mu_i}{\partial\pi_i}\frac{\partial\pi_i}{\partial\eta_i} = n_i (\frac{\partial\eta_i}{\partial\pi_i})^{-1} = n_i(\frac{1}{\pi_i} + \frac{1}{1-\pi_i})^{-1} = n_i\pi_i(1-\pi_i)$
+
+Thus, $w_i = (n_i\pi_i(1-\pi_i))^2.\frac{1}{n_i\pi_i(1-\pi_i)} = n_i\pi_i(1-\pi_i)$
+
+## Wald inference:
+
+$\hat\beta \sim N(\beta, I^{-1})$
+
+Asymptotic variance: $I^{-1} = (X^TWX)^{-1}$
+
+$\hat\beta_j$ is asymptotically normal with variance $\hat var(\hat\beta) = I^{-1}$
+
+Estimated $\hat{cov}(\hat\beta) = (X^TWX)^{-1}$
+
+$z_w = \frac{\hat\beta_j-\hat\beta_{j0}}{SE(\hat\beta_j)}$
+
+## Deviance
+
+$L(\mu; y)$ = GLM log likelihood in terms of $\mu$
+
+$L(\hat\mu; y)$ -> substituting
+
+$L(\mu=y;y) \ge L(\hat\mu; y)$ because $\mu = y$ maximizes L in natural exponential.
+
+Unrestricted case with $\mu = y$ is called **saturated model**.
+
+### Binary case
+
+$D(y; \hat\mu) = -2(L(\hat\mu; y) - L(\mu=y; y)) \ge 0$. This is a LRT chi-square statistic for $H_0:$ GLM is correct vs $H_a:$ the GLM is incorrect, but saturated model is correct.
+
+df = # means in sat. model - # params in GLM = N - (p + 1)
+
+### Poisson case
+
+$D(y; \hat\mu) = 2\sum_i y_i ln(y_i/\hat\mu_i)$
+
+- Chi-square approximation adequate if $\mu_i$ are sufficiently large.
+- Formulas apply for log-linear rate models also; $\hat\mu_i = \hat\lambda_i t_i$
+
+### Binomial case
+
+For any GLM, link function can be written as:
+
+$D(y; \hat\mu) = 2\sum_i y_i ln(y_i/\hat\mu_i) + 2\sum_i(n_i-y_i)ln((n_i-y_i)/(n_i-\hat\mu_i))$, where $\hat\mu_i = n_i\hat\pi_i$
+
+- Chi-square approximation adequate if $\mu_i = n_i \pi_i$ and $n_i-\mu_i = n_i(1-\pi_i)$ are sufficiently large.
+- Never valid for $n_i = 1$. Therefore, chi-square approximation never works for ungrouped data. Therefore, deviance is completely useless even if we use bootstrap.
+
+Note: for 2x2 table independent binomial model under homogeneity $(\pi_1=\pi_2)$, $D(y;\hat\mu)$ is $G^2$ for testing homogeneity. $G^2(M)$ = model M's deviance

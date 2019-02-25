@@ -1,0 +1,83 @@
+---
+title: "Tests for independence / homogeneity"
+output: pdf_document
+---
+
+```{r}
+belief <- read.table("degreebelief.txt")
+belief$Degree <- factor(belief$Degree, levels = c("None", "HighSch", "College"))
+(btable <- xtabs(Freq ~ Degree + Belief, belief))
+(muhat <- outer(margin.table(btable, 1), margin.table(btable, 2)))/sum(btable) # Takes outer product of vectors giving \hat\pi_{i+}\hat\pi_{+j}
+```
+
+# Pearson chi-square test:
+
+```{r}
+(X2.test <- chisq.test(btable, correct = F))
+```
+
+# LRT
+
+```{r}
+(G2 <- 2 * sum(btable * log(btable / muhat)))
+1 - pchisq(G2, df = 10)
+```
+
+# Residuals
+
+## Pearson
+
+```{r}
+X2.test$residuals
+```
+
+## Standardized residuals
+
+```{r}
+X2.test$stdres
+```
+
+# Mosaic plot
+
+```{r}
+mosaicplot(btable, shade = T)
+```
+
+
+# Fisher exact test
+
+Test based on hypergeometric distribution
+
+Fixing row totals and column totals (therefore table total is also fixed)
+
+In 2x2 table the degrees of freedom is 1. So we can focus on just 1 element. Say $N_{11}$. Under null hypothesis of independence, $N_{11}$ is conditionally hypergeometric
+
+$$P_{H_0}(N_{11} = t) = \frac{{n_{1+} \choose t} \times {n_{2+} \choose n_{+1}-t}}{{n \choose n_{+1}}}$$
+
+- $H_{a1}: \theta > 1$ for $N_{11}$ larger than expected. $P_{H_0}(N_{11} \ge t_0)$
+- $H_{a1}: \theta < 1$ for $N_{11}$ smaller than expected. $P_{H_0}(N_{11} \le t_0)$
+- $H_0: \theta = 1$ for $N_{11}$ is as expected
+
+Comments:
+
+- Can use mid p-values
+- `fisher.test` in R, can be extended to IxJ tables with some computational difficulties
+
+# Ordinal variables
+
+Departure from independence are monotone: higher levels of X are observed with higher/lower levels of Y
+
+Procedure:
+
+- Assign numerical values (scores) to categories of X and Y (ask an expert)
+- Calculate sample correlation
+- Reject $H_0$: independence if sample correlation is far away from 0
+
+# Introduction to generalized linear models
+
+Regression model of the form $Y = \beta_0 + \beta_1x_1 + ... + \beta_px_p + \epsilon = E(Y) + \epsilon$ is not appropriate if Y is binary or count.
+
+## Generalized linear models
+
+- Random component: distribution of responses. Assumed to be from natural exponential family of the form $f(y_i;\theta_i) = a(\theta_i)b(y_i)exp(y_iQ(\theta_i))$. $Q(\theta_i))$ is the natural parameter.
+- Fixed component: 

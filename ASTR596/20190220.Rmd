@@ -1,0 +1,66 @@
+---
+title: "VAE in astronomy"
+output: pdf_document
+---
+
+# Autoencoder
+
+Input (x) -> Encoder ($g_\phi$) -> Bottleneck (Z) -> Decoder ($f_\theta$) -> Reconstructed input (x')
+
+Loss + regularization
+
+## Example: anomaly detection
+
+Plot in z space, points that are similar will be closer in z space.
+
+## Example: image compression
+
+Compress 220x220x3 RGB images to vector of 50 dims (2000x compression). Now for a query image find similarity in 50 dim space. However, galaxy angle is also encoded.
+
+## Example: Data compression
+
+Sparse representation of photometric redshift PDFs: preparing for petascale astronomy.
+
+## Example: Denoising
+
+Feed noisy data as input to autoencoder, but output will be the clean data.
+
+# Variational autoencoder
+
+Force z to follow a certain distribution
+
+Map x to distribution p(z|x), sample from $z_i \sim p(z)$, generate fake data using p(x,z) = p(x|z) p(z)
+
+Too expensive for large number of possibilities for z. So approximate q_\lambda(z|x) \approx p(z|x) such that q_\lambda(z|x) \sim N(z; \mu_\lambda(x), \sigma_\lambda(x))
+
+Loss: KL divergence: KL(p||q) = -\sum p(x) log(\frac{q(x)}{p(x)})
+
+Can be modified to ELBO loss by manipulating terms = Reconstruction (-E_q[log(x|z)]) + regularization (forcing q(z|x) to be normal).
+
+Variational autoencoder: map inputs to $log(\sigma^2), \mu$ using dense connections. Then sample to get z and pass that to decoder.
+
+Reparameterization is used to make the gradient possible to calculate.
+
+Since $\epsilon$ is not in control and the latent space is unconstrained or unsegmented, we have not constrained what we sample.
+
+**GAN with very powerful discriminator**
+
+- generates very realistic images
+- but it is vary hard to train
+- not really a sampling method
+- hard to evaluate likelihood of data p(x)
+- usually underfits
+
+Main goal is to fool the discriminator
+
+# $\beta$ VAE: disentanged VAE
+
+Regularization term has a weight of $\beta$ instead of 1. Tries to ensure that every dimension in latent space is different.
+
+On labeling the latent space, we can sample from a particular label in the latent space.
+
+Other variants: Multimodal VAE
+
+Unconstrained sampling, very small \beta - lot of structures, less control over modalities
+
+- Future work: can redshift, star formation rate and other relevant features be encoded as a modality

@@ -1,0 +1,11 @@
+Metallicity is estimated using spectral lines
+
+Traditional method: spectral energy distribution. But very complicated.
+
+Features: 5 SDSS bands (u,g,r,i,z), stellar mass, photometric redshift, 10 independent colors, 10 independent squared colors.
+
+2 samples: redshift 0.09-0.12, 0.12-0.25
+
+Stellar mass and photometric redshift are less significant. Feature importance varies by redshift, but few features turn out to be important for multiple redshifts.
+
+Dataset for CNN: 38" x 38" (arcsec) or 128 x 128 pxl.

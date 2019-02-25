@@ -1,0 +1,51 @@
+---
+title: "Generalized Linear Models"
+output: pdf_document
+---
+
+Link function: monotonic, differentiable such that $g(\mu_i) = \eta_i$, $\mu_i=E(Y_i)$
+
+Canonical link: $g(\mu_i) = logit(\pi(x_i)) = Q(\theta_i) = \beta_0 + \beta_1 x_{1i} + ... + \beta_p x_{pi}$s
+
+Natural exponential family => distribution completely determined by mean (sufficient, complete statistic). Variance of $Y_i$ is a function of $\mu_i$
+
+# Binary regression
+
+$Y_i ~ Bernoulli(\pi_i)$
+
+\begin{equation}
+  f(y_i;\pi_i)=
+  \begin{cases}
+    1-\pi_i, & \text{if}\ y_i=0 \\
+    \pi_i, & \text{otherwise}
+  \end{cases}
+\end{equation}
+
+$f(y_i;\pi_i)=(1-pi_i)exp(y_i log\frac{\pi_i}{1-\pi_i})$
+
+If logit link is used: logistic regression
+
+Suppose we use identity link: $\pi(x_i) = \beta_0 + \beta_1 x_{1i} + ... + \beta_px_{pi}$; but $\pi_i$ should be in (0, 1).
+
+Suppose we use log link: $ln(\pi(x_i)) = \beta_0 + \beta_1 x_{1i} + ... + \beta_px_{pi}$; but $log(\pi_i)$ is in $(-\infty, 0)$.
+
+Canonical link allows who range of real numbers. $\implies \pi(x) = \frac{e^{\beta_0 + \beta_1 x_{1} + ... + \beta_px_{p}}}{1+e^{\beta_0 + \beta_1 x_{1} + ... + \beta_px_{p}}}$. For single predictor case: $\pi(x)=0.5$ for $x=-\frac{\alpha}{\beta}$
+
+There are other link functions that can map from (0, 1) to $(-\infty, \infty)$
+
+# Poisson regression
+
+$Y_i ~ Poisson(\mu_i)$
+
+$f(y_i;\mu_i)=\frac{\mu_i^{y_i}e^{-\mu_i}}{y_i!}$
+
+$a(\mu) = e^{-\mu}; b(y) = \frac{1}{y!}; Q(\mu) = ln\mu$
+
+## Fitting GLM:
+
+Maximum likelihood estimation:
+
+- Newton-Raphson method
+- Fisher scoring (numerically bit more stable even though it's a little slower)
+
+`glm()` uses Fisher scoring by default.

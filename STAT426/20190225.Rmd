@@ -1,0 +1,107 @@
+---
+title: "Example: GLM"
+output: pdf_document
+---
+
+## Example
+
+```{r}
+horseshoe <- read.table("horseshoe.txt", header = T)
+model <- glm(satell ~ color + spine + width + weight, family = poisson, data = horseshoe)
+summary(model)
+```
+
+```{r}
+pchisq(model$deviance, model$df.residual)
+```
+
+**Note:** Looks like there is lack of fit in the data. Therefore estimates and levels of significance may by incorrect.
+
+**Variance - covariance matrix**
+
+```{r}
+vcov(model)
+```
+
+**Rebuilding model**
+
+```{r}
+model0 <- glm(satell ~ color + weight, family = poisson, data = horseshoe)
+summary(model0)
+```
+
+**Likelihood ratio test**
+
+```{r}
+anova(model0, model, test = "Chisq")
+```
+
+**Choosing variable to drop (LRT)**
+
+```{r}
+drop1(model, test = "Chisq")
+```
+
+Chisq test can be used as an alternative to Wald test. Compare `LRT` with chisq with 1 df.
+
+$H_0:$ full model is required (variable is significant) vs $H_1:$ reduced model is sufficient (variable is insignificant).
+
+**Score test**
+
+```{r}
+anova(model0, model, test = "Rao")
+```
+
+**Choosing variable to drop (Score)**
+
+```{r}
+drop1(model, test = "Rao")
+```
+
+**Profile likelihood CI**
+
+```{r}
+confint(model)
+```
+
+# Residuals
+
+Used to examine lack of fit: patterns of departure from model and "outliers".
+
+- Raw residuals: $y_i - \hat\mu_i$
+- Pearson residuals: $\frac{y_i - \hat\mu_i}{\sqrt{\nu(\hat\mu_i)}}$. Squaring and adding will give generalized Pearson chi square.
+- Eg: for Poisson: $\frac{y_i - \hat\mu_i}{\sqrt{\hat\mu_i}}$
+- Deviance residuals: $d_i = -2(L(\hat\mu_i; y_i)-L(y_i;y_i))$ is always negative; $D(y, \hat\mu) = \sum_{i=1}^{N}d_i$
+- ith deviance residual: $sign(y_i-\hat\mu_i)\sqrt{d_i}$; sum of squares of deviance residuals gives deviance
+- Neither Pearson nor deviance residuals are standardized. Variance tends to be less than 1
+- Standardized residuals: $r_i = \frac{y_i-\hat\mu_i}{\sqrt{\nu(\hat\mu_i)(1-\hat h_i)}} = \frac{e_i}{\sqrt{1-\hat h_i}}$; $h_i$ is the ith leverage = ith diagonal element of leverage matrix: $\hat H = \hat W^{1/2} X (X^T\hat WX)^{-1} X^T \hat W^{1/2} = \hat W^{1/2} X I^{-1} X^T \hat W^{1/2}$
+
+Leverage is a measure of potential influence.
+
+## Residuals in example
+
+**Raw**
+
+```{r}
+plot(residuals(model, type = "response"))
+```
+
+Raw residuals look skewed.
+
+**Pearson residuals**
+
+```{r}
+plot(residuals(model, type = "pearson"))
+(X.2 <- sum(residuals(model, type = "pearson")^2))
+model$deviance
+```
+
+We expect 5% to be outside $\pm 2$ range. Looks like there is some issue with the model.
+
+**Deviance residuals**
+
+```{r}
+plot(residuals(model, type = "deviance"))
+(X.2 <- sum(residuals(model, type = "deviance")^2))
+model$deviance
+```

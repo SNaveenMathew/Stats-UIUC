@@ -1,0 +1,81 @@
+---
+title: "Confidence intervals for measure of association"
+output: pdf_document
+---
+
+# Confidence intervals for measure of association
+
+Odds ratio:
+
+$$\hat\theta = \frac{n_{11}n_{22}}{n_{12}n_{21}}$$
+
+$(1-\alpha)$ CI for $ln\theta$
+
+$$ln\hat\theta \pm z_{\alpha/2}\sqrt{\frac{1}{n_{11}}+\frac{1}{n_{12}}+\frac{1}{n_{21}}+\frac{1}{n_{22}}}$$
+
+Difference of proportions $\pi_1 - \pi_2$:
+
+$\hat\pi_1 - \hat\pi_2 \pm z_{\alpha/2}\sqrt{\frac{\pi_1(1-\pi_1)}{n_1} + \frac{\pi_2(1-\pi_2)}{n_2}}$
+
+Relative risk:
+
+ln RR:
+
+$$lnr \pm z_{\alpha/2}\sqrt{\frac{1-\pi_1}{y_1} + \frac{1-\pi_2}{y_2}}$$
+
+# Usage in R:
+
+```{r}
+sb <- data.frame(Use=c("No","No","Yes","Yes"),
+                 Injury=c("Fatal","Nonfatal","Fatal","Nonfatal"),
+                 Freq=c(54,10325,25,51790))
+(sb_xtabs <- xtabs(Freq ~ Injury + Use, sb))
+( OR.est <- sb_xtabs[1,1] * sb_xtabs[2,2] / (sb_xtabs[1,2] * sb_xtabs[2,1]) )
+logOR.CI <- log(OR.est) + c(-1,1) * qnorm(1-0.05/2) * sqrt(sum(1/sb_xtabs))
+(exp(logOR.CI))
+
+```
+
+# Delta method:
+
+CI of transformed mean:
+
+If $\sqrt{n}(T_n - \theta) \to N(0, \sigma^2)$
+
+$$g(T_n) = g(\theta) + g'(\theta)(T_n-\theta)$$
+
+$$\implies \sqrt{n}(g(T_n)-g(\theta)) \approx g'(\theta)\sqrt{n}(T_n-\theta) \to^{d} N(0, (g'(\theta))^2\sigma^2)$$
+
+So CI of $g(\theta)$ is $g(T_n) \pm z_{\alpha/2}\frac{|g'(T_n)|\sigma}{\sqrt{n}}$
+
+If $\sigma^2 = \sigma^2(\theta)$, replace it as $\sigma^2 = \sigma^2(T_n)$
+
+## Example:
+
+$Y \sim Binomial(\pi, n)$, $T_n = \hat\pi = \frac{Y}{n}$
+
+Calculate CI of log-odds: $g(\pi) = logit(\pi) = ln(\pi/(1-pi))$
+
+CLT: $\sqrt{n}(\hat\pi-\pi) \to N(0, \pi(1-\pi)); g'(\pi) = \frac{1}{\pi(1-\pi)}$
+
+Asymptotic variance of $log(\hat\pi)-log(\pi)$ is $\frac{1}{n\pi(1-\pi)}$
+
+CI: $logit(\hat\pi) \pm z_{\alpha/2}\sqrt{\frac{1}{n\hat\pi(1-\hat\pi)}}$
+
+# Testing independence/homogeneity
+
+Assuming I x J table from multinomial sample (fixed total n):
+
+$\pi_{ij}$ = P(X in row i, Y in row j)
+
+Total number of non-redundant parameters: IJ - 1
+
+Want to test for independence (independent multinomial): $H_0: \pi_{ij} = \pi_{i+}pi_{+j}$
+
+Number of non-redundant parameters: (I-1) + (J-1)
+
+$\mu_{ij} = E(N_{ij}) = n\pi_{ij} = n\pi_{i+}\pi{+j}$
+
+MLE of $\hat\mu_{ij} = n\hat\pi_{i+}\pi_{+j} = \frac{n_{i+}n_{+j}}{n}$
+
+(Assuming no empty rows or columns)

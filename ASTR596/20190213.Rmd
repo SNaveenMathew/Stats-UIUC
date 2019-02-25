@@ -1,0 +1,28 @@
+---
+title: "Solar flare prediction"
+output: pdf_document
+---
+
+# Paper 1: solar flare prediction using SVM
+
+Input data: Vector magnetograms. Black: north (polarity lines directed outward), white: south (polarity lines directed inward). Strength and direction of magnetic field are represented in the data [HMI](http://hmi.stanford.edu/magnetic/). SHARP: identfies AR (active region) patches. SHARP gives 25 predictors, but last 12 (least important) variables are dropped using F-score.
+
+Has class imbalance problem: ~300 positive vs ~5000 negative. Adjust class weights to match these numbers.
+
+True skill statistic (TSS): $\frac{TP}{TP+FN} - \frac{FP}{FP+TN}$ will be in the range [-1, 1]. Score close to 1 is good. But this treats false positives and false negatives in the same way!
+
+False positive is much better than false negative: warning for flare, but no flare is better outcome than not warning for flare, but it actually flares.
+
+Using high $\frac{C_{minority}}{C_{majority}}$ led to higher TSS (48 hour interval for prediction).
+
+# Paper 2: Line of sight magnetogram + convolutional networks
+
+Merged MDI (1996-2011) and HMI data (2011-2015). Temporal cadence and spatial resolution of HMI to make it similar to MDI.
+
+Architecture:
+
+Input -> Conv 1 with 64 filters -> ReLU -> Max pooling -> Conv 2 -> ReLU -> Max pooling -> fully connected -> output
+
+X class flare prediction seems to be much better.
+
+Also did 10 fold CV. TSS results were slightly better than from HMI data.

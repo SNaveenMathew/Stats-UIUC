@@ -1,0 +1,2 @@
+Convert original image to degraded image using PSF (point spread function) + historical noise. Deconvolution is not unique.
+

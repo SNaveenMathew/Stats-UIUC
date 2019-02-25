@@ -1,0 +1,64 @@
+---
+title: "Testing indepedence / homogeneity"
+output: pdf_document
+---
+
+## Pearson $\chi^2$ test (score test)
+
+$$X^2 = \sum_{ij}\frac{(n_{ij}-\mu_{ij})^2}{\mu_{ij}} \sim_{H_0}^. \chi^2_{(I-1)(J-1s)}$$
+
+Reject $H_0$ if $X^2 > \chi^2_{(I-1)(J-1)}(\alpha)$ -> one sided test: larger X^2 => reject $H_0$
+
+## Likelihood ratio test
+
+$$G^2 = 2\sum_{ij}n_{ij}ln(n_{ij}/\mu_{ij})$$
+
+$G^2$ is larger if null is not true. Reject $H_0$ if $G^2 > \chi^2_{}$
+
+If null is true, $X^2$ and $G^2$ are asmyptotically equivalent. For smaller counts, $\chi^2$ approximation tends to be better for $X^2$
+
+# For independent binomial model
+
+Indenependence (in multinomial) implies homogeneity (in independent binomial).
+
+$H_0: \pi_1 = \pi_2$
+
+$$z = \frac{\hat\pi_1 - \hat\pi_2}{\sqrt{\hat\pi(1-\hat\pi)(1/n_1 + 1/n_2)}}; \hat\pi = \frac{y_1+y_2}{n_1+n_2}$$
+
+z also gives direction of dependence, not just a conclusion about (in)dependence.
+
+$X^2$, $G^2$ are not necessarily compatible with Wald CI.
+
+Reject $H_0$ does not imply $\theta=1$ not in Wald CI.
+
+Score and profile likelihood CIs are compatible with Wald CI.
+
+# Nature of dependence
+
+Residuals can help in identifying nature of dependence:
+
+- Raw: $n_{ij} - \hat\mu_{ij}$ - don't have equal variance. Eg: $N \sim Poisson(\mu); var(N) = \mu$. Larger $\mu$ results in larger variance.
+- Pearson: $e_{ij} = \frac{n_{ij} - \hat\mu_{ij}}{\sqrt{\hat\mu_{ij}}} \implies X^2=\sum_{ij}e^2_{ij}$. Still don't have variance = 1. Usually variance is systematically less than 1. Asymptotic variance $\ne$ 1
+- Standardized: $r_{ij} = \frac{n_{ij} - \hat\mu_{ij}}{\sqrt{\hat\mu(1-p_{i+})(1-p_{+j})}}$. Variance is very close to 1. Asymptotic variance = 1.
+
+# Partitioning $G^2$
+
+Aspiring - myocardial infarction example:
+
+- What kind of attack does apiring affect? Remove the no infarction column and calcluate $G^2_1$. Conclusion: If one has heart attack, there is no evidence that aspirin will make it non-fatal.
+
+- Does aspirin affect occurrence of heart attack: attack = fatal + non fatal. Calculate $G^2_2$ of resulting 2x2 table.
+
+- $G^2_{total} = G^2_1 + G^2_2\text{ (exactly)}$, $G^2_1$ and $G^2_2$ are independent. Same decomposition does not hold for $X^2$
+
+# Example (degree of belief)
+
+X = highest degree obtained (None, High School, College)
+Y = belief in God (1 = lowest, 6 = highest)
+
+```{r}
+belief <- read.table("degreebelief.txt")
+belief$Degree <- factor(belief$Degree, levels = c("None", "HighSch", "College"))
+(btable <- xtabs(Freq ~ Degree + Belief, belief))
+(muhat <- outer(margin.table(btable, 1), margin.table(btable, 2)))/sum(btable) # Takes outer product of vectors giving \hat\pi_{i+}\hat\pi_{+j}
+```

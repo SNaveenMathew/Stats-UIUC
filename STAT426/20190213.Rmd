@@ -1,0 +1,48 @@
+---
+title: "Generalized Linear Models"
+output: pdf_document
+---
+
+## Example: Psych data
+
+```{r}
+psych <- read.table("psych.txt", header = T)
+model <- glm(ill ~ ., data = psych, family = binomial)
+summary(model)
+```
+
+None of the variables seem to be significant. Can we remove all? No - remove one at a time.
+
+Getting rid of collinearity by replacing with summary (sum)
+
+```{r}
+psych$rsum <- rowSums(psych) - psych$ill
+model1 <- glm(ill ~ rsum, data = psych, family = binomial)
+print(summary(model1))
+plot(psych$rsum, fitted(model1))
+```
+
+# Grouped data: binomial
+
+$Y_i ~ binomial(n_i, \pi(x_i))$
+
+R requires $Y_i$ and $n_i - Y_i$
+
+## Example: snoring data
+
+```{r}
+snoreheart <- read.table("snoreheart.txt", header = T)
+model <- glm(cbind(Disease, NoDisease) ~ Snoring, data = snoreheart, family = binomial)
+summary(model)
+with(snoreheart, plot(Snoring, Disease/(Disease + NoDisease)))
+```
+
+### For a 2x2 table:
+
+$\theta = \frac{\pi_1/(1-pi_1)}{\pi_2/(1-p2_1)} = e^{logit(\pi_1)-logit(\pi_2)}$
+
+## Other link function
+
+Let $g(\pi) = F(\pi)$ such that $F(\pi)$ is stirctly increaing cdf
+
+Using cdf $\phi$ of standard normal leads to probit regression

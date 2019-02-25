@@ -1,0 +1,5 @@
+Disease  NoDisease  Snoring
+24       1355       0        # Never
+35        603       2        # Occasionally
+21        192       4        # Nearly every night
+30        224       5        # Every night
