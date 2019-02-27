@@ -37,4 +37,4 @@ Methodology: Matrix decomposition + L1 penalty.
 Application: Detecting moving object (separate from background noise) from set of images.
 
 Methodology 3: Graphical models.
-Application: Detecting network connectivity of multiple regions of brain. Helps in detecting ALS / Parkinson's digit.
+Application: Detecting network connectivity of multiple regions of brain. Helps in detecting ALS / Parkinson's disease.

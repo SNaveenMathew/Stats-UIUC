@@ -1,0 +1,19 @@
+---
+title: "Transient detection"
+output: pdf_document
+---
+
+# HiTS
+
+HiTS takes difference of image and reference image (without transient). Positive examples are simulated using psf moved across the image.
+
+RF seems to outperform CNN in certain signal-noise-ratios (SNR), but CNN generally has higher accruacy, precision, recall and F1 than RF
+
+# Zwicky
+
+Real/bogus classifier using ExtraTrees.
+
+## Labelling
+
+- Data in Zooniverse is labelled manually. Reference, difference, direction of difference and other meta data are provided to labellers.
+- GROWTH marshall also gives a filtered list of candidate transients. But this is expected to be biased.

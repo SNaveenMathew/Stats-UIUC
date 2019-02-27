@@ -1,0 +1,84 @@
+---
+title: "Example: Residuals of GLM"
+output: pdf_document
+---
+
+## Example
+
+```{r}
+horseshoe <- read.table("horseshoe.txt", header = T)
+model <- glm(satell ~ color + spine + width + weight, family = poisson, data = horseshoe)
+summary(model)
+```
+
+### Leverages
+
+```{r}
+plot(hatvalues(model), type = "h")
+```
+
+### Standardized residuals
+
+```{r}
+plot(rstandard(model, type = "pearson")) # We use standardized residuals of pearson type, not deviance type
+```
+
+# Overdispersion
+
+var(Y) larger than expected from fitted values $\hat\mu$. Common in Poisson regression, may occur in binomial regression. Underdispersion may also happen (var(Y) smaller than expected from fitted values $\hat\mu$)
+
+Sources of overdispersion:
+
+- heterogeneity among observations (variations in $\mu$ not captured in the model)
+- lurking variables (unused predictors (possibly unknown), higher order terms)
+- correlation among observations (eg. clustering)
+
+Under GLM let var(Y) = $\nu^*(\mu)$ when $\mu = E(Y)$
+
+Overdispersion: 
+
+Remedy: quasi-likelihood with additional parameter $\phi$ that models variance separately from mean.
+
+$\nu_\phi(\mu) = \phi \nu^*(\mu)$; For Poisson GLM: $\nu_\phi(\mu) = \phi \mu$; $\phi > 1 \implies$ overdispersion
+
+$\hat\beta$ remains the same under quasi-likelihood. Therefore, $\hat\mu$ remains the same.
+
+$\phi$ is estimated as $\hat\phi = \frac{X^2}{N-p'}$ where $X^2 = \sum_i\frac{(y_i-\hat\mu_i)^2}{\nu^*(\hat\mu_i)}$
+
+Only the standard error of estimates will change: New standard error = $SE(\hat\beta_{j-new}) = \sqrt{\hat\phi}*SE(\hat\beta_{j-old}) \implies$ p-value of 2 sided test will be larger than before.
+
+```{r}
+var(rstandard(model, type = "pearson"))
+(phihat <- sum(residuals(model, "pearson")^2)/df.residual(model))
+summary(model, dispersion = phihat)
+```
+
+### Modified LRT
+
+```{r}
+drop1(model, test = "F")
+```
+
+Shows a warning because model was fit with likelihood, but requested summary uses quasi likelihood. Quasi-Poisson: quasi likelihood with a Poisson model
+
+# Fitting quasipoisson directly
+
+```{r}
+quasimodel <- glm(satell ~ width + weight + spine + color, data = horseshoe, family = quasipoisson)
+summary(quasimodel)
+```
+
+AIC requires a true likelihood, therefore it is NA.
+
+```{r}
+drop1(quasimodel, test = "F")
+```
+
+No warning!
+
+## Other remedies using true likelihood instead of quasi likelihood:
+
+- Use negative binomial instead of Poisson. It has 2 parameters, therefore it can fit mean and variance separately. It works only for overdispersion.
+- Use beta binomial can allow overdispersion in binomial case.
+
+- Another alternative: random effects (mixed models)
