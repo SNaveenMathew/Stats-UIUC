@@ -47,3 +47,58 @@ $Y_i \sim indep.binomial(n_i, \pi(x_i))$
 Example: take sum(X) and count(X) for each distinct value of Y
 
 Kernel of likelihood of grouped and ungrouped data are the same => MLE will remain the same. However, saturated models are different => deviance will be different. But deviance based comparison between nested sub-models is valid because saturated model log-likelihood cancels out.
+
+Fitted values are still going to remain the same for grouped model (does not return $n_i\hat\pi_i$).
+
+# Categorical predictor
+
+Same as independent binomial model with I x-variable categories. and columns = success, failure. Test for dependence of x and y is same as test for homogeneiry of the contingenct table.
+
+Model: $Y_i \sim indep.binomial(n_i, \pi_i)$
+
+In the context of logistic regression: I-1 indicator variables + intercept. We omit the coefficient of $X_1$
+
+Model: $logit(\pi_i) = \beta_0 + \beta_2\tilde x_2 + \beta_3\tilde x_3 + ... + \beta_I\tilde x_I$
+
+If we define $\beta_1 \equiv 0$, then $\beta_0 = logit(\pi_1)$
+
+$\beta_i = logit(\pi_i) - logit(\pi_1)$
+
+MLEs of $\pi_i$s: $\hat\pi_i = y_i/n_i$. MLE does not exist of $y_i \in \{0,n\}$ for some i
+
+Letting $\beta_1 \equiv 0 \equiv \hat\beta_1$, we find $\hat\beta_0 = logit(\hat\pi_1)$ and $\hat\beta_i = logit(\hat\pi_i) - \hat\beta_0$.
+
+This model is saturated. Therefore deviance based goodness of fit test is not available, except if the observations are semi-grouped naturally.
+
+## Testing for effect of X:
+
+$H_0: \beta_2 = \beta_3 = ... = \beta_I = 0 (\equiv \beta_1)$
+
+Use likelihood ratio test: $M_0: logit(\pi_i) = \beta_0$ vs $M_1: logit(\pi_i) = \beta_0 + \beta_i$
+
+Uses $G^2(M_0, M_1)$ which uses $G^2$ statistic for testing independence/homogeneity in Ix2 table. Alternative: Pearson $\chi^2$ test.
+
+## Ordinal X
+
+Assign some numerical scores for the ordinal levels and use the scores in logistic regression model.
+
+# Example
+
+```{r}
+malform <- data.frame(Present=c(48, 38, 5, 1, 1),
+Absent=c(17066, 14464, 788, 126, 37),
+Drinks=factor(c("0", "<1", "1-2", "3-5", ">=6")))
+malform
+```
+
+```{r}
+model <- glm(cbind(Present, Absent) ~ Drinks, data = malform, family = binomial)
+summary(model)
+```
+
+Deviance is 0 because model is saturated.
+
+```{r}
+p_0 <- malform[1,1]/(malform[1,1] + malform[1,2])
+log(p_0/(1-p_0))
+```
