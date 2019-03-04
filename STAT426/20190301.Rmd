@@ -1,0 +1,87 @@
+---
+title: "Logistic Regression"
+output: pdf_document
+---
+
+Link: logit
+
+# One variable case
+
+$\pi(x) = \frac{e^{\beta_0 + \beta_1 x}}{1+e^{\beta_0 + \beta_1 x}}$ or $\frac{\pi(x)}{1-\pi(x)} = e^{\beta_0 + \beta_1 x}$
+
+$\frac{\partial}{\partial x}\pi(x) = \beta \pi(x)(1-\pi(x))$
+
+Odd ratio at (x+1) vs x = $e^{\beta_1}$
+
+Value of x at which $\pi(x) = 0.5$ is called median effective level. In case of 1 predictor, $MEL = -\frac{\alpha}{\beta}$ if $\beta \neq 0$
+
+In toxicology: LD50: dosage at which probability of death is 50%.
+
+Other summaries:
+
+- change in $\pi(x)$ over observed range of x
+- change in $\pi(x)$ between observed upper and lower quartiles of x
+- x distance between $\pi(x) = 1/4$ and $\pi(x) = 3/4$
+
+**Remarks**
+
+- If the mean centered version of X is used, $\beta_0$ is the log-odds at the sample mean of original X.
+- Logistic regression remains valid for retrospective studies. Same $\beta$ is estimated as in a prospective study. This may not apply to binary/binomial regressions with other types of link functions
+
+## Example
+
+$\beta_0 = 1$, $\beta_1 = 2$
+
+- Find slope when $\pi(x) = 0.1$. Ans: $2 \times 0.1 \times 0.9 = 0.18$
+- Proportion by which odds of Y = 1 increases: $e^2 = 7.39 \implies$ 639% increase
+- x for $\pi(x) = 0.5$. Ans: $\beta_0 + \beta_1 \times x = log(\frac{1/2}{1/2}) = 0 \implies x = -\frac{1}{2}$
+
+## Definition
+
+Independently sampled data points: $(x_i, y_i)$ for i = 1, 2, ..., N
+
+MLE: $\hat\beta_0, \hat\beta_1$
+
+## Wald statistic
+
+$H_0: \beta_1 = 0$ vs $H_1: \beta_1 \neq 0$
+
+$\frac{\hat\beta_1}{SE(\hat\beta_1)} \sim N(0,1)$
+
+## Odds ratio
+
+Calculate $L = e^{\beta_1-z_{\alpha/2}*SE(\beta_1)}$, $U = e^{\beta_1+z_{\alpha/2}*SE(\beta_1)}$ (L, U) is CI for $e^{\beta_1}$, which is the odds ratio at (x+1) vs x.
+
+## Estimated probability
+
+$\hat{var}(logit \hat\pi (x_0)) = \hat{var}(\hat\beta_0) + x_0^2 \hat{var}(\hat\beta_1) + 2x_0\hat{cov}(\hat\beta_0, \hat\beta_1)$
+
+Wald CI of $logit(\pi)$: $logit(\hat\pi(x_0)) \pm z_{\alpha/2}SE(logit(\hat\pi(x_0)))$
+
+## Example
+
+```{r}
+horseshoe <- read.table("horseshoe.txt", header = T)
+model <- glm(y ~ width, data = horseshoe, family = binomial)
+summary(model)
+```
+
+We cannot use deviance statistic here for goodness of fit test because estimated counts can be less than 5.
+
+```{r}
+plot(y ~ width, data = horseshoe, pch = 20)
+x <- horseshoe$width
+curve(predict(model, data.frame(width = x), type = "response"), add = TRUE)
+```
+
+### Profile likelihood CI
+
+```{r}
+(plik <- confint(model))
+```
+
+### CI of odds ratio
+
+```{r}
+exp(plik[2, ])
+```

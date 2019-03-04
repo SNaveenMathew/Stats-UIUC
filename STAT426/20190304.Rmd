@@ -1,0 +1,49 @@
+---
+title: "Logistic Regression"
+output: pdf_document
+---
+
+```{r}
+horseshoe <- read.table("horseshoe.txt", header = T)
+model <- glm(y ~ width, data = horseshoe, family = binomial)
+summary(model)
+```
+
+### MEL
+
+```{r}
+-coef(model)[1]/coef(model)[2]
+```
+
+### Predict for width = 26.5
+
+```{r}
+print(predict(model, data.frame(width = 26.5))) # estimated logit
+print(predict(model, data.frame(width = 26.5), type = "response")) # estimated probability
+print(predict(model, data.frame(width = 26.5), se.fit = T)) # estimated and standard error of logit
+logit.wald <- predict(model, data.frame(width = 26.5), se.fit = T)
+(logit.wald <- logit.wald$fit + c(-1, 1) * qnorm(0.975) * logit.wald$se.fit) # Wald CI of logit
+exp(logit.wald)/(1+exp(logit.wald)) # Wald CI of probability
+```
+
+### Standard error of logit
+
+```{r}
+x0 <- 26.5
+covhat <- vcov(model)
+sqrt(covhat[1,1] + x0^2 * covhat[2,2] + 2 * x0 * covhat[1,2]) # estimated standard error of logit
+```
+
+# Goodness of fit tests
+
+- Deviance cannot be used directly in Bernoulli response because the expected counts may be < 5. Add higher order terms: change model to $\beta_0 + \beta_1 x + \beta_2 x^2$ and check whether quadratic term is significant.
+- If data has replicates (repeated x), use grouped (binomial) data to test using deviance
+- Hosmer-Lemeshow test (pseudo grouped data) - grouped version of Pearson test
+
+# Generalization
+
+$Y_i \sim indep.binomial(n_i, \pi(x_i))$
+
+Example: take sum(X) and count(X) for each distinct value of Y
+
+Kernel of likelihood of grouped and ungrouped data are the same => MLE will remain the same. However, saturated models are different => deviance will be different. But deviance based comparison between nested sub-models is valid because saturated model log-likelihood cancels out.
