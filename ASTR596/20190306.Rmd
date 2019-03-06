@@ -1,0 +1,24 @@
+---
+title: "RNN for supernovae classification"
+output: pdf_document
+---
+
+# Paper 1
+
+## Data
+
+Supernova photometric classification challenge. 21319 simulated light curves from SPCC. Instantaneous inputs for RNN: time, flux, flux error, position, dust extinction, photo-z.
+
+## Result
+
+Type 1A vs not type 1A gives better result that other efforts.
+
+# Paper 2
+
+## Data
+
+Simulated phase curves
+
+## Method
+
+Bidirectional recurrent encodings fed into random forest

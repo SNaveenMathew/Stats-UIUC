@@ -87,7 +87,7 @@ Assign some numerical scores for the ordinal levels and use the scores in logist
 ```{r}
 malform <- data.frame(Present=c(48, 38, 5, 1, 1),
 Absent=c(17066, 14464, 788, 126, 37),
-Drinks=factor(c("0", "<1", "1-2", "3-5", ">=6")))
+Drinks=factor(c("0", "1-", "1-2", "3-5", "6+")))
 malform
 ```
 
@@ -102,3 +102,10 @@ Deviance is 0 because model is saturated.
 p_0 <- malform[1,1]/(malform[1,1] + malform[1,2])
 log(p_0/(1-p_0))
 ```
+
+## Indicator matrix
+
+```{r}
+model.matrix(model)
+```
+

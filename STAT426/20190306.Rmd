@@ -1,0 +1,129 @@
+---
+title: "Logistic Regression"
+output: pdf_document
+---
+
+```{r}
+malform <- data.frame(Present=c(48, 38, 5, 1, 1),
+Absent=c(17066, 14464, 788, 126, 37),
+Drinks=factor(c("0", "<1", "1-2", "3-5", ">=6")))
+model <- glm(cbind(Present, Absent) ~ Drinks, data = malform, family = binomial)
+```
+
+## Predicted logits
+
+```{r}
+predict(model)
+```
+
+## Estimated probabilities
+
+```{r}
+fitted(model)
+```
+
+## LRT for any relationship
+
+```{r}
+drop1(model, test = "Chisq")
+```
+
+Seems like there is no effect of drinks, but test is questionable because expected counts can be less than 5. Alternative: Pearson test
+
+```{r}
+drop1(model, test = "Rao")
+```
+
+or
+
+```{r}
+chisq.test(cbind(malform$Present, malform$Absent), correct = F)
+```
+
+Still uncertain because expected counts can be small.
+
+## Assigning scores instead of ordinal variable
+
+```{r}
+malform$drink.score <- c(0, 0.5, 1.5, 4, 7)
+model2 <- glm(cbind(Present, Absent) ~ drink.score, data = malform, family = binomial)
+summary(model2)
+```
+
+Wald test suggests significant.
+
+## LRT
+
+```{r}
+drop1(model2, test = "Chisq")
+```
+
+## Pearson test
+
+```{r}
+drop1(model2, test = "Rao")
+```
+
+Looks like `drink.score` is significant.
+
+Check goodness of fit:
+
+```{r}
+1 - pchisq(deviance(model2), df.residual(model2))
+```
+
+Testing with `drink.score` focuses the test in one direction. (We expect the relationship between `Drinks` and `malform` to be monotonous => more power in test if we choose appropriate scores)
+
+# Multiple logistic regression
+
+$logit(\pi) = \beta_0 + \beta_1 x_1 + ... + \beta_p x_p$
+
+Increasing just $x_j$ by 1 increases logit by $\beta_j$ if all other variables are fixed.
+
+$e^{\beta_j} = \frac{odds\ at\ (x_j +1)}{odds\ at\ x_j}$
+
+# Models
+
+## Saturated
+
+$log\pi(x, z) = \beta_0 + \beta_1 x + \beta_2 z + \beta_3 xz$
+
+MLEs of $\beta$s can be solved explicitly from computed $\hat\pi$s
+
+## Additive
+
+$log\pi(x, z) = \beta_0 + \beta_1 x + \beta_2 z$
+
+Log odds ratio at X=1 vs X=0: $logit(\pi(1,z)) - logit(\pi(0,z)) = \beta_1$
+
+Homogeneous XY association with z.
+
+## Z only model
+
+$logit(\pi(x,z)) = \beta_0 + \beta_2 z$
+
+Conditional independence between X and Y given Z. This can happen when X -> Z -> Y, which means when conditioned on Z, Y does not depend on X. This model does not talk about marginal independence.
+
+These models are nested => test for homogeneous association by comparing additive and saturated models.
+
+# Example
+
+```{r}
+deathpenalty <- read.table("deathpenalty.txt")
+dp <- reshape(deathpenalty, v.names = "Freq", timevar = "DeathPenalty",
+              idvar = c("Defendant", "Victim"), direction = "wide")
+dp
+```
+
+Count = 0 will give problem because likelihood = 0
+
+```{r}
+model <- glm(cbind(Freq.Yes, Freq.No) ~ Defendant*Victim, data = dp, family = binomial)
+summary(model)
+```
+
+Saturated model => deviance = 0
+
+p-values ~ 1
+
+Number of iterations to converge = 22 (non-existence of MLE)
