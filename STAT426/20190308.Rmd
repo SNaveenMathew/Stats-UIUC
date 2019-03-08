@@ -1,0 +1,99 @@
+---
+title: "Logistic Regression"
+output: pdf_document
+---
+
+# Example
+
+```{r}
+deathpenalty <- read.table("deathpenalty.txt")
+dp <- reshape(deathpenalty, v.names = "Freq", timevar = "DeathPenalty",
+              idvar = c("Defendant", "Victim"), direction = "wide")
+model <- glm(cbind(Freq.Yes, Freq.No) ~ Defendant*Victim, data = dp, family = binomial)
+summary(model)
+```
+
+## Building additive model
+
+```{r}
+add.mod <- glm(cbind(Freq.Yes, Freq.No) ~ Defendant + Victim, dat = dp, family = binomial)
+summary(add.mod)
+```
+
+MLE exists. Estimated odds ratio of white vs black defendant: $e^{-0.8678} = 0.42$
+
+Wald CI: $e^{-0.8678 \pm 1.96*0.3671} = (0.20, 0.86)$
+
+Is the model adequate?
+
+```{r}
+anova(add.mod, model, test = "Chisq")
+```
+
+Additive model is sufficient (test is a bit questionable because few expected counts < 5).
+
+```{r}
+drop1(add.mod, test = "Chisq")
+```
+
+This uses additive model as full model.
+
+```{r}
+vic.mod <- glm(cbind(Freq.Yes, Freq.No) ~ Victim, dat = dp, family = binomial)
+anova(vic.mod, model, test = "Chisq") # Test for defendent effect
+```
+
+Defendant effect does not seem to be significant. This is because the test has more degrees of freedom.
+
+## Interaction plot
+
+```{r}
+interaction.plot(dp$Defendant, dp$Victim, predict(add.mod), ylab = "Estimated logit for additive model")
+interaction.plot(dp$Defendant, dp$Victim, predict(add.mod, type = "response"), ylab = "Estimated probability for additive model")
+interaction.plot(dp$Defendant, dp$Victim, predict(model), ylab = "Estimated logit for saturated model")
+interaction.plot(dp$Defendant, dp$Victim, predict(model, type = "response"), ylab = "Estimated probability for saturated model")
+```
+
+## Continuous and categorical
+
+```{r}
+horseshoe <- read.table("horseshoe.txt", header = T)
+hsmodel <- glm(y ~ factor(color) + width, data = horseshoe, family = binomial)
+summary(hsmodel)
+```
+
+Odds ratio of 1 cm increase in width (color unchanged): $e^{0.46796} = 1.60$
+
+Odds ratio of colors 5 vs 4 (going to 5 from 4): $e^{-1.32992-(-0.2238)} = 0.33$ - we don't know whether this is significant because we have not adjusted for multiple comparison.
+
+```{r}
+drop1(hsmodel, test = "Chisq")
+```
+
+Looks like color is insignificant.
+
+```{r}
+plot(y ~ width, data = horseshoe, type = "n", xlab = "Width", ylab = "Prob. satellite")
+x <- horseshoe$width
+curve(predict(hsmodel, data.frame(color = 2, width = x), type = "response"), add = T, col = "brown1", lwd = 2)
+curve(predict(hsmodel, data.frame(color = 3, width = x), type = "response"), add = T, col = "brown3", lwd = 2)
+curve(predict(hsmodel, data.frame(color = 4, width = x), type = "response"), add = T, col = "brown4", lwd = 2)
+curve(predict(hsmodel, data.frame(color = 5, width = x), type = "response"), add = T, col = "black", lwd = 2)
+```
+
+## Using color as ordinal variable
+
+```{r}
+hsmodel2 <- glm(y ~ color + width, data = horseshoe, family = binomial)
+summary(hsmodel2)
+```
+
+Color seems to be significant! This is because we are focusing the test in a particular direction (taking ordinal variables as categorical only tests significance of difference between levels).
+
+### LRT
+
+```{r}
+drop1(hsmodel2, test = "Chisq")
+```
+
+Using scores for ordinal variable increases the power of the test.
