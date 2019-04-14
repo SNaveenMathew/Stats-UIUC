@@ -1,0 +1,122 @@
+---
+title: "Model evaluation"
+output: pdf_document
+---
+
+# Correlation measure
+
+<Write notes>
+
+# Likelihood measures
+
+Consider models with maximum log likelihoods:
+
+- intercept-only: $L_0$
+- model M: $L_M$
+- saturated model: $L_S$
+
+$$\frac{L_M-L_0}{L_S-L_0} \in [0,1]$$
+
+Changes between grouped and ungrouped models because 
+
+Recommendation: Use ungrouped data format for calculation of likelihood measure.
+
+# Classification tables
+
+Let estimate of P(success | x) = $\hat\pi(x)$
+
+Classifier:
+
+\begin{equation}
+  \hat y_i=
+  \begin{cases}
+    1& \text{if}\ \hat y_i \ge \pi_0 \\
+    0 & \text{otherwise}
+  \end{cases}
+\end{equation}
+
+- $Sensitivity = P(\hat Y=1|Y=1)$: $\pi_0$ increases $\implies$ sensitivity decreases
+- $Sensitivity = P(\hat Y=0|Y=0)$: $\pi_0$ increases $\implies$ specificity increases
+
+These don't depend on marginal distribution of Y
+
+- Proportion correct = $P(Y=1|\hat Y=1)$ + $P(Y=0|\hat Y=0)$
+- Proportion incorrect = $P(Y=0|\hat Y=1)$ + $P(Y=1|\hat Y=0)$
+
+These depend on marginal distribution of Y. Therefore, cannot be estimated from restrospective sample only.
+
+- Issue: overfitting
+- Fix: leave-one-out cross validation
+
+# Receiver operating characterisc (ROC) curve
+
+Sensitivity vs 1-specificity for all possible cutoffs $\pi_0$. Usually estimated from the data.
+
+Idea: evaluate classification performance without fixing prior cutoff $\pi_0$
+
+Let us consider guessing:
+
+\begin{equation}
+  \hat y_i=
+  \begin{cases}
+    1& \text{wp}\ \pi_1 \\
+    0 & \text{wp}\ 1-\pi_1
+  \end{cases}
+\end{equation}
+
+Sensitivity = $P(\hat Y=1|Y=1) = \pi_1$
+Specificity = $P(\hat Y=0|Y=0) = 1-\pi_1$
+
+Therefore, the corresponding point in ROC curve is $(\pi_1, pi_1)$
+
+- Always non-decreasing, pass through (0,0) and (1,1)
+- often above $45^o$ line
+- AUC is also called concordance index
+
+# Example
+
+```{r}
+horseshoe <- read.table("horseshoe.txt", header = T)
+mod1 <- glm(y ~ width, data = horseshoe, family = binomial)
+cor(horseshoe$y, fitted(mod1))
+mod2 <- glm(y ~ factor(color), data = horseshoe, family = binomial)
+cor(horseshoe$y, fitted(mod2))
+mod3 <- glm(y ~ width + factor(color), data = horseshoe, family = binomial)
+cor(horseshoe$y, fitted(mod3))
+mod0 <- glm(y ~ 1, data = horseshoe, family = binomial)
+(logLik(mod1) - logLik(mod0))/(0-logLik(mod0))
+(logLik(mod2) - logLik(mod0))/(0-logLik(mod0))
+(logLik(mod3) - logLik(mod0))/(0-logLik(mod0))
+```
+
+Log likelihood of saturated model for ungrouped data is always 0
+
+## Apparent classification table
+
+- Uses same data for fitting and classification
+
+```{r}
+pi0 <- 0.5
+(tbl <- table(y = horseshoe$y, yhat = as.numeric(fitted(mod3) > pi0)))
+(sensitivity <- tbl[2,2]/sum(tbl[2,]))
+(specificity <- tbl[1,1]/sum(tbl[1,]))
+(prop.correct <- (tbl[1,1]+tbl[2,2])/sum(tbl))
+# AUC is proportion of concordant pairs + half count pairs when they are equal
+(auc <- mean(outer(pihatcv[horseshoe$y==1], pihatcv[horseshoe$y==0], ">") +
+               0.5*outer(pihatcv[horseshoe$y==1], pihatcv[horseshoe$y==0], "==")))
+```
+
+## Leave one out cross validation
+
+```{r}
+pihatcv <- numeric(nrow(horseshoe))
+for(i in 1:nrow(horseshoe)) {
+  pihatcv[i] <- predict(update(mod3, subset = -i), newdata = horseshoe[i,], type = "response")
+}
+(cv.tbl <- table(y = horseshoe$y, yhat = as.numeric(pihatcv > pi0)))
+(sensitivity <- cv.tbl[2,2]/sum(cv.tbl[2,]))
+(specificity <- cv.tbl[1,1]/sum(cv.tbl[1,]))
+(prop.correct <- (cv.tbl[1,1]+cv.tbl[2,2])/sum(cv.tbl))
+(auc <- mean(outer(pihatcv[horseshoe$y==1], pihatcv[horseshoe$y==0], ">") +
+               0.5*outer(pihatcv[horseshoe$y==1], pihatcv[horseshoe$y==0], "==")))
+```

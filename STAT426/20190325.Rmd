@@ -1,0 +1,84 @@
+---
+title: "Test with stratification variable"
+output: pdf_document
+---
+
+# Mantel-Haenszel Tests
+
+Consider a 2x2 X-Y contingency table. Example:
+
+- X = exposure (yes/no); Y = disease presence
+- X = treatment (A or B); Y = whether successful
+
+Z = age range -> may be a confounding variable.
+
+Let Z have K categories => 2x2xK table -> each stratum is 2x2 partial table
+
+Main question: Are X and Y conditionally independent given Z?
+
+If not, what is their conditional association (odds ratio)?
+
+Second question: Homogeneity?
+
+## Model based approach: Logistic regression
+
+$logit(\pi_{ik}) = \beta_0 + \beta x_i + \beta_k^Z; \pi_{ik}$
+
+Assumes homogeneous X-Y association with Z as there is no interaction term. Homogeneity => All conditional associations are the same - does not mean marginal is same.
+
+Testing conditional independence: $H_0: \beta = 0$ - Wald, likelihood ratio, score, etc.
+
+Common conditional odds ratio: $\theta_{XY(k)} = e^\beta$ for all k. We can also get transformed CI or profile likelihood CI.
+
+Testing $H_0: \beta_k^Z=0$ is equivalent to conditional independence of Y and Z given X.
+
+**Note**
+
+Homogeneous assumption can be tested with grouped data: comparison with saturated model.
+
+Homogeneity rejected => worthwhile to investigate how XY association varies between strata.
+
+## Non-model based: CMH
+
+Generalization of Fisher exact test:
+
+Consider $i^{th}$ partial table. Elements: $n_{11k}, n_{12k}, n_{21k}, n_{22k}$; Margins: $n_{1+k}, n_{2+k}, n_{+1k}, n_{+2k}, n_{++k}$.
+
+We may not have enough observations in a partial table. We should be able to combine information across strata.
+
+There is no XY association when Z=k => conditioning on $k^{th}$ partial table's marginal totals:
+
+- $\mu_{11k} = E(N_{11k}) = \frac{n_{1+k} n_{+1k}}{n_{++k}}$
+- $var(N_{11k}) = \frac{n_{1+k} n_{+1k}n_{2+k} n_{+2k}}{n_{++k}^2(n_{++k}-1)}$ based on hypergeometric distribution
+
+$CMH = \frac{(\sum_k(n_{11k}-\mu_{11k}))^2}{\sum_k var(N_{11k})}$
+
+- $\theta_{XY(k)}>1 \implies$ CMH will be high if $n_{11k}$ is higher than expected
+- $\theta_{XY(k)}<1 \implies$ CMH will be high if $n_{11k}$ is lower than expected
+
+Reject $H_0:$ conditional independence if $CMH > \chi^2_1(\alpha)$
+
+Valid for infinite number of strata - unlike logistic regression where the number of parameters tends to infinity.
+
+Mantel-Haenszel estimate:
+
+$\hat\theta_{MH} = \frac{\sum_k n_{11k} n_{22k}/n_{++k}}{\sum_k n_{12k} n_{21k}/n_{++k}} = \frac{\sum_k \hat\pi_{11k}\hat\pi_{22k}n_{++k}}{\sum_k \hat\pi_{12k}\hat\pi_{21k}n_{++k}}$
+
+reduces to $\hat r$ if K = 1
+
+Asymptotic variance of $\hat \theta_{MH}$: Agresti 6.4.5
+
+## Example:
+
+```{r}
+infectioncure <- read.table("infectioncure.txt", header=TRUE)
+head(infectioncure)
+# Response coding: 1: success, 2: failure.
+
+# Reshaping for logistic regression: successes and failures for one clinic-treatment pair should be in same row
+ic <- reshape(infectioncure, varying=list(c("success","failure")),
+              v.names="count", timevar="response",
+              idvar=c("center","treat"), direction="wide")
+
+# There are 0 counts => homogeneity must be assumed
+```

@@ -1,0 +1,49 @@
+---
+title: "Multinomial models"
+output: pdf_document
+---
+
+# Formats of data
+
+- Ungrouped codes: $y_i = j; j \in \{1, ..., J\}$ - inconvenient for mathematicla codes
+- Ungrouped indicator vectors: $y_i = (y_{i1}, ..., y_{iJ})$, where $y_{ij}$ = 1 if observation i in category j, otherwise 0. $Y_i \sim multinomial(1, \pi(x_i))$ where $\pi(x)=(\pi_1(x), ..., \pi_J(x))$. Note: $\sum_{j=1}^{J}y_{ij}=1$
+- Grouped (replicates for explanatory variables): $y_i = (y_{i1}, ..., y_{iJ})$, where $y_{ij}$ is number of responses in category j for observation i. $\sum_{j=1}^Jy_{ij} = n_i$. Then $Y_i \sim multinomial(n_i, \pi(x_i))$
+
+Likelihood: $l(\theta) \propto \prod_{i=1}^N\prod_{j=1}^J \pi_j(x_i;\theta)^{y_{ij}}$
+
+# Nominal response
+
+Consider **baseline category logistic model**
+
+$$ln\bigg(\frac{\pi_j(x)}{\pi_J(x)}\bigg) = \beta_{0j} + \beta_j^Tx; j = 1, ..., J-1$$
+
+- These are baseline (category) logits with J as baseline category
+- Parameters estimated by MLE where $\beta_{0j}$ and $\beta_j$ are unrestricted
+- $beta_{J0}=1$ and $\beta_J=0$
+
+Choice of baseline category does not affect the model
+
+$$ln(\frac{\pi_a(x)}{\pi_b(x)}) = ln(\frac{\pi_a(x)}{\pi_J(x)})-ln(\frac{\pi_b(x)}{\pi_J(x)}) = (\beta_{0a}-\beta_{0b}) + (\beta_a - \beta_b)^Tx$$
+
+# Interpretation
+
+$\frac{\pi_j(x)}{\pi_J(x)} = e^{\beta_{0k}+\beta_jx}$ is odds of Y=j conditional on {Y=j or Y=J}. We call it the odds of j relative to J.
+
+$e^{\beta_j}$ is the multiplicative change in this odds when X increases by 1.
+
+odds(y=j|A) = $\frac{P(y=j|A)}{(1-P(y=j|A))} = \frac{P(y=j|A)}{P(y=J|A)}=\frac{P(Y=j)/P(A)}{P(Y=J)/P(A)}$
+
+Response probability: $\pi_j(x) = \frac{e^{\beta_{0j} + \beta_j^T x}}{\sum_{h=1}^J e^{\beta_{0h} + \beta_h^T x}}$
+
+Remark: unlike binomial case, $\pi_j(x)$ is not necessarily monotone function of each variable X.
+
+# Estimation
+
+MLE: $\hat\beta_{01}, ..., \hat\beta_{0J}, \hat\beta_1, \hat\beta_2, ..., \hat\beta_{J-1}$
+
+Number of free parameters: (J-1)(1+p), where x has p elements
+
+Substituting MLEs:
+
+- Fitted values: $\hat\pi_{ij} = \hat\pi_j(x_i)$
+- Estimated logits: $ln(\frac{\hat\pi_j(x)}{\hat\pi_J(x)}) = \hat\beta_{0j} + \hat\beta_j^Tx$

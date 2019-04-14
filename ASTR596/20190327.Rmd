@@ -1,0 +1,34 @@
+---
+title: "Photometric redshif to quasars"
+output: pdf_document
+---
+
+# QSO:
+
+Aperiodic, red noise
+
+# LSST
+
+- Good signal to noise
+- Sufficient sampling (cadence)
+- Low systematics - same instrument in good conditions
+
+# Previous work
+
+- Pan STARRS1
+
+- Time scale and amplitude are more varied for quasars than for variable stars
+
+# Light curve image
+
+Each wavelength is treated as a separate image.
+
+- CNN architecture averages across 2, 4, 8, 16, 32 and 64 days.
+- Average 2 consecutive nights with zero padding.
+- Color and temporal data are convolved separately.
+
+# Results
+
+- Bright quasars are difficult to detect because usually catalog has dim quasars.
+- Recall independent of redshift.
+- Can identify redshift better than KNN, but requires sufficient sample to train on.

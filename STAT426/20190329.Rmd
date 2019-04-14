@@ -1,0 +1,100 @@
+---
+title: "Test with stratification variable"
+output: pdf_document
+---
+
+## Example:
+
+```{r}
+infectioncure <- read.table("infectioncure.txt", header=TRUE)
+head(infectioncure)
+# Response coding: 1: success, 2: failure.
+
+# Reshaping for logistic regression: successes and failures for one clinic-treatment pair should be in same row
+ic <- reshape(infectioncure, varying=list(c("success","failure")),
+              v.names="count", timevar="response",
+              idvar=c("center","treat"), direction="wide")
+
+# There are 0 counts => homogeneity must be assumed
+
+# Odds ratio estimates
+
+for(k in unique(ic$center))
+  with(ic[ic$center==k,], print(success[treat==1] * failure[treat==2] /
+                                  (success[treat==2] * failure[treat==1])))
+
+Treatment <- factor(c("Drug","Control")[ic$treat])
+mod <- glm(cbind(success,failure) ~ Treatment + center, family=binomial,data=ic)
+summary(mod)
+
+# Wald test suggests significant Treatment (Drug). Center also looks significant
+drop1(mod, test="Chisq")
+```
+
+**Remarks**
+
+- If we did not account for center, p-value of treatment would have been 0.1 (insignificant).
+- Assumes homogeneous association across centers => common conditional odds ratio = exp(0.7769) = 2.2. Transformed Wald interval of conditional odds ratio = $exp(0.7769 \pm 1.96*0.3067) = (1.19, 3.97)$
+- Profile likelihood CI of odds ratio: `exp(confint(mod)["TreatmentDrug", ])` = (1.2, 4.02)
+- If we didn't account for center, MLE will give odds ratio of 1.5 and confidence interval contains 1.
+
+## Test for homogeneous association
+
+### $G^2$ test
+
+```{r}
+1 - pchisq(deviance(mod), df.residual(mod))
+```
+
+### Pearson $\chi^2$ test
+
+```{r}
+1-pchisq(sum(residuals(mod, type = "pearson")^2), df.residual(mod))
+```
+
+$\chi^2$ approximation may not be valid for these tests
+
+## CMH test
+
+```{r}
+ic.array <- xtabs(count ~ treat + response + center, data = infectioncure)
+ic.array
+```
+
+Some of these tables have 0 values
+
+```{r}
+mantelhaen.test(ic.array, correct = FALSE)
+```
+
+- correct = TRUE does continuity correction
+- CI of odds ratio is (1.18, 3.87) - obtained using approximation of log of CMH estimate
+- Non-model based method is giving same result as model based method
+- CMH is valid even when logistic regression is not valid
+- Exact conditional test (generalization of Fisher exact test) if counts are too few that CMH is not valid
+
+# When MLE does not exist
+
+Logistic regression MLE is unique if it exists. Log-likelihood is strictly concave when X has full rank. But it doesn't always exist.
+
+Let $x_i^T$ be ith row of X matrix. Y is binary
+
+MLE exists if there does not exist a non-zero $b \neq 0$ such that $\forall$ i,
+
+- $b^Tx_i > 0 \implies y_i=1$
+- $b^Tx_i < 0 \implies y_i=0$
+
+If X has full rank, then existence of b above implies MLE does not exist. There is no maximum.
+
+## Special case: complete separation - MLE doesn't exist
+
+There exists b such that:
+
+- $y_i = 1 \implies b^Tx_i > 0$
+- $y_i = 0 \implies b^Tx_i < 0$
+
+Comments:
+
+- If there is no intercept, there exists a subspace in column space of X that perfectly separates the classes
+- If there is intercept, there exists a hyperplane that perfectly separates classes
+- Likelihood converges to 1

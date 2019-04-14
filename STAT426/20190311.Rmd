@@ -1,0 +1,74 @@
+---
+title: "Matrix vector representation"
+output: pdf_document
+---
+
+# Likelihood
+
+$\eta = X^T \beta$
+
+$\implies Likelihood = <something>$
+
+Score vector: $u(\beta) = \nabla L(\beta) = X^Ty - \sum_i n_i x_i \pi(x_i) = X^Ty - \sum_i x_i \mu_i = X^T(y-\mu)$
+
+Score is 0 at MLE: $X^Ty = X^T\hat\mu \implies y-\hat\mu$ is orthogonal to columns of X, just like linear regression.
+
+Information matrix: $\nabla^2 L(\beta) = -\sum_in_ix_ix_i^T\pi(x_i)(1-\pi(x_i)) = -X^TWX$ where $W = diag(n_i \pi(x_i)(1-\pi(x_i))) = diag(var(Y_i))$
+
+Fisher information: $J = E(-\nabla^2 L(\beta)) = X^TWX$, $\hat{cov}(\hat\beta) = (X^T\hat WX)^{-1}$
+
+$\hat W = diag(n_i \hat\pi_i(1-\hat\pi_i))$
+
+Standard error of $logit(\hat\pi(x)) = x^T\hat\beta$ is $\sqrt{x^T\hat{cov}(\hat\beta)x}$
+
+Wald CI of $logit(\pi(x)) = x^T\hat\beta \pm z_{\alpha/2}\sqrt{x^T\hat{cov}(\hat\beta)x}$. This can be transformed to get CI for $\pi(x)$
+
+$\nabla L(\beta)$ is useful in Newton-Raphson method for finding $\hat\beta$
+
+Estimated hat matrix: $\hat H_{at} = \hat W^{1/2} X (X^T \hat W X)^{-1} X^T \hat W^{1/2}$
+
+Diagonal elements of hat matrix give an idea about leverages.
+
+# Fitting logistic regression
+
+## Variable selection
+
+Choose simplest model that can explain variation in Y based on variation in X.
+
+Issues: collinearity among independent variables. Effect of one variable may mask the effect of another. Therefore, remove/add one variable at a time.
+
+## Stepwise procedures
+
+- Forward selection: start with no X, add 'best' variable at each step, until model stops improving
+- Backward elimination: start with all variables, remove (worst) variable at each step, stopping before model becomes inadequate
+- stepwise selection: perform forward selection, but also allow removal of variables (if appropriate) at each step
+
+**Notes:**
+
+- Consider interaction terms, not just main effects. Consider hierarchy rule
+- Categorical variable => all indicators should be added / removed simultaneously
+
+## Akaike information criterion
+
+$AIC = -2(max log likelihood - effective\ parameters)$ is equivalent to $D(y; \mu) - 2.df$ with a constant difference, where df is residual degrees of freedom.
+
+First term penalizes lack of fit. Second term penalizes complexity.
+
+Usage: Choose model with smallest AIC.
+
+## Example
+
+```{r}
+horseshoe <- read.table("horseshoe.txt", header = T)
+model <- glm(y ~ weight + width + factor(color) + factor(spine), data = horseshoe, family = binomial)
+summary(model)
+drop1(model, test = "Chisq")
+```
+
+Collinearity may be an issue.
+
+```{r}
+with(horseshoe, cor(weight, width))
+with(horseshoe, plot(weight, width))
+```
+

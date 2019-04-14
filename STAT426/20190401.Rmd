@@ -1,0 +1,47 @@
+---
+title: "MLE of Logistic Regression"
+output: pdf_document
+---
+
+MLE may not exist even if complete separation does not hold.
+
+Eg: Quasi-complete separation. Hyperplane in explanatory variable space separates Y = 0 and Y = 1, except that both cases exist on the hyperplane itself.
+
+This happens when there is a nominal categorical explanatory variable with only Y = 1 cases or Y = 0 cases.
+
+Signs that MLE doesn't exist:
+
+- numerical estimates have large magnitudes
+- standard errors are huge (z-values near 0, p values near 1)
+- some fitted  values close to $\hat\pi$ close to 0 or 1
+- iterations count is unusually large (non-convergence warning)
+
+Possible remedies if MLE doesn't exist:
+- Use likelihood test for inference
+- Penalized likelihood (Bayes)
+
+## Example
+
+```{r}
+incontinence <- read.table("incontinence.txt", header=TRUE)
+mod <- glm(y ~ x1 + x2 + x3, family=binomial, data=incontinence)
+drop1(mod, test = "Chisq")
+drop1(mod, test = "Rao")
+```
+
+## Identifying the problem
+
+- Warning: perfect separation
+- Divide by 0: quasi-complete separation - substituting model equation gives slightly different values. Score inference is approximate.
+
+# Other binary regression models
+
+Logit model may not be best fit.
+
+## Probit model
+
+Link: inverse starndard normal. Model is also called probit regression.
+
+$g(\pi)=\phi^{-1}(\pi)$
+
+Logit converges to 0 or 1 slower than probit.

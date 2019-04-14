@@ -1,0 +1,32 @@
+---
+title: "Photometric redshift"
+output: pdf_document
+---
+
+# Redshift:
+
+- Relative motion of objects
+- Expansion of universe
+- massive objects causing increase in wavelength of light
+
+# Estimation
+
+Take spectra at different times
+
+- Limited time in telescopes an spectroscopes
+- Matching SED (spectral energy density) templates
+
+Read: [FLRW Cosmology](https://en.wikipedia.org/wiki/Friedmann%E2%80%93Lema%C3%AEtre%E2%80%93Robertson%E2%80%93Walker_metric)
+
+# Paper 1
+
+[GitHub](https://github.com/IftachSadeh/ANNZ)
+
+Magnitudes of u, g, r, i, z as input. Output is photometric redshift. Colors are more important (determine shape) in determining the photometric redshift.
+
+Uses 68%ile width of bias for nearest neighbors with similar photometric properties as uncertainty of estimated redshift.
+
+# Paper 2
+
+CNN vs boosted decision trees
+

@@ -1,0 +1,93 @@
+---
+title: "Model selection"
+output: pdf_document
+---
+
+# AIC
+
+## Forward selection
+
+Better choices are the ones with lower AIC
+
+```{r}
+horseshoe <- read.table("horseshoe.txt", header = T)
+nullmod <- glm(y ~ 1, family=binomial, data=horseshoe)
+formod <- step(nullmod, ~ width * factor(color) * factor(spine), direction = "forward")
+```
+
+At the first step there is no interaction term because of hierarchy. `width` gets added first. `color` gets added in next step.
+
+## Backward elimination
+
+```{r}
+fullmod <- glm(y ~ width*factor(color)*factor(spine), data = horseshoe, family = binomial)
+step(fullmod)
+```
+
+Backward elimination produced same model as forward selection.
+
+## Stepwise selection
+
+```{r}
+step(nullmod, ~ width*factor(color)*factor(spine), direction = "both")
+```
+
+Final model is same as foward selection and backward elimination.
+
+AIC looks at predictive power of model, not necessarily significance. So we can apply LRT and check p-value as alternative to AIC for defining the best and worst terms.
+
+# Diagnostics
+
+## Residuals
+
+- Raw: $e_i = y_i - \hat{y_i}$
+- Deviance: $sign(e_i)\sqrt{d_i}$
+- Pearson: $\frac{e_i}{stderror(\hat e_i)}$
+- Standardized: $\frac{e_i}{sqrt{1-\hat h_i}}$
+
+Even standardized residuals may not be applicable to Bernoulli case because of low expected counts
+
+## Influence
+
+- Leverages measure potential influence
+
+Unlike linear regression, outlying observation in X is not necessarily high leverage.
+
+- Cook's distance: Cook's distance > 1 is usually a problem
+
+- Dfbeta: Each parameter-observation: standardized change in parameter estimate when observation is removed. Large magnitude => problem (> 1 may also mean undue influence in few cases).
+
+## Example
+
+```{r}
+hdbp <- data.frame(cases = c(3, 17, 12, 16, 12, 8, 16, 8),
+                   total = c(156, 252, 284, 271, 139, 85, 99, 43),
+                   bloodpressure = factor(c("<117","117-126","127-136",
+                                            "137-146","147-156","157-166",
+                                            "167-186",">186")))
+null_mod <- glm(cbind(cases, total-cases) ~ 1, family = binomial, data = hdbp)
+1-pchisq(null_mod$deviance, null_mod$df.residual)
+```
+
+Lack of fit is apparent.
+
+```{r}
+rstandard(null_mod, type = "pearson")
+```
+
+Notice that the BP in original data set are in increasing order.There seems to be an increasing trend in terms of BP.
+
+```{r}
+hdbp$bpscore <- c(111.5, 121.5, 131.5, 141.5, 151.5, 161.5, 176.5, 191.5)
+llmod <- glm(cbind(cases, total - cases) ~ bpscore, data = hdbp, family = binomial)
+rstandard(llmod, type = "pearson")
+```
+
+There is one observation (out of 8) that has |Pearson residual| > 2. This is a concern.
+
+```{r}
+cooks.distance(llmod)
+dfbetas(llmod)
+```
+
+We find that the second observation has high influence and high effect on coefficients.

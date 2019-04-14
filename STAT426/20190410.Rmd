@@ -1,0 +1,57 @@
+---
+title: "Multinomial models"
+output: pdf_document
+---
+
+# Example
+
+```{r}
+library(vcdExtra)
+library(VGAM)
+data(Alligator)
+alli <- reshape(Alligator, v.names="count", timevar="food",
+                idvar=c("lake","sex","size"), direction="wide")
+mod1 <- vglm(cbind(count.invert,count.reptile,count.bird,count.other,
+                   count.fish) ~ size + lake + sex,
+             family=multinomial, data=alli)
+mod2 <- vglm(cbind(count.invert,count.reptile,count.bird,count.other,
+                   count.fish) ~ size + lake,
+             family=multinomial, data=alli)
+
+# Testing whether sex is required
+# anova and drop1 functions don't work
+llrts <- deviance(mod2) - deviance(mod1)
+llrts.df <- df.residual(mod2) - df.residual(mod1)
+1 - pchisq(llrts, llrts.df) # Looks insignificant
+
+# Predictive power
+AIC(mod1)
+AIC(mod2) # Has better predictive power, so sex is not important
+
+summary(mod2)
+
+# Conditional odds of invertibrate relative to fish
+exp(1.458205)
+
+# Transformed 95% CI
+exp(1.458205 + c(-1, 1) * qnorm(0.975) * 0.395945)
+
+# Fitted values
+fitted(mod2)
+
+library(nnet)
+alli2 <- transform(Alligator, food = factor(food, levels=c("fish","invert","reptile","bird","other")))
+mod2alt <- multinom(food ~ size + lake, data=alli2, weights=count)
+summary(mod2alt)
+
+# Mosaic plot
+allitable <- xtabs(count ~ lake + sex + size + food, data=Alligator)
+mosaic( ~ food + lake + size, allitable, shade=TRUE)
+```
+
+Note:
+
+- Cannot group if quantitative variables are present
+- Model can be represented as multivariate response GLM
+- Probit-type model is possible
+- Residual degrees of freedom depends on data format: grouped data with N multinomial observations generally have (J-1)(N-(1+p)) degrees of freedom. Saturated model has (J-1) parameters per observation. Therefore saturated model has N*(J-1) free parameters.

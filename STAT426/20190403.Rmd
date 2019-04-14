@@ -1,0 +1,42 @@
+---
+title: "Probit model"
+output: pdf_document
+---
+
+If the susceptibility is normally distributed, we use a probit regression to model probability of `death`, given the outcome of experiments are `death` (1) or `no death` (0).
+
+$\pi(x) = \phi(\beta_0 + \beta_1 * x)$
+
+Alternative motivation: normal tolerance distribution.
+
+# Properties and interpretation
+
+$\frac{d\pi(x)}{dx} = \beta_1 \phi(\beta_0 + \beta_1 * x)$
+
+- Steepest at $x = -\beta_0/\beta_1$ - also the median effective level
+
+$\phi(z) = \frac{1}{\sqrt{2*\pi}}e^{-z^2/2} \implies Slope(0)=\frac{\beta}{\sqrt{2*\pi}} > $ slope of logit at $x = -\beta_0/\beta_1$, which is $\beta/4$. This means logistic regression betas are 1.6-1.8 times to get the same fit as probit if both are a good fit to the data.
+
+# Model fitting
+
+- MLE to get $\hat\beta$. Can use deviance (or Pearson $\chi^2$) to check goodness of fit.
+- Residuals and influence measures are also available. Fitted values are defined as usual.
+- Fisher scoring and Newton-Raphson algorithms are different for probit regression unlike logistic regression. Can cause software to report different *standard errors* (observed information vs Fisher information). MLEs should be same.
+
+# Inference
+
+$Y_i \sim indep.binomial(n_i, \pi(x_i))$
+
+$\phi^{-1}(\pi(x_i))=\eta_i$
+
+$\hat{cov}(\hat\beta) = (X^T\hat WX)^{-1}$
+
+$\hat W = diag\bigg(n_i\frac{(\phi(\hat\eta_i))^2}{\Phi(\hat\eta_i)(1-\Phi(\hat\eta_i))}\bigg)$
+
+Suppose we allow latent variables to have unknown variance $\sigma^2$ (arbitrary). We observe only {0, 1} outcomes.
+
+$\pi(x) = P(Y=1|x)=P(Y^*=0|x)=P(\frac{Y^*-\tilde\beta_0-\tilde\beta_1x}{}>\frac{}{}|x)$
+
+Increasing x by 1 increases E(Y*) by $\tilde\beta_1 = \sigma\beta_1$ ($\beta$ standard deviations)
+
+$\tilde\beta_0, \tilde\beta_1, \sigma^2$ are not identified, so can't be estimated.

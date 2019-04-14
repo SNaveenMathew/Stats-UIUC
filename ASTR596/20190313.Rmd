@@ -1,0 +1,68 @@
+---
+title: "Exoplanet detection"
+output: pdf_document
+---
+
+# Data
+
+Relative flux vs time
+
+# Old method
+
+Box fitting least squares (BLS): looks like histogram regression. Grid search / brute force BLS. Mostly made by hand.
+
+Transits may not look like boxes.
+
+# Pearson paper
+
+Look at time series (Kepler telescope is the data source)
+
+## Data
+
+300k+ transit and non-transit samples.
+
+## Methods
+
+- MLP with some structure, dropout only on first layer (why?)
+- Wavelet MLP: wavelet transform is like a low pass filter. 2nd order Daubechies wavelet on whitened light curves fed to MLP.
+- CNN 1D: 4 convolutional filters, downsampling: finds local patterns.
+- SVM
+- BLS: 1 pixel slope on box side (sub-pixel precision) - more realistic. Finds transit and mid-transit depth.
+
+## Results
+
+Phase binning in CNN to bring different transits data together to same point makes it predict cases that are otherwise not predicted as transit. This is applicable for cases where we know the period of revolution.
+
+# Robovetter vs CNN
+
+## Data
+
+- local
+- global
+- both
+
+Local and global data are fed through different channels even for feed forward network.
+
+- Global view: entire phase of light curve. Good for eclipsing binary systems.
+- Local view: better for seeing all small details. Misses information such as binary systems.
+
+## Data preparation
+
+- Pass through BLS and find period
+- Remove confirmed planets
+- Flatten light curve using spline breakpoint spacing
+- All light curves are normalized
+
+## Modeling
+
+- 3600 plants, 12137 non-planets
+- Random horizontal reflections to augment training data
+
+### CNN architecture
+
+- Large number of layers of convolution and pooling
+- No dropout!
+
+## Results
+
+- CNN was able to differentiate between planet transits and eclipsing binaries

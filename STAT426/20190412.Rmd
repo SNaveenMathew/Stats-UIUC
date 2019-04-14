@@ -1,0 +1,56 @@
+---
+title: "Ordinal response"
+output: pdf_document
+---
+
+## Definition
+
+Y = 1, 2, ..., J in increasing order
+
+## Model
+
+Cumulative logits:
+
+$logit(P(Y \le j|x))=ln(\frac{P(Y \le j)}{P(Y > j)})$ for j = 1, ..., J-1
+
+Proportional odds model:
+
+$logit(P(Y \le j | x)) = \beta_{0j} + \beta^Tx$ j = 1, 2, ..., J-1 such that $\beta_{01} \le \beta_{02} \le ... \le \beta_{0J-1}$
+
+- For each j this is a logistic regression with binary outcome indicating subset {1, ..., j} versus {j+1, ..., J}
+- $\beta$ does not depende on j
+
+Example: J = 2 implies $logit(P(Y=1|x)) = \beta_{01}+\beta^Tx$
+
+Question 1: Why should alphas be ordered?
+
+For $1 \le j < J-1$ we know $0 < P(Y \le j|x) \le P(Y \le j+1|x) < 1$. Therefore, $logit(P(Y\le j|x)) - logit(P(Y\le j+1|x)) \le 0 \implies \alpha_{j+1} \ge \alpha_j$
+
+Question 2: Why should beta be the same for all j?
+
+Otherwise, there would exist an x for which the probabilities would be in wrong order.
+
+Example: for J = 4, $\beta > 0$:
+
+- P(Y = 4) decreases as x increases
+- P(Y = 3), P(Y = 2) increase from 0, reaches maximum and then decreases to 0 as $x \to \infty$
+- P(Y = 1) increases from 0 to 1 as $\beta$ increases
+
+## Interpretation
+
+$ln(\frac{odds(Y\le j|x_1)}{odds(Y\le j|x_2)}) = logit(P(Y\le j |x_1)-logit(P(Y\le j |x_2) = \beta^T(x_1-x_2)$. If p = 1 and $x_1-x_2=1$, cumulative odds ratio for any j < J is $e^\beta$
+
+Consider the situation where X is binary and J = 3.
+
+$\pi_i(j) = P(Y=j|x=i)$
+
+- $\sum_i \pi_i(j)=1$
+- $\frac{\pi_1(1)/(\pi_2(1)+\pi_3(1))}{\pi_1(0)/(\pi_2(0)+\pi_3(0))} = \frac{\pi_3(0)/(\pi_1(0)+\pi_2(0))}{\pi_3(1)/(\pi_1(1)+\pi_2(1))} = e^\beta$
+
+## Checking proportional odds assumption
+
+Can use test (Eg: LRT) of fitted model vs more general model that allows separate $\beta_j$ for each cumulative logit.
+
+## Model fitting
+
+Usually by MLE (Fisher scoring / Newton-Raphson)

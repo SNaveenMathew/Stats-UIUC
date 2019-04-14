@@ -1,0 +1,16 @@
+---
+title: "Star galaxy classification using CNN"
+output: pdf_document
+---
+
+# Data
+
+SDSS (17k stars, 48k galaxies: mean redshift = 0.36), CFHTLens (9k stars, 58k galaxies: mean redshift = 0.59)
+
+# Data augmentation
+
+- Rotation
+- Reflection
+- Translation
+- Gaussian noise
+
