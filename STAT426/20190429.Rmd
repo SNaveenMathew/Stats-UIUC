@@ -1,0 +1,58 @@
+---
+title: "Matched Pairs"
+output: pdf_document
+---
+
+## Subject specific logit model
+
+$logit(P(Y_{it}=1)) = \alpha_i + \beta$; $Y_{it}$ are independent between and within pairs.
+
+## Conditional likelihood
+
+For data y, statistic s(y) is partially sufficient for some of the parameters $\theta$. Joint density can be factorized.
+
+$f(y;\theta)=f(y|s;\theta)f(s;\theta)$
+
+Let $l_c(\theta) = f(y|s;\theta)$ - called conditional likelihood - can be treated like full likelihood. If s is chosen carefully, we can make sure that conditional likelihood depends only on $\beta$.
+
+If $s_i = y_{i1}+y_{i2}$; i = 1, 2, ..., n
+
+Conditioning on $s_i$, $l_c(\beta)=\prod_{i=1}^{n}f(y_{i1},y_{i2}|s_i;\beta)$ where $f(y_{i1},y_{i2}|s_i;\beta)=1$ if $s_i=0,2$ or $\frac{e^{\beta y_{i2}}}{1+e^\beta}$
+
+Depends on $\beta$ as long as some of the pairs sum to 1.
+
+$\hat\beta = ln(\frac{n_{21}}{n_{12}})$ when exists. $SE = \sqrt{\frac{1}{n_{21}} + \frac{1}{n_{12}}}$ for both conditional (conditioning on $S_i$) and unconditional
+
+Remember: population averaged effect: $ln(\frac{p_{+1}/p_{+2}}{p_{1+}/p_{2+}})$
+
+Alternative: $\alpa_i$s are random effects (random variable) => generalized linear mixed model
+
+## Matched case-control studies
+
+Observational study may be conducted to determine how particular factor X relates to Y.
+
+Retrospective study: observations are sampled from population of cases and population of controls. X is then determined for each observation.
+
+How do we adjust X-Y relationship for possible factors (not of direct interest)?
+
+Matched case-control studies: group together the cases and controls that are similar in some characteristic (not of direct interest). Then an analysis is used that accounts for retrospective sampling and grouping.
+
+Imagine the total population is partitioned into strata based on factors that are not of direct interest. Let Z denote stratum of individual in population.
+
+Model: $logit(P(Y=1|X=x,Z=z)) = \alpha_z + \beta x$. This model holds under direct sampling (if it were feasible). This homogeneous X-Y association over Z extends what we learnt earlier (X is binary) to continuous X.
+
+Consider one-to-one matching: possible pairs: (1, 0) or (0, 1).
+
+Matching must be performed carefully: Consider all possible pairings of a case and a control in the sample population stratum Z, the probability that such a pair enters study cannot depend on X values.
+
+As technicality, assume each case-control pair is in some random order
+
+\begin{equation}
+Y^* = 
+\begin{cases}
+    1& \text{if} \\
+    0 & \text{otherwise}
+\end{cases}
+\end{equation}
+
+For each inependent variable we have $Y^*_i, (X_1, X_2)$. The corresponding no intercept logistic regression model: $logit(\pi(x_{i1}, x_{i2})) = \beta(x_{i2}-x_{i1})$. MLE has explicit form: $\hat\beta = ln(\frac{n_{21}}{n_{12}}). Validity of models is limited to logit link - other links don't work.

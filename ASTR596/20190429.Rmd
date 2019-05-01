@@ -1,0 +1,68 @@
+---
+title: "Cosmic web"
+output: pdf_document
+---
+
+# Intro
+
+How do we know their existence?
+
+- $\Lambda$CDM model
+- observations
+
+How to constrain clusters?
+
+- Primarily empirical
+    - Halo mass function
+- Density distribution
+    - Navarro-Frenk-White profile (somewhat universal density profile for halos)
+
+Note: DBscan and k-means can be potentially used for identification
+
+Results are inconsistent
+
+# Paper 1
+
+## Objective
+
+Assign probabilistic classes for LSS (large scale structures)
+
+### Training difficulties
+
+- Constraining properties is hard due to inconsistencies between proposed algorithm (filament)
+- What is the truth value: we don't know
+    - N-body simulations for creating training data? No, create a toy model. Generate structures using pre-determined statistics
+
+### Toy model
+
+- Clusters: spherical Gaussian distribution (randomly)
+- Filaments: [Bezier curve](https://en.wikipedia.org/wiki/B%C3%A9zier_curve) "spines" between two random clusters - visual approximation, not theoretical
+- Voids: uniform background
+
+**Data**: 660k particlues
+
+**Model**: Random forest, PCA + KNN
+
+# Paper 2
+
+DCGAN using 2D N body simulation images
+
+Real image -> Discriminator (DCNN) <- Fake image, generate image after attaining Nash equilibrium
+Prior distribution (trick data)
+
+## GAN difficulties
+
+- Mode collapse (corrected using model collapse protection)
+- Cosmic web is multimodal
+
+## Diagnostics
+
+- Power (angular) spectrum
+- Cross power spectrum
+- Auto power spectrum
+- Dimensionless matter overdensity
+- Peak statistics
+- Statistical independence of generated images (cross power spectrum)
+- Mass distribution using auto power spectrum
+- Pixel density histogram between generated image and N-body simulations
+- Covariance between power spectrum at different wave numbers

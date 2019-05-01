@@ -1,0 +1,49 @@
+---
+title: "Matched Pairs"
+output: pdf_document
+---
+
+## McNemar test
+
+Doesn't depend on diagonal elements.
+
+Departure from marginal homogeneity:
+$\delta=\pi_{+1}-\pi_{1+}$
+
+Estimated using $d=p_{+1}-p_{1+}$
+
+Corresponding Wald CI can be obtained.
+
+Resulting test is different from McNemar's test because this is Wald test whereas McNemar's test is score test.
+
+**Remarks**
+
+- $Y_{i1}$ and $Y_{i2}$ having positive dependence leads to more precise inference than if they were independent. Negative dependence makes it less precise.
+- Exact binomial test: when off diagonal elements are small
+- McNemar's test in chi-square form is equivalent to CMH test based on certain subject specific representation (different stratum for each pair)
+
+## Subject specific analysis
+
+We assumed $P(Y_{i1}=1)$ and $P(Y_{i2}=1)$ to be independent of i.
+
+Consider $\beta = ln\bigg(\frac{odds(Y_{i2}=1)}{odds(Y_{i1}=1)}\bigg) = 0$ for marginal homogeneity
+
+We do not assume identically distributed pairs, but assume $\beta$ is same for all i.
+
+Let $logit(P(Y_{i1}=1)) = \alpha_i$, then $logit(P(Y_{i2}=1)) = \alpha_i + \beta$
+
+Subject-specific logistic model:
+
+$logit(P(Y_{it}=1)) = \alpha_i + \beta x_t; x_1=0, x_2=1$
+
+There are n+1 parameters. As sample size increases, number of parameters also increases. Therefore, usual asymptotics do not generalize to this case. Consistency may also be a problem.
+
+### Can be fixed using conditional likelihood analysis
+
+$f(y;\theta)=f(y|s;\theta)f(s;\theta)$
+
+Let $l_c(\theta) = f(y|s;\theta)$ - called conditional likelihood - can be treated like full likelihood. If s is chosen carefully, we can make sure that conditional likelihood depends only on $\beta$.
+
+If $s_i = y_{i1}+y_{i2}$; i = 1, 2, ..., n
+
+Conditioning on $s_i$, $l_c(\beta)=\prod_{i=1}^{n}f(y_{i1},y_{i2}|s_i;\beta)$ where $f(y_{i1},y_{i2}|s_i;\beta)=1$ if $s_i=0,2$ or $\frac{e^{\beta y_{i2}}}{1+e^\beta}$

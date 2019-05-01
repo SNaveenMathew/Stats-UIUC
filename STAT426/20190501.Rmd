@@ -1,0 +1,66 @@
+---
+title: "Matched Pairs"
+output: pdf_document
+---
+
+## Generalized matched case-control
+
+- More than 1 X variable on which strata are created ($X_1, ..., X_p$)
+- More than 1 control for each case (one-to-many matching) - matched set instead of matched pair (not allowed to match based on $X_1, ..., X_p$)
+
+Let n = total number of matched sets, $T_i$ = total number of subjects in ith matched set, $Y_{it}$ = response Y for subject t in matched set i: will be 1 for only one t for a given i (only one control in each set), $x_{hit}$ = value of $X_h$ for subject t in matched set i
+
+h = 1, ..., p; i = 1, ..., n; t = 1, ..., $T_i$
+
+## Model
+
+Logit link: $logit(P(Y_{it}=1)) = \alpha_i + \beta_1 x_{1it} + ... + \beta_p x_{pit} = \alpha_i + x_{it}^T \beta$ with $x_{it}^T = (x_{1it}, ..., x_{pit})$; conditioned on $S_i = \sum_{t=1}^{T_i} {Y_{it}} = 1$
+
+$P(Y_{i\tau}=1|S_i=1) = \frac{e^{x_{i\tau}} \beta}{\sum_{t=1}^{T_i}e^{x_{i\tau}} \beta}$
+
+Let $\tau_i$ be is the index such that $y_{i\tau_i}=1$, then $\prod_{i=1}^n \frac{e^{x_{i\tau}} \beta}{\sum_{t=1}^{T_i}e^{x_{i\tau}} \beta}$ is conditional likelihood for $\beta$. Using it is conditional logistic regression.
+
+## Example
+
+```{r}
+library(faraway)
+data(amlxray)
+head(amlxray)
+```
+
+```{r}
+subset(amlxray, downs=="yes")
+```
+
+If `downs` is used as predictor, MLE will not exist (quasi complete separation)
+
+Restricting analysis to individuals (matched sets) who don't have Down's syndrome
+
+```{r}
+nonDown <- subset(amlxray, !(ID %in% subset(amlxray, downs=="yes")$ID))
+table(nonDown$ID)
+```
+
+Only one-to-one or one-to-two matching observed in the data set.
+
+```{r}
+library(survival)
+mod <- clogit(disease ~ Sex + Mray + Fray + CnRay + strata(ID), data=nonDown)
+summary(mod)
+```
+
+- CnRay.L: linear
+- CnRay.Q: quadratic (orthogonalized with respect to linear and intercept terms)
+- CnRay.C: cubic (orthogonalized with respect to quadratic, linear and intercept terms)
+
+exp(coef) is odds ratio
+
+Table also shows transformed Wald 95% CI of the odds ratio (exp(coef)).
+
+To get a single p-value for CnRay variable:
+
+```{r}
+drop1(mod, test="Chisq")
+```
+
+Difficult to interpret CnRay.L, CnRay.Q, CnRay.C as they are for the orthogonalized linear, quadratic and cubic terms of CnRay.

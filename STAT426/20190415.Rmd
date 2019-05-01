@@ -1,0 +1,81 @@
+---
+title: "Ordinal response"
+output: pdf_document
+---
+
+## Example
+
+```{r}
+happiness <- read.table("happiness.txt", header = T)
+library(VGAM)
+mod <- vglm(happy ~ trauma + race, data = happiness, family = propodds(reverse = F)) # Reverse changes sign of beta
+summary(mod)
+```
+
+Coefficients of trauma and race are **negative**. Therefore there is **positive** relationship between trauma and response variable. But happiness is in reverse order (1 = very happy, 2 = pretty happy, 3 = not so happy). Therefore, higher trauma is related to lower levels of happiness.
+
+- Odds of "very happy" or "pretty happy" for white relative to black (trauma held fixed): $e^{2.03612} = 7.660827$ (white is 0, black is 1, therefore difference is -1)
+- Wald 95% CI: $e^{2.03612 \pm 1.96 \times 0.69113} = (1.976851, 29.687759)$
+
+### LRT for race effect (controlling for trauma)
+
+```{r}
+modred <- vglm(happy ~ trauma, data = happiness, family = propodds(reverse = F))
+llrts <- deviance(modred) - deviance(mod)
+llrts.df <- df.residual(modred) - df.residual(mod)
+1 - pchisq(llrts, llrts.df)
+```
+
+Race effect is quite significant.
+
+### Estimating probabilities
+
+```{r}
+predict(mod, newdata = data.frame(trauma = mean(happiness$trauma), race = 0),
+        type = "response")
+```
+
+### Probabilities vs trauma
+
+```{r}
+x = happiness$trauma
+curve(predict(mod, data.frame(trauma=x,race=0), type="response")[,1],
+xlab="Trauma", ylab="Probability",
+xlim=range(happiness$trauma), ylim=c(0,1))
+curve(predict(mod, data.frame(trauma=x,race=0), type="response")[,2],
+add=TRUE, col="red")
+curve(predict(mod, data.frame(trauma=x,race=0), type="response")[,3],
+add=TRUE, col="blue")
+curve(predict(mod, data.frame(trauma=x,race=1), type="response")[,1],
+add=TRUE, lty=2)
+curve(predict(mod, data.frame(trauma=x,race=1), type="response")[,2],
+add=TRUE, col="red", lty=2)
+curve(predict(mod, data.frame(trauma=x,race=1), type="response")[,3],
+add=TRUE, col="blue", lty=2)
+legend("topright", c("white","black"), lty=1:2)
+legend("topleft", c("Very Happy","Pretty Happy","Not Too Happy"), lty=1,
+col=c("black","red","blue"))
+```
+
+### Fitting non-proportional model
+
+```{r}
+modnotprop <- vglm(happy ~ trauma + race, data = happiness, family = cumulative(parallel = F))
+llrts <- deviance(mod) - deviance(modnotprop)
+llrts.df <- df.residual(mod) - df.residual(modnotprop)
+1 - pchisq(llrts, llrts.df)
+```
+
+Reduced model is sufficient.
+
+```{r}
+library(MASS)
+mod <- polr(factor(happy) ~ trauma + race, data = happiness)
+summary(mod)
+```
+
+Assumes different parameterization, therefore the opposite signs of beta.
+
+Standard errors are different because this uses observed information rather than expected Fisher information.
+
+If happy is recoded as (3 = very happy, 2 = , 1 = not so happy), the signs of intercepts and coefficients will reverse, and intercepts will be rearranged.

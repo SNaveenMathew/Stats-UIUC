@@ -1,0 +1,68 @@
+# WFIRST
+
+Wide Field Infrared Survey Telescope (~ 2025)
+
+## Intro
+
+- 5 numbers describe the state of universe
+
+Simple cosmological model of universe:
+
+- Same laws apply across space and time
+- Total energy of universe = 0: geometry of universe is flat
+- Universe went through early acceleration leading to nearly scale-invariant spectrum of fluctuations
+
+Dark matter candidates:
+
+- DeBroglie wavelength ~ $10^{-22}$
+- Supermassive black hole
+
+Dark energy candidates:
+
+- Vacuum energy
+
+## History
+
+### CMB
+
+- Nearly uniform
+- COBE saw fluctuations
+- WMAP gave higher resolution - nearly Gaussian random
+
+### Baryon ~ acoustic oscillation
+
+- Dark matter stays
+- Baryonic matter travels like sound waves (like thin shock/sound wave)
+- Linearly combine these waves: almost matches WMAP data
+
+Note: Planck observations are consistent with WMAP, but has improved error bars. Planck surveyed at 9 different frequencies.
+
+## Problem
+
+Measurement of Hubble constant:
+
+- Planck: 68 $km\ s^{-1} megaparsec^{-1}$. Measured: 73 $km\ s^{-1} megaparsec^{-1}$ (Riess et al. 2018 paper measured this). Differs by 4.4 $\sigma$. Different experiments measured. They are 2-3 $\sigma$ off.
+- CMB should be adjusted for galactic foreground, other systematics.
+
+### Possible sources of error:
+
+- New physics that's happening at current time (Eg: CMB neutrinos. Adding extra parameters (Neutrino Puzzle: Anomalies, Interactions and Cosmological Tensions) leads to possibility of fit)
+
+**Future:**
+
+- EBOSS to fill in more data
+- Atacama Cosmology Telescope (data is less noisy than Planck for nearly 50% of the sky)
+- Need for some correction in past universe
+
+## WFIRST
+
+- Wide field instrument
+- Coronograph
+
+### Goals:
+
+- Study dark energy
+- Study statistical properties of exoplanets
+- Serves as test for General Relativity: tries to reconsile redishift-distance measurements in 2 different ways. If they don't match, then General Relativity does not hold irrespective of the nature of dark energy
+- Complements Kepler, TESS, Plato
+- Data will be freely available

@@ -1,0 +1,12 @@
+---
+title: "Debris disk"
+output: pdf_document
+---
+
+# Debris Disk
+
+Different from protoplanetary disk: debris disk have far less gas, far more dust, far less mass than protoplanetary disk
+
+# Data
+
+127 likely candidates from disk detective + literature, 450 candidates: 138 were bad.

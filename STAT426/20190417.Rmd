@@ -1,0 +1,50 @@
+---
+title: "Other models: Ordinal response"
+output: pdf_document
+---
+
+# Latent variable formulation
+
+Y derived from latent continuous variable $Y^*$. Eg: $Y=j if \alpha_{j-1}<Y^{*}\le \alpha_j$
+
+Suppose $Y^*=\beta^Tx + \epsilon$, where $\epsilon$ has known cdf G. Adding intercept to Y\* gives cut points at $\alpha + intercept$, which is the same model. Alternatively we can fix $\alpha_1=0$. Positive slope implies positive relationship between Y and X. Y\* independent implies Y is independent.
+
+$P(Y \le j | x) = P(Y^*\le\alpha_j|x)=P(Y^*-\beta^Tx|x)=G() \implies G^{-1}(P(Y^*-\beta^Tx|x)) = \alpha_j-\beta^Tx$
+
+Similar to proportional odds model, but G can be different. G = logit gives same model as proportional odds, but sign of $\beta$ is reversed.
+
+Cumulative probit model: $G = \phi$
+
+Proportional hazards: G^{-1}(p) = ln(-ln(1-p)) [used in survival analysis when there is grouped survival times]
+
+## Example
+
+```{r}
+library(VGAM)
+happiness <- read.table("happiness.txt", header = T)
+mod.logit <- vglm(happy ~ trauma + race, family = cumulative(parallel = T), data = happiness)
+summary(mod.logit)
+mod.probit <- vglm(happy ~ trauma + race, family = cumulative(parallel = T, link = "probit"), data = happiness)
+summary(mod.probit)
+```
+
+Saturated models are the same for logit and probit. Therefore, we can compare deviances.
+
+Another way of fitting:
+
+```{r}
+# Logit link
+library(MASS)
+mod.logit2 <- polr(factor(happy) ~ trauma + race, data = happiness)
+summary(mod.logit2)
+```
+
+Unlike `vglm`, `polr` uses $\alpha_j - \beta^Tx$. Positive $\beta$ indicates positive relationship between Y and x.
+
+- Threshold between level 1 and 2: -0.5181
+- Threshold between level 2 and 3: 3.4006
+
+```{r}
+# Fitting probit
+mod.probit2 <- polr(factor(happy) ~ trauma + race, data = happiness, method = "probit")
+```

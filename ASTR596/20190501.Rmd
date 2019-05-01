@@ -1,0 +1,85 @@
+---
+title: "Final presentation"
+output: pdf_document
+---
+
+# Exoplanet identification in binary star systems
+
+LISA strain waveforms + light curves -> Neural network -> gravitational wave astrophysics + exoplanet astronomy
+
+Interesting: identify whether individual planets are revolving around single star or binary stars
+
+# TDA for analysis of CMB data
+
+- Persistence homology (check persistence diagram - topology of point clouds)
+    - Point sources are persistent
+    - Noise is transient
+    - Also sensitive to non-Gaussian structure
+
+# Deblending galaxies using deep learning
+
+Blended object: 2 galaxies, galaxy + star overlap (projection effect)
+
+Estimated 20% blended galaxies in LSST
+
+Mask R-CNN:
+
+- scan image, generate poposals
+- classify proposals, generate bounding box and masks
+
+Classification -> Semantic segmentation -> Object detection -> Instance segmentation
+
+Image -> region of interest align -> object class -> binary pixel maps, class box
+
+# Quasar light curve
+
+RNN autoencoder on DES (dark energy survey)
+
+- Finding quasars in time-domain survey without spectroscopy
+- Searching intermediate-mass black holes in dwarf galaxies
+- Which model is best for quasar intrinsic variability?
+
+# Neural networks for analyzing rotating disks
+
+CLEAN algorithm - requires user inputs
+
+Reconstructing spectral lines of rotating disks using RNN. Morningstar et al. (2018) did something similar
+
+Training data: ALMA archive + data augmentation
+
+Features to be learnt: SNR, extent of high-SNR regions, sidelobes, negative bowls
+
+Makes deconvolution process faster and more objective
+
+# SED (spectal energy density)
+
+- Observed flux velocity vs wavelength
+
+## Making of galaxy SED
+
+- Initial mass function
+- Star formation history, chemical evolution
+- Simple stellar population
+- Dust production/extinction curves
+- etc.
+
+What we observe: few points in the whole curve
+
+Generate large amounts of SED data and replace MCMC for parameter search with neural network.
+
+# Generating 3D images of LSS using SDSS eBOSS
+
+- Recent work: DCGAN 2D images: 3D N-body simulations projected into 2D slice -> GAN
+    - Problems: projection effects, inconsistencies in N-body simulations at smaller scales
+- SDSS - Baryon Acoustic Oscillation Spectroscopy Survey
+
+Method:
+
+- Repeat DCGAN on SDSS
+- Apply 3D GAN
+
+# Star-galaxy classification
+
+More training data, data augmentation
+
+Network architecture: Xception, averaged model

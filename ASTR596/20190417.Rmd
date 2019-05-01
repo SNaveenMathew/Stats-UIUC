@@ -1,0 +1,33 @@
+---
+title: "Weak lensing"
+output: pdf_document
+---
+
+# Background
+
+Light follows geodesigcs (shortest path in space-time), which is not necessarily a straight line
+
+
+# Convergence and shear
+
+Traces mass surface density, gives isotropic magnification. Measured from galaxy flux $= \int \Delta\phi dz = \int4\pi G\rho dz = \frac{\Sigma}{\Sigma_C}$ 
+
+Shear gives distortions
+
+# Naive measurement
+
+Complicated formula for $\sigma_8 = \int \frac{4\pi k^2dk}{(2\pi)^3}P(k)|W_8(k)|^2
+
+# Beyond power spectrum
+
+Different wavenumbers evolve at different rates => non-linearity. Smaller structures form clusters at faster rate than larger structures. Different CMB images with different concentrations of wavenumbers will have same power spectrum. Therefore, deep learning is useful. Alternatives: Minkowski diagram.
+
+# Data
+
+Dark matter N-body simulations + ray tracing for lensing
+
+- 96 combinations of $\Omega_m$ and $\sigma_8$
+
+# Results
+
+- Less scatter and bias

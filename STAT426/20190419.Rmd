@@ -1,0 +1,66 @@
+---
+title: "Matched Pairs"
+output: pdf_document
+---
+
+# Example Association
+
+- Two binary repeated measures
+
+$Y_{i1}$ = vote in 2004, $Y_{i2}$ = vote in 2008 where 1 = Democrat, 0 = Republican
+
+Test: Was there a shift in party preference? How much?
+
+- Crossover experiment with two treatments and binary response
+
+Subject i takes drug once, placebo once in random order
+
+$Y_{i1}$ = indicator of improvement in drug period, $Y_{i2}$ = indicator of improvement in placebo period
+
+Is improvement more likely when taking the drug? By how much?
+
+- One-to-one matched case-control study with binary explanatory variable (matching is based on other factors that we want to control: Eg: age, sex, etc.)
+
+Y = 1 if case, 0 if control
+
+X = indicator of exposure or predisposing factor = 1 if present, 0 if absent
+
+By design, $(Y_{i1}, Y_{i2}) = (0,1)\ or\ (1,0)$. Analysis requires special techniques.
+
+We assume independence between pairs, not within pairs.
+
+# Marginal Analysis
+
+Assume $(Y_{i1}, Y_{i2})$ are identically distributed.
+
+Population averaged table: $Y_{i1}$ 0,1 vs $Y_{i2}$
+
+$N_{11}, N_{12}, N_{21}, N_{22} \sim multinomial(n, \{\pi_{11}, \pi_{12}, \pi_{21}, \pi_{22}\})$
+
+$p_{ij} = \frac{n_{ij}}{n}$
+
+Marginal distributions are same => marginal homogeneity
+
+$\pi_{i+} = \pi_{+i} \implies \pi_{12} = \pi_{21}$
+
+$E(N_{21}-N_{12}) = n(\pi_{21}-\pi_{12}) = 0$ under marginal homogeneity
+
+How far should this difference be away from 0 to reject the null? Required: variance of the difference
+
+$var(N_{21}-N_{12})=var(N_{21})+var(N_{12})-2cov(N_{12}, N_{21}) = n\pi_{21}(1-\pi_{21}) + n\pi_{12}(1-\pi_{12}) - 2(-n\pi_{21}\pi_{12})$
+
+Under null hypothesis: $\pi_{12}=\pi_{21}=\pi^*$
+
+$\implies var(N_{21}-N_{12})= 2n\pi^*$
+
+MLE: $\hat\pi^* = \frac{n_{21}+n_{12}}{2n}; \hat{var}(N_{21}-N_{12}) = n_{21}+n_{12}$
+
+## McNemar's test:
+
+Null: Marginal homogeneity
+
+Reject if $z_0 = \frac{n_{21}-n_{12}}{\sqrt{n_{21}+n_{12}}} \sim N(0,1)$. Equivalently, reject if $z_0^2 > \chi_1^2(\alpha)$
+
+**Departure from marginal homogeneity:**
+
+$\delta=\pi_{+1}-\pi_{1+}$ estimated by $d = p_{+1}-p_{1+}$ with approximate Wald CI: $d \pm z_{\alpha/2}\sqrt{\hat\sigma^2(d)}$ where $\hat\sigma^2(d) = \frac{p_{12}+p_{21}-(p_{12}-p_{21})^2}{n}$
