@@ -1,0 +1,89 @@
+---
+title: "Lecture 01"
+author: "Naveen Mathew Nathan S."
+date: "8/27/2019"
+output: pdf_document
+---
+
+# Introduction
+
+Book: 
+
+Computational science:
+
+- simulations: getting numerical solutions for experimental settings that arise from theory
+- data science: arises from observations
+
+Numerical methods: eg - converting differential equations into algebraic equations.
+
+Example: some observed pressure, temperature and velocity, use differential equation and solve numerically. Did not work because the time step was large.
+
+Equations: $\partial e/\partial t + v \nabla e = -P/\rho \nabla v + HOT$, $\partial v/\partial t = ... + HOT$
+
+CPU - processor register - CPU cache (level 1, 2 and 3) - physical memory (RAM) - solid state memory (non-volatile flash based) - virtual memory (file based storage)
+
+Writing code to maximize the use of cache can speed up computation.
+
+Pipelining:
+
+CPUs don't compute just 1 task at a time. They process some of a task, start another task, process, start, ... Compiler handles pipelining.
+
+Vectorization:
+
+Adding two double vectors: c = a + b, len(a) = 8
+
+8 64-bit load-add-stores
+
+Vectorization: add in chunks of 8 each. Add all elements
+
+Heat dissipation becomes a problem as number of FLOPs of a processor increases. Alternative: more threads of execution (greater concurrency). Also: hybrid parallelism.
+
+Multiplying 2 floats ~ 20 pJ, read operand from on-chip memory at far end of chip ~ 1 nJ, Read operand from off-chip RAM ~ 16 nJ
+
+In future FLOP will be free, but storage and communication will be expensive
+
+# Parallel computing models
+
+## Shared memory (Eg: OpenMP)
+
+- Requires special hardwards, each process can see all memory, parallelism implemented via compiler directives
+
+!$OMP PARALLEL SHARED(A,B) PRIVATE(i)
+!$OMP DO SCHEDULE(STATIC)
+do i = 1, 199
+  A(i) = B(i) + ...
+enddo
+!$OMP END DO
+!$OMP END PARALLEL
+
+
+## Message passing (Eg: MPI)
+
+- Each process has private memory, parallelism implemented via explicit transfers, can work on any networked CPUs
+
+call mpi_init(err)
+call mpi_comm_rank(MPI_COMM_WORLD, me, err)
+call mpi_snedrecv(parameters)
+
+do i = 1, 199
+  A(i) = B(i) + ...
+enddo
+
+call mpi_finalize(err)
+
+### Concepts
+
+- Speedup: $S_N = \frac{t_1}{t_N}$ where $t_i$ is time in i processors
+- Parallel efficiency: speedup/N (efficiency = 1 => perfect parallel performance)
+- Scaling: strong-scaling: speedup $\propto$ N for fixed workload, weak-scaling: speedup constant for workload $\propto$ N (increasing workload and number of processors)
+- Amdahl's law: $S_N = \frac{N}{BN + (1-B)}$, B = % of algo that is serial for N processors
+
+
+# Important notes:
+
+Where GPU may not be best: when the pattern of computation is different in each data unit. GPUs are better for structured data.
+
+CPU can do a bunch of tasks. A previous gate decides whether a gate receives a signal.
+
+GPU doesn't allow pipelining, but allows large number of processing units to be embedded.
+

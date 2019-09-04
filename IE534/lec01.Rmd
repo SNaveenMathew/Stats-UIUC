@@ -1,0 +1,101 @@
+---
+title: "Lecture 01"
+author: "Naveen Mathew Nathan S."
+date: "8/27/2019"
+output: pdf_document
+---
+
+## Logistics
+
+- pyTorch: pythonic framework
+- tensorflow: 
+
+pyTorch used in course. Define and run.
+
+500 GPU hours per student for training.
+
+## Introduction
+
+Machine learning: 
+
+- Data is $(X, Y) \in R^d \times y$ and model is $f(x; \theta): R^d \to R^K$. Example: d = 784, K = 9 for MNIST.
+- $\theta \in \Theta$ are parameters in model
+
+$L(\theta) = E_{(X, Y)}[\rho(f(X; \theta), Y)]$
+
+Expectation over distribution of data (X, Y)
+
+- $\rho$ measures distance between model prediction z and y
+- Distance is averaged over distrbution $P_{(X,Y)}$ of the data
+- $\theta = argmin_{\theta'}(L(\theta'))$: best model within a class of models
+
+- Typically distribution $P_{(X, Y)}$ unknown. We only have a sample
+- Therefore, replace the minimization of expectation as minimization of average over observations in the data
+- $L^N(\theta) = \frac{1}{N}\sum_{n=1}^{N}\rho(f(x^n; ), y)$
+- As $N\to\infty$, the sample average converges to expectation: $L^N(\theta) \to L(\theta)$
+
+
+### Optimization
+
+- Not easy to find the minimizer
+- Minimization cannot be easily calculated for non-convex non-linear model like neural network. Numerical methods required (GPUs, distributing can make it faster)
+- Stochastic gradient descent used to train deep learning models
+- Best model only if the stationary point satisfies certain properties (because problem is non-convex)
+
+## Multiclass logistic regression
+
+- Classification problem: $Y = \{0, 1, ..., K-1\}$, $\Theta = R^{K\times d}$
+- $f(x; \theta) = F_{softmax}(\theta x)$, where $F_{softmax} = \frac{\sum_{k=0}^{K-1} e^{z_k}}(e^{z_1}, e^{z_2}, ..., e^{z_{K-1}})$ produces a probability distribution on Y. $F_{softmax}: R^d\to Y$
+
+### Loss function
+
+- $L(\theta) = E_{(X, Y)}[\rho(f(X; \theta), Y)]$, $\rho(z, y) = -\sum_{k=0}^{K-1}1_{y=k} log(z_k)$ is the negative log likelihood. Also called cross-entropy error or negative log likelihood.
+
+### Gradient descent:
+
+$\theta^{(l+1)} = \theta^{(l)} - \alpha^{(l)}\nabla_\theta L(\theta^{(l)})$
+
+- Objective function increases in the direction of gradient. Move in direction opposite to gradient to minimize objective function.
+- $\alpha^{(l)}$ is a hyperparameter (learning rate). It is a positive scalar and may depend on iteration number l. $\alpha$ too large: overshoot minima, too small: too long to converge. $\alpha^{(l)}$ should be decreased during the course of training -> learning rate schedule.
+
+Taylor expansion:
+
+- $L(\theta^{(l+1)}) - L(\theta^{(l)}) = \nabla_\theta L(\theta^{(l)} \times (\theta^{(l+1)} - \theta^{(l)}) + \frac{1}{2}\nabla_{\theta \theta} L(\theta^{(l)} \times (\theta^{(l+1)} - \theta^{(l)})$
+
+Substituting from gradient descent update equation:
+
+$L(\theta^{(l+1)}) - L(\theta^{(l)}) = -\alpha^{(l)}(\nabla_\theta L(\theta^{(l)}))^T \nabla_\theta L(\theta{(l)}) + \frac{1}{N}(\alpha^{(l)})^2 ... $
+
+First term dominates second term when $\alpha$ is small. Also the first term is negative. Therefore the loss function decreases after each iteration.
+
+Update direction is reliable only in a small neighborhood of the current point. Gradient may change drastically at different regions of the loss curve (as a function of parameters).
+
+Computationally expensive because expectation of gradient requires integration.
+
+$\nabla_\theta L(\theta^{(l)}) = \nabla_\theta E_{(X, Y)}[\rho(f(X; \theta^{(l)}), Y)] = E_{(X, Y)}[\nabla_\theta \rho(f(X; \theta), Y)]$
+
+For a sample this reduces to: $\nabla_\theta L(\theta^{(l)}) = \frac{1}{N}\sum_{n=1}^{N} \nabla_\theta [\rho(f(x^n; \theta^{(l)}), y^n)]$. Since the summation is evaluated on the whole data set, the computation may be expensive. Therefore, gradient descent is slow.
+
+### Stochastic gradient descent
+
+Computationally efficient version of gradient descent. Moves in the same direction of gradient descent *on an average*. It follows a noisy, but unbiased descent direction.
+
+- $E[\nabla_\theta \rho(f(x^{(l)}; \theta^{(l)}), y^{(l)})|\theta^{(l)}] = E[\nabla_\theta \rho(f(X; \theta^{(l)}), Y)|\theta^{(l)}]$ because $(x^{(l)}, y^{(l)})$ is chosen uniformly at random from the data set = $\nabla_\theta L(\theta^{(l)})$
+
+Noise that enters the equation also requires the update steps to be small (small $\alpha$)
+
+Stochastic gradient descent: instead of using the whole data set, randomly sample just 1 example from the data set and run the update based on gradient. Sampling is done with replacement because usually l is larger than the sample size. In practice SGD converges faster than gradient descent. It is more advantageous when the data set size is large.
+
+### Learning rate schedule
+
+SGD will converge if $\sum_{l=0}^{\infty} \alpha^{(l)} = \infty$ and $\sum_{l=0}^{\infty} \alpha^{(l)} = \infty$
+
+One choise: $\alpha^{(l)} = \frac{c_O}{c_1 + l}$
+
+Piece-wise constant periodic schedule:
+
+- $C: l\le K_1$
+- $C/10 K_1<l\le K_2$
+- $C/100 K_2<l\le K_3$
+
+May overshoot or be stuck if C or $K_i$s are not chosen properly

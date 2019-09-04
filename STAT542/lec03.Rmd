@@ -1,0 +1,45 @@
+---
+title: "Lecture 03"
+author: "Naveen Mathew Nathan S."
+date: "8/30/2019"
+output: pdf_document
+---
+
+# Degrees of freedom
+
+Quantifies flexibility of the model.
+
+$df_{model} = \frac{1}{\sigma^2} \sum_{i=1}^{n} cov(\hat Y_i, Y_i)$ evaluated on the training data
+
+For 1 NN, $\hat Y_i = Y_i$, therefore $df = \frac{n * cov(Y_i, Y_i)}{\sigma^2} = n$
+
+For N NN, $\hat Y_i = \bar Y$, $cov(\bar Y, Y) = \frac{1}{n}\sigma^2$, therefore $df = \frac{\sum_{i=1}^{n} \frac{1}{n}\sigma^2}{\sigma^2} = 1$
+
+Linear model: $\hat\beta = (X^TX)^{-1}X^TY$; $\hat Y = X(X^TX)^{-1}X^TY$
+
+Redefining df: $cov(\hat Y, Y) = [cov(\hat Y_i, Y_j)] \implies \sum_{i=1}^{n} cov(\hat Y_i, Y_i) = tr(cov(\hat Y, Y))$
+
+From the model we know that $Y = X\beta + \epsilon$
+
+$cov(\hat Y, Y) = E[(X(X^TX)^{-1}X^TY-X(X^TX)^{-1}X^TX\beta) \times (Y-X\beta)^T] = E[X(X^TX)^{-1}X^T\epsilon \epsilon^T] = X(X^TX)^{-1}X^T\sigma^2 I_{n\times n}$ assuming X is not random
+
+$tr(cov(\hat Y, Y)) = tr(X(X^TX)^{-1}X^T\sigma^2 I_{n\times n}) = \sigma^2 tr(X(X^TX)^{-1}X^T)$
+
+Using $tr(ABC) = tr(CAB) = tr(BCA)$, $tr(cov(\hat Y, Y)) = \sigma^2 tr((X^TX)^{-1}X^TX) = \sigma^2 tr(I_{p \times p}) = \sigma^2 \times p$, therefore $df = \frac{\sigma^2 \times p}{\sigma^2} = p$
+
+1 NN plot looks like a Vornoi tesselation
+
+In practice it is not possible to know the exact value of bias and variance because the true model is unknown.
+
+## Distance measures
+
+- Measure of closeness of points
+- Euclidean distance: $d^2(u,v) = \sum_{i=1}^{p}(u_i-v_i)^2$
+- Euclidean distance has scaling issues: variable with highest range will tend to dominate the distance measure
+- Scaled Euclidean distance: $d^2(u,v) = \sum_{i=1}^{p}\frac{(u_i - v_i)^2}{\sigma_i^2}$
+- Mahalanobis distance: account for correlation as well as scale: $d^2(u,v) = (u-v)^T\Sigma^{-1}(u-v)$, where $\Sigma$ is the covariance matrix
+- Hamming distance: used for categorical variables: count of differences in observed values of individual categorical variables
+
+## Drawbacks
+
+- Slow: if training set size is n and test set size is 1, n distances will be calculated and then sorted to obtain k nearest neighbors: no very efficient for large n. The same process is repeated for each new test example. KD-tree: splits the range of values of each independent variable into 2.

@@ -1,0 +1,86 @@
+---
+title: "STAT429 - Session 1"
+author: "Naveen Mathew Nathan S."
+date: "8/26/2019"
+output: pdf_document
+---
+
+## Examples
+
+### Johnson & Johnson stock price
+
+```{r}
+library(astsa)
+plot(jj, type = 'o')
+```
+
+General pattern:
+
+- increasing trend
+- sharper increase/decrease in later years
+
+### Global temperature deviations
+
+```{r}
+plot(globtemp)
+abline(h = 0)
+```
+
+Shows ups and downs but increasing in general.
+
+```{r}
+plot(nyse)
+```
+
+Mostly stable, high volatility in a short period.
+
+```{r}
+plot(speech)
+```
+
+Patterns repeat.
+
+```{r}
+library(xts)
+djiar <- diff(djia$Close)/djia$Close[-nrow(djia)]
+plot(djia, col = "black")
+```
+
+Stochastic volatility models may be required to model the variation here.
+
+## Time Series
+
+- Data collected over time.
+- Time oriented or chronological.
+- Sequence of observations on a variable of interest.
+- Data cannot be assumed independent.
+- Time series models incorporate time dependence.
+
+### Approaches
+
+#### Time domain approach
+
+Modeling future value of a time series based on a parametric function of current and past values.
+
+#### Frequency domain approach
+
+Assume the primary feature of a time series is periodical or systematic sinusoidal variations. These variations are naturally found in most data sets.
+
+Both approaches produce similar results on long time series. Ideally - use both in complementary way.
+
+## Time domain approach:
+
+### Box and Jenkins approach: ARIMA, transfer function
+
+- Additive model: observed data arise from the sum of structured components. Eg: $trend + seasonal + effect error$
+- Multiplicative model: Observerd data arise from multiplicative model involving product of factors.
+
+## Three steps for model building
+
+- Model specification
+- Model fitting
+- Model diagnostics
+
+# Problem set:
+
+1.2 a) and b)

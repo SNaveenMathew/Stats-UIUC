@@ -1,0 +1,79 @@
+---
+title: "Lecture 03"
+author: "Naveen Mathew Nathan S."
+date: "9/3/2019"
+output: pdf_document
+---
+
+## Homework 1:
+
+- Choose sufficiently large number of hidden units
+- Gradient checking using finite difference
+- Train for sufficiently large number of iterations; don't train too long
+- Use an appropriate learning rate schedule
+
+## Derivation
+
+$\rho = -log F_{SOFT, Y}(U) \implies \nabla_{U_m}\rho = -\frac{1}{F_{SOFT, Y}(U)} \times -\frac{e^{u_y}e^{u_m}}{(\sum_j e^{u_j})^2} = F_{SOFT,m}(U)$ if m != Y
+
+If m == Y, $\nabla_{U_m}\rho = -\frac{1}{F_{SOFT, Y}(U)}[\frac{e^{u_Y}e^{u_m}}{(\sum_j e^{u_j})^2} + \frac{e^{u_Y}}{\sum_j e^{u_j}}] = -(I_{Y=m} - F_{SOFT, m}(U))$
+
+Generalizing: $\nabla_u\rho = -(e(Y) - F_{SOFT}(U)) = -(e(Y) - f(X;\theta))$ where $e(Y) = [fn(m)]$ where fn(m) = 1 if m = Y or 0 otherwise
+
+$\nabla_{b^2} = \frac{\partial \rho}{\partial b^2} = \frac{\partial \rho}{\partial U} \odot \frac{\partial U}{\partial b^2} = \frac{\partial \rho}{\partial U}$
+
+$\frac{\partial \rho}{\partial C_{i,j}} = \sum_{m=0}^{K-1} \frac{\partial \rho}{\partial u_m}\frac{\partial u_m}{\partial C_{i,j}}$, $\frac{\partial u_m}{\partial C_{i,j}}$ = 0 if $i \neq m$ or $H_j$ otherwise
+
+$\frac{\partial \rho}{\partial C_{i,j}} = \frac{\partial \rho}{\partial u_i}H_j \implies \frac{\partial \rho}{\partial C} = \frac{\partial \rho}{\partial U} H^T$
+
+$\delta = \frac{\partial \rho}{\partial H}$, $\delta_i = \sum_{m=0}^{K-1}\frac{\partial \rho}{\partial u_m} \frac{\partial u_m}{\partial H_i} = \sum_{m=0}^{K-1}\frac{\partial \rho}{\partial u_m} C_{m,i} = \frac{\partial \rho}{\partial U}C_{.,i}$: i-th column of C, $\implies \delta = C^T \frac{\partial \rho}{\partial U}$
+
+$\frac{\partial \rho}{\partial b^1} = \delta \odot sigma'(Z)$, where $\sigma'(Z) = [\sigma'(Z_0), ..., \sigma'(Z_{d_h-1})]$
+
+$\frac{\partial \rho}{\partial W_{i,j}}=\delta_i \sigma'(Z_i) X_j \implies \frac{\partial \rho}{\partial W} = (\delta \odot \sigma'(Z))X^T$
+
+Parts of the chain rule are being reused for computing partial derivative in lower (smaller l) layers. This can be seen in the use of $\frac{\partial \rho}{\partial U}$ and $\delta$
+
+## Multi-layer neural network
+
+- $Z^1 = W^1x + b^1$
+- $H^1 = \sigma(Z^1)$
+- $Z^l = W^lH^{l-1} + b^l$ for l = 2, ..., L
+- $H^l = \sigma(Z^l)$ for l = 2, ..., L
+- $U = W^{L+1}H^L + b^{L+1}$
+- $f(x; \theta) = F_{softmax}(U)$
+
+Network has L hidden layers followed by a softmax function to map to probability distribution. Each layer of the neural network has $d_H$ hidden units. The l-th hidden layer $H^l \in R^{d_H}$. $H^l$ is produced by applying element-wise non-linearity to input $Z^l \in R^{d_H}$. Called fully-connected neural network because every hidden unit in layer (l-1) is connected to every hidden unit in layer l.
+
+$\sigma(Z^l) = [\sigma(Z^l_0), ..., \sigma(Z^l_{d_H-1})]$
+
+## SGD for updating $\theta$ for a general feed-forward network
+
+- Initialize W: $W_{i,j} \sim iid$ Gaussian $(0, \frac{1}{d_H})$ (Xavier initialization) or uniform, where $d_h$ is number of hidden units (not the number of hidden layers)
+- Randomly select a data sample (X, Y)
+- Compute forward step: $Z^1, H^1, ..., Z^L, H^L, U, f(X; \theta)$ and $\rho:= \rho(f(X; \theta), Y)$
+- Calculate partial derivative: $\frac{\partial \rho}{\partial U} = -(e(Y) - f(X;\theta))$
+- Calculate partial derivatives: $\frac{\partial\rho}{\partial b^{l+1}}$, $\frac{\partial\rho}{\partial W^{l+1}}$ and $\delta^L$
+- For l = L-1, ..., 1:
+    - Calculate $\delta^l = (W^{l+1})^T(\delta^{l+1} \odot \sigma'(Z^{l+1}))$
+    - Calculate partial derivative wrt $W^{l}$ and $b^{l}$
+- Update parameters $\theta$ using update equation $\theta_{iter+1} = \theta_{iter} - \alpha_{iter} \nabla_{\theta_{iter}} \rho$
+
+## Hyperparameters
+
+- Number of layers L
+- Number of hidden units per layer $d_H$
+- Activation function
+- Mini batch size (too small will lead to large error in gradients, too large will take too much time to train - similar to batch gradient descent)
+
+More hidden units, more number of layers => more powerful model, more likely to overfit if data set (sample size) is not sufficiently large
+
+Vanishing gradient problem: if number of layers is large, small $\frac{\partial \rho}{\partial H^l}$ will lead to small values of $\frac{\partial \rho}{\partial H^{l-1}}, ..., \frac{\partial \rho}{\partial H^1}$
+
+## Computational cost of backprop
+
+Number of arithmetic operations: $N[(L-1)(3d_H^2 + d_H) + d_H(2d_H+d+3K+1) + 2K]$
+
+Memory required: $(L-1)(d_H^2 + d_H) + d_H(d+K) + K$
+
+Memory cost of backpropagation algo: $(L-1)(d_H^2 + d_H) + d_H(d+K) + K + 2Nd_H$

@@ -1,0 +1,18 @@
+---
+title: "Lecture 02"
+author: "Naveen Mathew Nathan S."
+date: "8/29/2019"
+output: pdf_document
+---
+
+## Why do parallel programs not always scale?
+
+Embarassingly parallel: A process that can execute without dependencies on data or outputs from other processes. Therefore, there is no need for transfer between processors.
+
+- Communication: Number of communication partners (worst case: all to all communication where all cores should communicate with every other core); Latency, bandwidth, other costs.
+- Dependency: control or data dependency (eg: computed sum sequentially sent from core to core to compute sum of all elements)
+- Load imbalance: synchronization, starvation (work starved processors will be the bottleneck)
+
+Ideal case: each processor has the same amount of work to do: embarrassingly parallel
+
+Makefile has a list of dependencies and commands

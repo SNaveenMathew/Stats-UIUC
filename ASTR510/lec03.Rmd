@@ -1,0 +1,120 @@
+---
+title: "Lecture 03"
+author: "Naveen Mathew Nathan S."
+date: "9/3/2019"
+output: pdf_document
+---
+
+# Mesh Discretization
+
+Mesh is a way of encoding a location in space. It does not encode any information about the function directly.
+
+## Structured mesh
+
+Regular array of indexed zones: incrementing / decrementing an index leads to an adjacent cell. These cells are also adjacent in memory.
+
+Unstructured mesh: Irregular array of elements linked by pointers. Eg: used in computing gas flow over an object
+
+## Storage in mesh
+
+- Finite differencing: function values at points:
+
+$q_{ij} = q(x_i, y_j)$ where $x_i = i \Delta x$ and $y_j = j \Delta y$
+
+- Finite volume: function averages over zones (finite element on unstructure meshes)
+
+$\bar q_{ij} = \frac{1}{\Delta x \Delta y}\int_{x_{i-1/2}}^{x_{i+1/2}}\int_{y_{j-1/2}}^{y_{j+1/2}} q(x, y) dx dy$, $x_i = (i+\frac{}{})\Delta x$
+
+## Finite differencing
+
+$q(x) = q(x_i) + q'(x_i) * (x-x_i) + \frac{1}{2}q''(x_i) * (x- x_i)^2 + ...$
+
+Using this expansion we can come up with approximations for q', q'', ...
+
+- $q'(x_i) = \frac{q(x_{i+1})-q(x_i)}{\Delta x} + O(\Delta x)$ one-sided difference
+- $q'(x_i) = \frac{q(x_{i+1})-q(x_i)}{2\Delta x} + O((\Delta x)^2)$ centered difference
+- $q''(x_i) = \frac{q(x_{i+1}) - 2q(x_{i}) + q(x_{i-1})}{(\Delta x)^2} + O((\Delta x)^2)$
+
+The coefficients are called stensils
+
+- For q': [0, -1, 1], [-1/2, 0, 1/2], [1/12, -2/3, 0, 2/3, -1/12]
+- For q'': [1, -2, 1]
+
+In multiple dimensions: $\frac{\partial^2 f}{\partial x^2} + \frac{\partial^2 f}{\partial y^2} \sim \frac{f_{i+1,j}-2*f_{i,j}+f_{i-1,j})}{\Delta x^2} + \frac{f_{i,j+1}-2*f_{i,j}+f_{i,j-1})}{\Delta y^2}$
+
+Finite volume:
+
+$\bar q_j = \frac{1}{\Delta x}\int_{x_{j-1/2}}^{x_{j+1/2}}q(x)dx$
+
+For q'(x):
+
+- $q'(x) = \frac{\bar q_{i+1} - \bar q_{i}}{\Delta x} + O(\Delta x)$
+- $[-1/2, 0, 1/2] + O(\Delta x^2)$
+- $[-5/48, 34/48, 0, -34/48, 5/48] + O(\Delta x^4$
+
+For q''(x):
+
+- $[1, -2, 1] + O(\Delta x^2)$
+
+## Algebraic representation of PDE:
+
+$a \frac{\partial^2 q}{\partial x^2} + a \frac{\partial^2 q}{\partial x^2} + b \frac{\partial^2 q}{\partial x \partial y} + c \frac{\partial^2 q}{\partial y^2}+ d \frac{\partial q}{\partial x} + e \frac{\partial q}{\partial y} + fq = g$
+
+Nature of the solution dependes on $b^2 - 4ac$:
+
+- <0 => elliptic equation. Eg: Poisson equation $\nabla^2 \phi = \rho$
+- =0 => parabolic equation. Eg: Diffusion equation $\frac{\partial T}{\partial t} = \kappa\nabla^2T$
+- >0 => hyperbolic equation. Eg: Wave equation $\frac{\partial^2 \rho}{\partial t^2} + a^2 \nabla^2 \rho = 0$
+
+## Advection equation:
+
+Special case of wave equation where the waves move in one direction
+
+$\frac{\partial q}{\partial x} + a \frac{\partial q}{\partial x} = 0$
+
+Taking s = x - at. We observe that any f(s) is a solution to the above equation. Therefore, solution after a time t is just a translation of solution at time t = 0.
+
+### Discretizing the advection equation
+
+- FTCS: $\frac{q_i^{n+1}-q_i^n}{\Delta t} + a\frac{q_{i+1}^n - q_{i-1}^n}{2\Delta x} = 0$
+- BTCS: $\frac{q_i^{n+1}-q_i^n}{\Delta t} + a\frac{q_{i+1}^n - q_{i-1}^n}{2\Delta x} = 0$
+- Upwind: a>0, downwind: a<0: $a$
+
+### Numerical instability
+
+FTCS on linear advection equation and starting with square pulse, we expect the square wave to propagate in time. But the result is an exploding wave. Why?
+
+Let us try $q^n_j = \psi(k)^ne^{ikj}$. This $\psi^{n+1} e^{ijk} = \psi^n-\frac{a\Delta t}{2\Delta x}[\psi^n e^{ik(j+1)}-\psi^n e^ik(j-1)] \implies |\psi(k)| = [1 + \frac{(a \Delta t)^2}{(\Delta t)^2}sin^2(k)]^1/2 > 1$ unconditionally
+
+Upwind scheme is conditionally stable:
+
+$|a|\frac{\Delta t}{\Delta x} < 1$ leads to a relatively stable solution. The square wave becomes curved and elongated, but the center is approximately at the right position. This is the CFL (Courant-Friedrichs-Lewy) criterion. CFL criterion is necessary but not sufficient.
+
+If CFL criterion is met, all the points of q which are required for computing current q will already be computed using the difference equation.
+
+### Upwinding: Taylor series
+
+$\frac{\partial q}{\partial t}|_{i}^{n} = -a\frac{\partial q}{\partial x}|_{i}^{n} + \frac{1}{2}a\Delta x \frac{\partial^2 q}{\partial x^2}|_{i}^{n} + O(\Delta t, Delta x^2)$
+
+### Lax-Wendroff
+
+Second-order method: $q_i^{n+1} = q(x_i, t_{n+1}) = q_i^n + \Delta t \frac{\partial q}{\partial t}|_{i}^{n} + \frac{1}{2} \Delta t^2 \frac{\partial^2 q}{\partial t^2}|_{i}^{n} + O(\Delta t^3)$
+
+Equivalent to taking FTCS and diffusing away the tendency of FTCS to blow up. Dispersive (wave-like) error near discontinuities.
+
+## Definitions
+
+- Consistency: Define local truncation error by using Taylor expansion. If lowest order terms are $O(\Delta x^p, \Delta t^p)$, the difference operator is said to be locally p-th order
+- Stability: Method is stable if as $\Delta x, \Delta t \to 0$, the method produces a result that tends towards some finite limit.
+- Convergence:
+- Lax Equivalence Theorem: If and only if a method is consistent and stable, it is convergent.
+
+## Diffusion equation
+
+$\frac{\partial^2q}{\partial t^2} = D \frac{\partial^2 q}{\partial x^2}$
+
+Substituting q(x, t) = X(x)T(t), $X \dot T - DTX''=0 \implies \frac{\dot T}{T} = D\frac{X''}{X}$ will be true when both are equal to constant c.
+
+- c < 0: $T(t) \propto e^{-|c|t}$, $X(x) \propto e^{ix\sqrt{|c|D}}$
+- c > 0 leads to X(x) being explosive: not physically possible, hence discarded
+

@@ -1,0 +1,55 @@
+---
+title: "Lecture 02"
+author: "Naveen Mathew Nathan S."
+date: "8/28/2019"
+output: pdf_document
+---
+
+# K Nearest Neighbors
+
+$\hat f(X^*) = \frac{1}{K}\sum_{i\in N_K(X^*)} Y_i$
+
+- The set of K nearest neighbors will be considered for computing the value of $\hat f(X^*)$ for regression and the majority vote from K nearest neighbors for classification.
+- The nearest neighbors are obtained from the training set that has ground truth real values or categorical labels.
+
+## Evaluation
+
+Sum of squares of error: $E[(\hat f(X^*) - Y^*)^2]$
+
+Sources of randomness: $\hat f$ and $Y^*$. We assume that $X^*$ is fixed and $Y^* = f(X^*) + \epsilon$
+
+### Decomposing sum of squres
+
+$E[(Y^* - \hat f(X^*))^2] = E[((Y^*- f(X^*)) + (f(X^*) - \hat f(X^*))^2] = E[(Y^*- f(X^*))^2] + 2 * E[(Y^*- f(X^*)) * (f(X^*) - \hat f(X^*))] + E[(f(X^*) - \hat f(X^*))^2]$
+
+First term is the irreducible error. Also, $Y^*- f(X^*)$ and $f(X^*) - \hat f(X^*)$ are independent
+
+$= E[(Y^*- f(X^*))^2] + E[(\hat f(X^*) - E[\hat f(X^*)])^2] = E[(Y^*- f(X^*))^2] + E[(\hat f(X^*) - E[\hat f(X^*)])]^2 + var(\hat f(X^*))$ = irreducible error + (bias of estimator)^2 + variance of estimator
+
+For 1 nearest neighbor, $f(X^*) - E(Y^*) \approx f(X^*)-E(Y_{(1)}^*) \approx f(X^*) - f(X_{(1)}^*)$
+
+- $Bias^2 \approx 0$ because as $N \to \infty$, we have $f(X^*) - f(X_{(1)}^*) \le L * (X^* - X_{(1)}^*)$
+- $Variance \approx \sigma^2$
+
+For N nearest neighbor, $\hat f(X^*) = \bar Y \forall X^*$, but variance = $\frac{\sigma^2}{N} \to 0$ as $N \to \infty$
+
+This shows the tradeoff between bias and variance. As K increases, the bias will increase, but variance will decrease.
+
+Boundary will have bias regardless because all K nearest neighbors are likely to lie on the same side of the boundary.
+
+### Preventing under or overfitting
+
+- Additional penalty in loss based on model complexity
+- Cross-validation
+
+## Cross validation
+
+### K-fold cross validation
+
+Split the data into K equal parts. Randomly choose (K-1) parts as training data and test using the 1 remaining part. Repeat till all K combinations are used for fitting and testing respectively. Average the loss over all folds.
+
+$E = \frac{1}{K}\sum_{i=1}^{K}E_i$
+
+### Leave one out cross validation
+
+Extreme version of K-fold cross validation where K = N, so only one point is left out for testing.

@@ -1,0 +1,110 @@
+---
+title: "Lecture 02"
+author: "Naveen Mathew Nathan S."
+date: "8/29/2019"
+output: pdf_document
+---
+
+# SGD
+
+Theorem: suppose $\nabla_\theta L(\theta)$ is globally Lipschitz ($|f(x) - f(y)| \le K|x-y| \forall K>0,x,y$) and bounded. (quadratic function is not globally Lipschitz; neural network loss functions are non-convex, not globally Lipschitz). Furthermore, assumed that holds and $L(\theta)$ is bounded, then $P[lim_{l \to \infty} \nabla_\theta L(\theta^{(l)}) = 0] = 1$.
+
+Asymptotics: when number of hidden units is large ("overparameterized" regime) SGD trained neural network will converge to global minima.
+
+## Mini batch SGD
+
+- Randomly initialize $\theta^{(0)}$
+
+- For l = 0, 1, ..., L:
+
+ * Select M data samples $(x^{(l, m)}, y^{(l, m)})_{m=1}^{M}$ at random from the data set (); M << N
+ * SGD has large variance 
+ * Calculate gradient: $G^{(l)} = \frac{1}{M}\sum_{m=1}^{M}\nabla_\theta \rho(f(x^{(l,m)}; \theta^{(l)}), y^{(l,m)})$
+ * Update parameters $\theta^{(l+1)} = \theta^{(l)} - \alpha^{(l)} * G^{(l)}$
+
+- Less noisy than SGD update with single sample: $Var[G^{(l)}|\theta^{(l)}] = Var[\frac{1}{M}\sum_{m=1}^{M}\nabla_\theta \rho(f(x^{(l,m)}; \theta^{(l)}), y^{(l,m)})|\theta^{(l)}] = \frac{1}{M}Var[\nabla_\theta \rho(f(x^{(l,m)}; \theta^{(l)}), y^{(l,m)})|\theta^{(l)}] = \frac{1}{M} Var[SGD]$
+
+# Single layer fully connected neural network
+
+Single layer: 1 hidden layer
+
+- $Z = Wx + b^1$
+- $H_i = \sigma(Z_i)$, i = 0, 1, ..., $d_H-1$; H is an element-wise non-linear activation
+- $f(x; \theta) = C^TH + b^2$
+- $\theta = \{W, b^1, C, b^2\}$ are the parameters of the model
+
+Neural network can be used to predict an outcome $Y \in R^K$ given an input $X \in R^d$
+
+Examples of $\sigma$:
+
+- $sigmoid(z) = \frac{e^z}{1+e^z}$ varies between 0 and 1
+- $tanh(z) = \frac{e^z-e^{-z}}{e^z+e^{-z}}$ varies between -1 and 1
+- $ReLU(z) = max(z, 0)$
+
+For a regression problem, $\rho(z, y) = ||z-y||^2; L(\theta) = E_{X, Y}[||Y-f(X;\theta)||^2]$
+
+Definition: $\theta^* \in argmin_\theta L(\theta)$
+
+Universal approximation theorem: More number of hidden units implies more complex the model.
+
+Let $Y = f^*(X)$; we would like to learn model $f(x; \theta)$ for relationship $y = f^*(x)$
+
+Neural network trained with SGD can approximate any function arbitrarily well
+
+$E_{X,Y}[||Y-f(X;\theta)||^2] < \epsilon$
+
+Neural network can also have local minima, which is not global minima. Simple example: one-layer network $f: R \to R$ with single ReLU unit:
+
+$f(x; \theta) = c *max(Wx+b^1,0)+b^2$
+
+Suppose dataset has 2 data points: $\{(x_0, y_0), (x_1, y_1)\}$ and that loss function $\rho(z,y) = (z-y)^2$; For any $c,W \in R$, $b^1 < min(-Wx_0, -Wx_1)$ and $b^2 = \frac{y_0+y_1}{2}$ is a local minimum
+
+## Classification
+
+- Categorical outcome
+- Outcome is one of $Y = {0, 1, ..., K-1}$
+- Output will be vector of probabilities
+
+$L(\theta) = -\sum_{n=1}^{N}log f_{y^n}(x^n; \theta)$, where $f(x; \theta): R^d \to$ probability distribution of Y: $Y \in \{0, 1, ..., K-1\}$
+
+This can be rewritten as: $\rho(v,y) = -\sum_{k=0}^{K-1}1_{y=k} logv_k$ and $L_{\theta} = E_{(X,Y)}[\rho(f(X;\theta), Y)]$
+
+The whole classification model:
+
+- $Z = Wx + b^1$
+- $H_i = \sigma(Z_i)$
+- $U = CH + b^2$
+- $f(x; \theta) = F_{softmax}(U)$ to map the fs to a probability distribution
+
+$F_{softmax, i}(z) = \frac{e^{z_i}}{\sum_{j}e^{z_j}}$
+
+### Gradient
+
+$\nabla_\theta \rho(f(x; \theta), y)$
+
+#### Backpropagation
+
+- Randomly select new data sample (X, Y)
+- Compute forward step Z, H, U, $f(X; \theta)$ and $\rho(f(X;\theta), Y)$ (computing model predictions)
+- Calculate partial derivative $\frac{\partial \rho}{\partial U} = -(e(Y) - f(X;\theta))$; $e(Y) = (I_{Y=0}, I_{Y=1}, ..., I_{Y=K-1})$
+- Calculate $\frac{\partial\rho}{\partial b^2}$ = $\frac{\partial\rho}{\partial U}$, $\frac{\partial\rho}{\partial C} = \frac{\partial\rho}{\partial U} H^T$ and $\delta = C^T \frac{\partial \rho}{\partial U}$
+- Calculate partial derivatives $\frac{\partial \rho}{\partial b^1} = \delta \odot \sigma'(Z)$ and $\frac{\partial \rho}{\partial W} = \bigg(\delta \odot \sigma'(Z)\bigg)X^T$ : element wise multiplication
+- Update parameters $\theta = \{C, b^2, W, b^1\}$ with stochastic gradient descent step
+
+# MNIST
+
+- Contains 28 x 28 images. Can be rearranged into $x \in R^{784}$ vector
+- Normalize the data to range [0, 1]
+
+# PyTorch implementation
+
+- Define model
+- Convert data to PyTorch tensors/variables
+- Apply model to data
+- Compute objective function
+- Backward () -> computes backpropagation
+- Update model
+
+# Derivation of backpropagation
+
+$\frac{\partial \rho}{\partial U} = \frac{\partial (-logf_Y(X; \theta))}{\partial U} = \frac{\partial (-log F_{softmax,y} (U))}{\partial U} = \frac{\partial -log(\frac{e^{z_i}}{\sum_j{e^{z_j}}})}{\partial U} = -(F_{softmax,y} (U))(1-F_{softmax,y} (U))$
