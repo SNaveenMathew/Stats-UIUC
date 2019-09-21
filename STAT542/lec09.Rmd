@@ -1,0 +1,40 @@
+---
+title: "Lecture 09"
+author: "Naveen Mathew Nathan S."
+date: "9/18/2019"
+output: pdf_document
+---
+
+# Splines
+
+## Histogram regression
+
+Assume that the number of predictors = 1.
+
+Degress of freedom of model = number of regions in data = $i_max$. Basis: $I(X_l^{(i)} < X < X_u^{(i)}); i \in \{1,2, ..., i_{max}\}$, where $X_l^{(i)} = X^{(i-1)}_{u}$. This can be achieved with $i_max - 1$ knots (+ 2 knots at $(-\infty, \infty)$). Let $i_{max} = p$, therefore degrees of freedom = p. Let the knots be {$\psi_1, \psi_2, ..., \psi_p$}
+
+## Linear extension to histogram regression: Piece-wise linear regression
+
+Degrees of freedom = 2 * number of regions = $2 p$. Basis: $X_1[I(X_l^{(i)} < X < X_u^{(i)})]; i \in \{1,2, ..., i_{max}\}$
+
+## Continuity correction
+
+Constraints: $\beta_0^{(i-1)} + \beta_1^{(i-1)}\psi_i$, this is contrained optimization. However, an appropriate design of basis can make this a simple linear regresison estimation problem.
+
+### Design of basis:
+
+$max(0, x-\psi_i), i \in \{1,2,3, ..., \}$
+
+This directly forces continuity as sum of continuous functions is continuous functions is a continuous function. This is true even though the $\psi$s are discrete
+
+## Cubic spline
+
+Continuity is not sufficient. First and second derivatives should also be the same. Third derivative may not be the same. This gives $4*(p+1) - 3*p+4$ parameters
+
+### Design of basis (B-spline):
+
+Look at the B-spline image. Basis at a range $\psi_i, \psi_{i+1}$ is non-zero only in the region. The non-zero basis contains a linear term, quadratic term and cubic term. The design matrix for B-spline basis is banded. Any function $f(x)$ is just a linear combination of the basis terms. The intercept term is global.
+
+This is constructed using `splines::bs`. The column space of the B-spline basis is same as the column space of truncated cubic splines. It is not just sufficient to argue that the degrees of freedom are the same. The boundaries of the estimate are going to remain cubic!
+
+Natural cubic spline: B-spline with linear estimate outside the boundary of observed data. Degrees of freedom = p

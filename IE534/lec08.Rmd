@@ -1,0 +1,66 @@
+---
+title: "Lecture 08"
+author: "Naveen Mathew Nathan S."
+date: "9/19/2019"
+output: pdf_document
+---
+
+## ADAM
+
+For training iteration k
+
+- $s = \rho_1s + (1-\rho_1)g$ -> momentum
+- $r = \rho_2r + (1-\rho_2)g\odot g$
+- $\hat s = \frac{s}{1-\rho_1^{k+1}}$ will be > s. For large k this becomes same as RMSpropr
+- $\hat r = \frac{r}{1-\rho_2^{k+1}}$ will be > r. For large k this becomes same as RMSpropr
+- $\Delta \theta = -\eta\frac{\hat s}{\delta + \sqrt{\hat r}}$
+- $\theta = \theta + \Delta \theta$
+
+Requires initialization of r. Eg: $r^{(0)}=0$. This biases r downwards towards 0, therefore $\hat r$ is intentionally made to be larger than r
+
+## Overfitting
+
+- regularization
+- dropout
+
+## Droupout
+
+Consider fully connected network
+
+- $Z^1 = W^1X+b^1$
+- $Z^l = W^lH^{l-1} + b^l$
+- $H^l = R^l \odot \sigma(Z^l)$: Randomized
+- $U = W^{L+1}H^L + b^{L+1}$
+- $f(X, R, U) = $
+
+$R^l$ = 1 with probability p, 0 with probability 1-p -> Bernoulli random variable
+
+Let $R = (R^1, ... , R^L)$ also called the mask. Do element-wise multiplication with R.
+
+SGD:
+
+- Randomly generate data sample
+- Randomly generate mask
+- Calculate gradient: $G^{(k)} = \nabla_\theta \rho(f(X, R; \theta), Y)$
+- Take SGD step: $\theta^{(k+1)} = \theta^{(k)} - \alpha^{(k)}G^{(k)}$
+
+Hinton: overfitting occurs between complex relationships that occur between neurons in the same layer
+
+Dropout minimizes $L(\theta) = E_{(X,Y),R}[\rho (f(X, R;\theta), Y)]$
+
+- Dropout minimizes average loss over a collection of models: each model is of the same size as the original fully connected network!!!
+- Number of distinct models grows exponentially with $L \times d_H$. Directly optimizing $E_R[\rho]$ is very expensive
+
+- $f_{prediction}(X; \theta) = F_{softmax}(U)$
+
+Hinton's heuristic: When making a prediction on the testing set, replace $R^l$ with $E(R^l) = p$.
+
+Another heuristic would be to take each testing example and run through the models randomly (Monte Carlo) and average their predictions.
+
+## Batch normalization
+
+Normalization learned during training
+
+$H^l = \sigma(BN_\theta(Z^l)); Z^l = W^lH^{l-1} + b^l$. Goal is to learn a transformation such that $E_X[BN_{\theta^{(k)}}[Z^l_i]] = 0$ and $var_X[BN_{\theta^{(k)}}[Z^l_i]] = 1$.
+
+**Reason:** If Z is large, the gradient of activation function will be small.

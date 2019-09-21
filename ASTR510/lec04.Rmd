@@ -1,0 +1,86 @@
+---
+title: "Lecture 04"
+author: "Naveen Mathew Nathan S."
+date: "9/5/2019"
+output: pdf_document
+---
+
+## Types of error
+
+- Truncation error: converting differential equations to algebraic equations using finite difference scheme
+- Round-off error: most computers use IEEE binary representation for 32-bit floating point. Sign bit: 1, exponent bits: 8, mantissa bits; 23. Eg: $\frac{1}{3} = 0.\bar 3 \approx (00111110101010101010101010101011)_2 = 0.33333298563957214$. Another example: $42.34 + 3.312 e-7 = 42.3400003312 \approx 42.340000$ in single precision reals. Double precision is required!
+
+Fix:
+
+- rearrange calculations
+- use double precision
+- keep track of small differences (Eg: Kahan summation)
+- reduce number of operations
+
+## Measure of errors
+
+$L_n norm = [\frac{1}{N}\sum_{i=0}^{N-1}|q_i^{numerical} - q_i^{analytical}|^n]^\frac{1}{n}$
+
+Commonly used: $L_1norm, L_2norm, L_\infty norm$
+
+$L_\infty norm = sup|q_i^{numerical} - q_i^{analytical}|$
+
+Most of the time we don't have an analytical solution.
+
+Measure global self-convergence rate using three meshes with N, rN and $r^2N$ zones,
+
+$p = \frac{ln \epsilon(q_{r^2N} - q_{rN}) - ln \epsilon(q_{rN} - q_{N})}{ln r}$
+
+## Applying BTCS to Advection Equation
+
+$q_i^{n+1} = q_i^{n} - a\frac{\Delta t}{2 \Delta x}(q_{i+1}^{n+1} - q_{i-1}^{n+1})$. Treat q as a matrix: $A = [a_{i,j}]$ such that $a_{i,j} = 1$ when i = j, $a_{i,j} = \sigma$ if i-j = 1, $a_{i,j} = -\sigma$ if i-j = -1, $a_{i,j} = 0$ otherwise. $Q_1 = [q_1^{n+1}, q_2^{n+1}, ..., q_{N-2}^{n+1}]^T$, $Q_2 = [q_1^{n}, q_2^{n}, ..., q_{N-2}^{n}]$, then we have $AQ_1 = Q_2$ where $\sigma = \frac{a\Delta t}{2\Delta x}$. Note that boundary conditions are included in the matrix.
+
+This can be rewritten as $(1 + \sigma D).q^{n+1} = q^{n}$ where D is spatial difference matrix and $q^n$ is solution vector for timestep n.
+
+$(1 + \sigma D)q^n + \Delta t(1+\sigma D) \frac{\partial q}{\partial t}|^n + O(\Delta t^2, \Delta x^2) = q^n$
+
+# Finite volume schemes
+
+$\int_0^L dx\[\frac{\partial \rho}{\partial t}] + a\frac{\partial \rho}{\partial x\} = 0$
+
+$a \times \rho$ is a flux: tells how fast liquid is ejected
+
+$\frac{d}{d t}\int_0^L = \frac{dM}{dt} = -a[\rho(L) - \rho(0)$
+
+Average over timestep: $\frac{1}{\Delta t}\int_{}^{}$
+
+Adding first 2 equations, we know that $q_3$ gets cancelled. Therefore, q is conserved
+
+## Donor cell method
+
+Suppose f(q) = aq. $\bar f_{i+1/2}^{n+1/2} = a_{i+1/2}\bar q_i^n$ if $a_{i+1/2} > 0$ or $a_{i+1/2}\bar q^n_{i+1}$ if $a_{i+1/2} < 0$ otherwise
+
+## Lax-Friedrichs/Rusanov method
+
+Unstable without second term, conditionally stable with it
+
+## Operator splitting
+
+$D[q^n] = D_3[D_2[D_1[q^n]]] + O(\Delta t^2)$
+
+Making it symmetric for higher order terms (Strang splitting): $D[q^n] = D_1^{1/2}[D_2^{1/2}[D_1^{1/2}[D_2^{1/2}[q^n]]]] + O(\Delta t^3)$
+
+## Adaptive mesh refinement
+
+- If grid is non-uniform, they are not equally spaced. Therefore, second order accuracy in derivative is tough to achieve.
+    - Nonuniform mesj
+    - Lagrange mesh
+    - Arbitrary Lagrangian-Uelerian
+
+- p refinement - adjust order of method
+- h refinement
+    - Nested grids
+    - Stuctured AMR
+    - Finite elements
+
+Types of AMR:
+
+- patch-base AMR
+- Oct-tree AMR
+
+Space filling

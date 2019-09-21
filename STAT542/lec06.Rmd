@@ -1,0 +1,52 @@
+---
+title: "Lecture 06"
+author: "Naveen Mathew Nathan S."
+date: "9/9/2019"
+output: pdf_document
+---
+
+# Effect of bias in bias-variance tradeoff of linear regression
+
+Let X be shared between training and testing sets.
+
+- Training: $y = f(x) + \epsilon$
+- Testing: $y^* = f(x) + \epsilon^*$
+
+We will estimate f in similar way even though underlying function is non-linear.
+
+Testing error: $E|y^* - x\hat\beta|^2 = E|y-\mu+\mu-H\mu + H\mu - x\hat\beta|^2$
+
+H is determined by covariates. If H is rank n, $H\mu = \mu$. If H is of lower rank, $H \mu$ will be projection of $\mu$ in restricted column space.
+
+$= E|y^*-mu|^2 + E|\mu - H\mu|^2 + E|H\mu - x\hat\beta|^2$
+
+- First term will always exist because $\epsilon^*$ cannot be predicted for the test set. This is the irreducible error
+- Second term will be small if the model is very flexible (like 1 NN or linear model with very large p). Otherwise the difference exists. This is $bias^2$
+- Third term: $x\hat\beta = Hy \implies E|H(\mu-y)|^2 = E|He|^2 = E[tr(e^TH^THe)] = p\sigma^2$
+
+Let us intentionally remove 1 variable. First term remains the same, second term increases because the space of H becomes less representative, third term decreases because p decreases.
+
+Training error: $E|y-x\hat\beta|^2 = E|(I-H)y|^2 = E|(I-H)\mu| + E|(I-H)\epsilon|^2 = bias^2 + (n-p)\sigma^2$
+
+Explaining bias-variance tradeoff with extreme cases:
+
+- When we have n independent variables such that H is full rank $H_{n \times n}$, bias = 0, variance is $p \times \sigma^2$
+- When we have 0 independent variables, bias will be largest, but variance is 0
+
+## Variable selection
+
+Testing error = Training error + $2p\sigma^2$ can be approximated by: Testing error = Training error + $2p\hat\sigma^2$, where $\hat\sigma^2 = \frac{SSE}{n-p}$
+
+- Reducing the number of variables is better for reducing difference in SSE between training and testing sets.
+- If a covariate is not very correlated with outcome, we can remove it. This increases the bias only slightly, but variance may decrease drastically (compared to increase in bias).
+- We can define a dimensionless metrics that help us in deciding whether a variable should be dropped. Example: Mallow's Cp, AIC, BIC. All such metrics can be simplified as: Goodness of fit + complexity penalty
+- Mallow's Cp = RSS + $2p \hat\sigma_{full}^2$
+- AIC = -2Log-likelihood + 2p
+- BIC = -2Log-likelihood + p*logn (usually works better in high dimensional data)
+- Algorithms:
+    - Best subset selection: brute force search of all combinations of variables and evaluating selected metric
+    - Stepwise (forward/backward...) selection: sequentially choose best model by adding/removing/editing one variable at a time starting from null/full model
+
+### Best subset selection using LEAPS
+
+Some of the combinations can be ignored. Eg: If $RSS(X_1, X_2) < RSS(X_3, X_4, X_5, X_6)$, $C_P(X_1, X_2) < C_P(X_3, X_4, X_5, X_6)$. Therefore all sub models of $(X_3, X_4, X_5, X_6)$ can be `leaped` over.

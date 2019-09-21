@@ -1,0 +1,102 @@
+---
+title: "Lecture 05"
+author: "Naveen Mathew Nathan S."
+date: "9/10/2019"
+output: pdf_document
+---
+
+**Note:** Attend TA office hours to get Bluewaters access.
+
+Mini-batch GD also moves in unbiased direction of gradient. It is less noisy compared to SGD - therefore, larger learning rate can be used. Computational cost is the same (embarrassingly parallel) if batch size is sufficiently small.
+
+Mini-batch GD: $\hat{\hat L} = \frac{1}{m}\sum_{i=1}^{m}\rho(f(X^{(i)}, \theta), Y^{(i)})$
+
+
+# Multi-layer neural network
+
+- $Z^{(l)} = $
+- $H^{(l)} = \sigma^{(l)}(Z^{(l)}) = (\sigma^{(l)}(Z^{l}_0), \sigma^{(l)}(Z^{l}_1), ..., \sigma^{(l)}(Z^{l}_{d_H-1}))$
+- $dim(W^{(1)})=d_H\times d$
+- $dim(b^{(1)}) = d_H$
+- $dim(W^{(l)}) = d_H^{(l)} \times d_H^{(l-1)}$ for l = 1, 2, ..., L. $d_H^{(L)} = K$ (number of outputs), $d_H^{(0)} = p$ (number of inputs)
+- $\sigma^{(L)} = F_{softmax}(H^{(l)})$ for a classification problem
+
+## Gradients
+
+$\delta^{(l)} = \frac{\partial \rho}{\partial H^{(l)}} \implies \delta^{(l)}_i = \sum_{j=1}^{d_H^{(l+1)}}\frac{\partial \rho}{\partial H_j^{(l+1)}} \frac{\partial H_j^{(l+1)}}{\partial H_i^{l}}$ for $l \in \{1, 2, ..., L-1\}$
+
+$H_j^{(l+1)} = \sigma^{(l+1)}(W_{j, :}^{(l+1)}H^{(l)} + b^{(l+1)}) \implies \frac{\partial H_j^{(l+1)}}{\partial H_i^{(l)}} = \sigma'^{(l+1)}(Z^{(l+1)})W_{j,i}^{(l+1)}$
+
+$\implies \delta^{(l)}_i = \bigg(\delta^{(l+1)}\odot\sigma'^{(l+1)}(Z^{(l+1)})\bigg)^TW_{:,i}^{(l+1)}$ for $l \in \{1, 2, ..., L-1\}$
+
+$\frac{\partial \rho}{\partial b^{(l)}} = \delta^{(l)}\odot \sigma'^{(l+1)}(Z^{(l+1)})$ for $l \in \{1, 2, ..., L\}$
+
+$\frac{\partial \rho}{\partial W^{(l)}} = \bigg(\delta^{(l)}\odot \sigma'^{(l)}(Z^{(l)})\bigg)\big(H^{(l-1)}\big)^T$ for $l \in \{1, 2, ..., L\}$ check this!
+
+$\delta^{(L)}_i = \sum_{m=0}^{K-1}\frac{\partial \rho}{\partial U_m}\frac{\partial U_m}{\partial H_i} = \sum_{m=0}^{K-1}\frac{\partial \rho}{\partial U_m}W_{m,i}^{(L+1)} = \frac{\partial \rho}{\partial U}.W_{:, i}^{(L+1)}$
+
+$\delta^{(L)}=(W^{(L+1)})^T\frac{\partial \rho}{\partial U}$
+
+$\frac{\partial \rho}{\partial b^{(L+1)}}=\big(W^{(L+1)}\big)^T\frac{\partial \rho}{\partial U}$ check this!
+
+# Convolution
+
+## Single layer convolution network
+
+Consider an input image $X \in R^{d_y\times d_x}$ and a filter $K \in R^{k_y \times k_x}$
+
+Convolution of matrix X with filter K is a map $X*K: R^{d_x\times d_y}\times R^{k_y\times k_x}\to R^{(d_y-k_y+1)\times (d_x-k_x+1)}$ where
+
+$(X*K)_{i,j} = \sum_{m=0}^{k_y-1}\sum_{n=0}^{k_x-1}K_{m,n}X_{i+m,j+n}$: same as dot product (sum product) of rectangular matrix $Z_{i,j}=<X_{i:i+k_y, j:j+k_x},K>\implies Z = X*K$
+
+Since the same filter K is applied on all regions of the image (sharing parameters), we expect the resulting $R^{k_y\times k_x}\to R^{(d_y-k_y+1)\times (d_x-k_x+1)}$ filtered image to be translation invariant. Has smaller number of parameters compared to an equivalent fully connected network - therefore, it can help in reducing overfitting.
+
+$H_{i,j} = \sigma(Z_{i,j})$
+
+Bias term can be added to Z (slightly more complex model) such that $H = \sigma(Z + b^{(2)}); b^{(2)}_{(d-k_y+1)\times(d-k_x+1)}$
+
+$f(x; \theta) = F_{softmax}(U)$
+
+$U_k = W_{k,:,:}H+b_k$
+
+SGD updates:
+
+- $b^{(l+1)}=b^{(l)} - \alpha^{(l)}\frac{\partial \rho}{\partial U}$
+- $W^{(l+1)}_{k, ., .} = W^{(l)}_{k, ., .} - \alpha^{(l)}\frac{\partial \rho}{\partial U_k}H$
+- $K^{(l+1)}=K^{(l)}-\alpha^{(l)}\big(X*\big(\sigma'(Z)\odot\delta\big)\big)$
+
+## Backpropagation:
+
+Cross entropy error: $\rho := \rho(f(X; \theta), Y) = -log(f_Y(X; \theta))$
+
+$\frac{\partial \rho}{\partial b_m} = \sum_{i=0}^{K-1}\frac{\partial \rho}{\partial U_i} \frac{\partial U_i}{\partial b_m} = \frac{\partial \rho}{\partial U_m}$
+
+$\frac{\partial\rho}{\partial W_{m, ., .}}=\sum_{i=0}^{K-1}\frac{\partial \rho}{\partial U_i}\frac{\partial U_i}{\partial W_{m, ., .}}$
+
+$\delta_{i,j} = \frac{\partial\rho}{\partial H_{i, j}} = \sum_{m=0}^{K-1}\frac{\partial \rho}{\partial U_m}\frac{\partial U_m}{\partial H_{i,j}} = \sum_{m=0}^{K-1}\frac{\partial \rho}{\partial U_m}W_{m,i,j} = \frac{\partial \rho}{\partial U}.W_{:, i, j}$
+
+$\frac{\partial \rho}{\partial K_{i,j}} = \sum_{m=0}^{d-k_{y}}\sum_{n=0}^{d-k_{x}} \frac{\partial \rho}{\partial }\frac{\partial }{\partial K_{i,j}} = X_{i:i+d-k_y, j:j+d-k_x}.(\sigma'(Z)\odot \delta)$
+
+$(X*(\sigma'(Z)\odot\delta_{i,j}))_{i,j} = \sum_{m=0}^{d-k_y}\sum_{n=0}^{d-k_x}(\sigma'(Z)\odot\delta)_{m,n} X_{i+m, j+n} = \frac{\partial \rho}{\partial K_{i,j}} \implies \frac{\partial \rho}{\partial K} = X*(\sigma'(Z)\odot\delta)$
+
+## Multiple channels
+
+K will be a stack of C filters of $k_y \times k_x$, where C is the number of channels. Therefore, $H \in R^{(d-k_y+1)\times(d-k_x+1)\times C}$ given by $H_{i,j,p}=\sigma(\sum_{m=0}^{k^l_y-1}\sum_{n=0}^{k_x^l-1} K^{l}_{m,n,p}X_{i+m, j+n})$. Therefore, $H_{:,:,p} = \sigma(Z_{:,:,p})$
+
+Backprop:
+
+$\delta_{i,j,p} := \frac{\partial \rho}{\partial H_{i,j,p}} = \frac{k=0}{K-1}\frac{\partial \rho}{\partial U_k}W_{k,i,j,p}={\partial \rho}{\partial U}.W_{:,i,j,p}$
+
+$\frac{\partial\rho}{\partial K_{:,:,p}} = X*(\sigma'(Z_{:,:,p})\odot\delta_{:,:,p})$
+
+$\frac{\partial \rho}{\partial b} = \frac{\partial \rho}{\partial U}$, $\frac{\partial \rho}{\partial W_{k, :,:,:}} = \frac{\partial \rho}{\partial U_k} H$
+
+## Multi-layer convolution networks:
+
+Input image is $X \in R^{d\times d\times C}$, $l^{th}$ convolution layer contains $C^l$ feature maps. Number of feature maps $C^l$ is often called number of channels for layer l. $l^{th}$ hidden layer is $H^l \in R^{d_y^l \times d_x^l \times C^l}$. First feature map $H^0 = X$. Filters for $l^{th}$-layer are: $K^l \in R^{d_y^l\times d_x^l\times C^l \times C^{l-1}}$.
+
+$H_{i,j,p}^l = \sigma(\sum_{p'=0}^{C^{l-1}-1}\sum_{m=0}^{k_y^l-1}\sum_{n=0}^{k_x^l-1}K^l_{m,n,p,p'}H^{l-1}_{i+m, j+n, p'})$
+
+The height $d_y^l$ and width $d_x^l$
+
+Size of feature maps monotonically decreases as the number of layers increase. $d_y^l $

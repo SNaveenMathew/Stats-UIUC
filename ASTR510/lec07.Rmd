@@ -1,0 +1,109 @@
+---
+title: "Lecture 07"
+author: "Naveen Mathew Nathan S."
+date: "9/17/2019"
+output: pdf_document
+---
+
+# Numerical experimentation
+
+## Goals
+
+- Exploration: what the solution looks like?
+- Theory calculation: Eg: non-linear growth rates for an instability? Fitting functions for results?
+- Parameter estimation: Eg: estimate galaxy density from redshift?
+- Sensitivity analysis: what model parameters are most important?
+
+**Guiding principles:**
+
+- Careful design: parameter choices, initial and boundary conditions
+- Correctness: 
+- Reproducibility
+
+# Model parameter selection
+
+- Full factorial design
+- Random sample design: a better way is to use thinned Markov process or quasirandom sequence (eg: Sobol)
+- Latin hypercube design:
+    - choose a row and column at random
+    - choose a row from remaining rows and a column from remaining columns at random
+    - repeat till all elements in square are exhausted. For n x n square this requires
+- Orthogonal array Latin hypercube design
+
+We still don't have to explore the whole space. If the problem we have symmetries, we exploit them
+
+- 1D:
+    - Plane symmetry: Cartesian (x)
+    - Axisymmetry (R)
+    - Spherical symmetry (r)
+- 2D:
+    - Plane symmetry: Cartesian (x, y)
+    - Plane symmetry: Polar (R, $\phi$)
+    - Axisymmetry: (R, z; R, $\phi$)
+- 2.5D: 2D mesh but carry all 3 components of vectors
+- 3D:
+    - Cartesian (x, y, z)
+    - Cylindrical (R, $\phi$, z)
+    - Spherical $(R, \theta, \phi)$
+
+If instabilities occur, they may grow based on symmetry. Therefore, there is no point in running 3D
+
+Eg: approximately spherical symmetry means instabilities may grow
+
+Potential issues:
+
+- Block representation of curved features
+- Artifacts at symmetry axes and coordinate singularities
+
+Example: core collapse supernova
+
+Other ideas: yin-yang mesh avoids artifacts. There are no poles unlike spherical mesh
+
+# Initializing structures that don't share mesh symmetry
+
+For finite-volume meshes, can be computationally complex to do integration over a zone. Solution: Use Monte Carlo integration.
+
+# Initializing AMR calculations
+
+- Start by initializing coarsest mesh
+- Decide where to refine; create new blocks
+- Redistribute blocks among processors if ncessary
+- Initialize solution on new blocks
+- Go to 2; if no new blocks required -> done
+
+# Considerations during mesh initializations
+
+- Conservation: interpolation should conserve totals
+    - $\sum_{ijk} \bar \rho_{ijk} \Delta x_i\Delta y_j\Delta z_k \neq 4 \pi \sum_n \rho_n r_n^2 \Delta r_n$
+- Empty regions: codes may not work with zero density. Interpoliation may cause negative values
+    - Eg: use fluff (tiny values) to fill those regions
+    - Ensure rough pressure continuity
+    - Timestep - don't make fluff too hot
+- Discontinuities: smear out to reduce noise
+    - Use average of left and right in zone containing the step (may slow down the code)
+    - Use exopnential cutoff in radial profiles
+
+# Gaussian random fields
+
+Gaussian random field $\rho(x)$ has Fourier transform defined by:
+
+- Amplitude distributed according to a Rayleigh distribution: $P(|\rho_k^2| > X) = e^{-\frac{X^2}{P(k)}}$, P(k) is the (given) power spectrum
+- Phase distributed uniformly in $[0, 2\pi)$
+
+Examples: Cosmological initial conditions, turbulent velocty or magnetic field.
+
+A realization of a given power spectrum in finite volume displays fluctuations in actual power about P(k) due to finite number of modes with given wave number k.
+
+Largest variance comes at small k, where we have smallest number of samples.
+
+Use Zel'dovich approximation (first order Lagrangian perturbation theory) to initialize Gauusian random perturbations.
+
+Suppose we initialize $\rho(x) = \bar \rho[1 + \delta(x)]$ on uniform mesh: corresponds to a displacement field $p(q,t)$ where $x(q) = q + p(q,t)$, qs are unperturbed positions. Velocity is $v(q) = \dot x(q) = \dot p(q,t)$
+
+Continuity equation connects $\rho$ with v:
+
+...
+
+(There is also a second order Lagrangian perturbation theory)
+
+(There can be unstructured meshes in 3D that are structured in quaternion)

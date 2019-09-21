@@ -1,0 +1,58 @@
+---
+title: "Lecture 04"
+author: "Naveen Mathew Nathan S."
+date: "9/5/2019"
+output: pdf_document
+---
+
+# Bluewater
+
+## Login
+
+ssh <userid>@bwbay.ncsa.illinois.edu
+
+## Interactive job
+
+## CPU job
+
+- qsub -I -l nodes=<num_nodes>:ppn=<num_processors>:xe -l walltime=<hh:mm:ss>
+
+## GPU job
+
+- qsub -I -l gres=ccm -l nodes=<num_nodes>:ppn=<num_processors>:xk -l walltime=<hh:mm:ss>
+- module add ccm
+- ccmlogin
+
+## Python in interactive mode
+
+- module load python/2.0.1
+- aprun -n 1 -N 1 python code.py
+    - n: Number of processing elements for the application
+    - N: Number of PEs to place per node
+
+## Batch job
+
+- qsub run.pbs
+- qstat -u <userid>
+- qdel <jobid>.bw'
+
+## Writing a PBS script
+
+```
+#!/bin/bash
+#PBS -l nodes=<num_nodes>:ppn=<num_processors>:xk
+#PBS -l walltime=<hh:mm:ss>
+#PBS -N job_name
+#PBS -e $PBS_JOB_ID.err
+#PBS -o $PBS_JOB_ID.out
+#PBS -m bea
+#PBS -M nedid@illinois.edu
+
+cd <path_to_directory>
+. /opt/modules/default/init/bash # to add modules commend to shell
+module load python/2.0.1
+module load cudatoolkit
+aprun -n <num_PE> -N <num_ppn_per_PE> python <script_name.py>
+```
+
+# PyTorch

@@ -1,0 +1,45 @@
+---
+title: "Lecture 05"
+author: "Naveen Mathew Nathan S."
+date: "9/6/2019"
+output: pdf_document
+---
+
+# Linear Regression
+
+$Loss = ||y-x_j^T\beta_j - \sum_{k \neq j} x_k^T \beta_k||_2^2$, where $r_j = y-\sum_{k \ne j}{x_k^T \beta_t=k}$. Therefore, we have $\beta_j = \frac{<r_j, x_j>}{<x_j, x_j>}$
+
+$L = |Y - f(x)|_2^2 \implies E(L) = \frac{1}{n}\sum_{i=1}^{n}(y_i - f(x_i))^2$
+
+$\hat \beta = argmin_\beta ||y - x\beta||_2^2 = argmin_\beta (y - x\beta)^T(y - x\beta)$
+
+$\frac{\partial RSS}{\partial \beta} = 0 \implies 2X^T(Y - X\beta) \implies \beta = (X^TX)^{-1}X^TY$
+
+$\hat Y = X\hat\beta = X(X^TX)^{-1}X^TY = HY$, where $H = X(X^TX)^{-1}X^T$. H is the hat matrix. It is used to project y in the vector space spanned by X. Therefore, $\hat Y$ is in the column space of X
+
+Properties of hat matrix:
+
+- $H^T = (X(X^TX)^{-1}X^T)^T = H$
+- $HH = H$
+- $(I-H)$ is also a projection matrix that projects y to column space orthogonal to space spanned by x: $(I-H)y = r$
+
+## Variance of estimator
+
+$var(\hat\beta) = var((X^TX)^{-1}X^TY) = (X^TX)^{-1}X var(y)X^T(X^TX)^{-1}$, we know that $var(y) = \sigma^2I_{p \times p}$, therefore $var(\hat\beta) = (X^TX)^{-1}\sigma^2$
+
+## Training and testing
+
+Let us assume that the covariates are shared between training and testing data.
+
+- Training: $y = X\beta + \epsilon$
+- Testing: $y^* = X\beta + \epsilon^*$
+
+Testing error: $E||y^* - X\hat\beta||_2^2 = E||y^*-X\hat\beta||^2 = E||y^*-x\beta+x\beta-x\hat\beta||^2 = E||\epsilon^*||^2 + 2E|\epsilon^*(X\beta - X\hat\beta)| + E||X\beta - X\hat\beta||^2$
+
+Using properties $tr(ABC) = tr(CAB) = tr(BCA)$, $E(tr(A)) = tr(E(A))$
+
+$E(tr((\beta-\hat\beta)^TX^TX(\beta-\hat\beta))) = tr(E(X^TX(\beta-\hat\beta)(\beta-\hat\beta)^T)) = tr(X^TXE((\beta-\hat\beta)(\beta-\hat\beta)^T)) = (X^TX)(X^TX)^{-1}\sigma^2 = p \sigma^2$
+
+Testing error: $(n + p) \sigma^2$
+
+Training error: $E||y-X\hat\beta||^2 = E||(I-H)y|| = E||(I-H)(X\beta + \epsilon)|| = (n-p)\sigma^2$

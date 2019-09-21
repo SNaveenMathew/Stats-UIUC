@@ -1,0 +1,26 @@
+---
+title: "Lecture 07"
+author: "Naveen Mathew Nathan S."
+date: "9/11/2019"
+output: pdf_document
+---
+
+# Ridge regression
+
+$min\frac{1}{2}||y-x\beta||_2^2$, s.t. $||\beta||^2 \le s$ or $min [\frac{1}{2}||y-x\beta||_2^2 + \lambda ||\beta||_2^2]$ where $\beta^T\beta = \sum_{i=1}^{p}\beta^2_i$
+
+Proof that the formulations are same:
+
+$$L = \frac{1}{2}||y-x\beta||_2^2 + \lambda ||\beta||_2^2 ; \frac{\partial L}{\partial \beta} = 0 \implies \frac{\partial ||y-x\beta||_2^2}{\partial \beta} = -\frac{\lambda||\beta||_2^2}{\partial \beta}$$: At the exact solution for the $\beta$, the hypersphere $||\beta||_2^2 = c_1$ will be tangential to the hyperellipse of $||y-x\beta||_2^2 = c_2$ in the space of $\beta$s. The normal to $||\beta||_2^2 = c_1$ will be opposite in direction to the normal to $||y-x\beta||_2^2 = c_2$
+
+Normal equation: $\frac{\partial L}{\partial \beta} = 0 \implies -2x^T(y-x\beta)+2\lambda\beta = 0 \implies \hat\beta^{ridge} = (x^Tx + \lambda I)^{-1}x^Ty \implies \hat\beta^{ridge} = (x^Tx + \lambda I)^{-1}(x^Tx)\hat\beta^{OLS} = Z\hat\beta^{OLS}$
+
+$$var(\hat\beta^{ridge}) = \sigma^2(x^Tx+\lambda I)^{-1}(x^Tx)(x^Tx + \lambda I)^{-1}$$
+
+$$E(\hat\beta^{ridge}) = E(Z\hat\beta^{OLS}) = Z\beta$$
+
+To simplify the bias variance analysis, let us assume $x^Tx = I$, therefore $\hat\beta^{ridge} = (I + \lambda I)^{-1}I\hat\beta^{OLS} = \frac{1}{1+\lambda}\hat\beta^{OLS}$
+
+To get a better understanding let us compare this with PCA. PCA is same as SVD performed after **centering** and **scaling** the data. This gives $x = UDV^T$ such that $U_{n\times n}, D_{n \times p}, V_{p \times p}$, where if p < n, D has non-zero elements only along the main diagonal. Properties of U and V: $U^TU = U U^T =I_{n \times n}$; U is a rotation matrix.
+
+$\hat y^{ridge} = x\hat\beta^{ridge} = x(x^Tx+\lambda I)^{-1}x^Ty = UDV^T(VD^T*U^TU*DV^T + \lambda I)^{-1}VD^TU^Ty = UDV^T(V{D^*}^2V^T + V\lambda IV^T)^{-1}VD^TU^Ty = UDV^T({D^*}^2 + \lambda I)^{-1}VD^TU^Ty = \sum_{j=1}^{p} U_j(\frac{d_j^2}{d_j^2 + \lambda}U_j^Ty)$

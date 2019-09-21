@@ -1,0 +1,20 @@
+---
+title: "Lecture 08"
+author: "Naveen Mathew Nathan S."
+date: "9/19/2019"
+output: pdf_document
+---
+
+## 
+
+Missed some part of the lecture
+
+## Boundary condition
+
+Handles using "ghost zones". Eg: do a one sided difference
+
+Special cases:
+
+- Periodic boundaries: $\bar q_i = \bar q_{i+N}; i \in \{1, 2, ..., N-1\}$
+- Subsonic outflow boundaries: characteristic flow decomposition: (v - s), v, (v + s), where s is the speed of sound and v is the speed of flow
+- Boundary continuity and differentiability condition may lead to artificial mass inflow rate. Set values to corresponding inflowing solution

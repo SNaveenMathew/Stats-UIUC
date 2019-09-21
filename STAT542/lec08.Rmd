@@ -1,0 +1,56 @@
+---
+title: "Lecture 08"
+author: "Naveen Mathew Nathan S."
+date: "9/13/2019"
+output: pdf_document
+---
+
+## Multicollinearity in ridge
+
+If the covariates are perfectly multicollinear $\hat\beta^{(OLS)}$ will lie on a hyperplane. It is not a distinct point. This can be explained by 0 eigenvalues of covariance matrix. If they are not perfectly multicollinear but one variable has high VIF, the contour hyper-ellipses will be highly skewed. This create a 'valley' or region where the loss is almost constant even if $\beta$ changes. However, when L2 penalty is added, these ellipses become more convex (less eccentric). This makes the opimization easier.
+
+## Leave-one-out cross validation for linear regression
+
+$CV = \sum_{i=1}^{n}(y_i-x_i\hat\beta_{[-i]})^2 = \sum_{i=1}^{n}(\frac{y-x\hat\beta}{1-H_{ii}})^2$
+
+$S_\lambda = X(X^TX+\lambda I)^{-1}X^T$
+
+Modified GCV: $GCV(\lambda) = \frac{\sum_{i=1}^{n}(y-x\hat\beta^{ridge})^2}{n-Trace(S_\lambda)}$
+
+Ridge penalty is equivalent to having Normal prior on betas. $\beta \sim N(0, \sigma^2/\lambda)$
+
+## Degrees of freedom
+
+$df(\hat f) = \frac{1}{\sigma^2}\sum_{i=1}^{n}cov(\hat y_i, y_i)$ for any model $\hat f$
+
+For ridge: $\hat y = X(X^TX+\lambda I)^{-1}X^Ty = \sum_{j=1}^{p}u_j\frac{d_j^2}{d_j^2+\lambda}u_j^Ty$ $\sum_{j=1}^{p}\frac{d_j^2}{d_j^2+\lambda}$
+
+# Lasso
+
+$Loss = \hat\beta^{(Lasso)} = argmin_\beta ||y-x\beta||_2^2 + \lambda ||\beta||_1$
+
+Let us assume $X^TX = I$
+
+$Loss(\beta) = ||y-x\hat\beta^{(OLS)}+x\hat\beta^{(OLS)}-x\beta||_2^2 + \lambda ||\beta||_1$
+
+$Loss(\beta) = ||y-\hat\beta^{(OLS)}||_2^2 - 2(y-x\hat\beta^{(OLS)})^Tx(\hat\beta^{(OLS)}-\beta) + ||x\hat\beta^{(OLS)}-x\hat\beta||_2^2 + \lambda||\beta||_1$
+
+where $y-x\hat\beta^{(OLS)} = \hat\epsilon^{(OLS)} \perp x$
+
+$\hat\beta^{(Lasso)} = argmin_\beta (X(\hat\beta^{(OLS)}-\beta))^T(X(\hat\beta^{(OLS)}-\beta)) + \lambda ||\beta||_1$
+
+$\hat\beta^{(Lasso)} = argmin_\beta (\hat\beta^{(OLS)}-\beta)^TX^TX(\hat\beta^{(OLS)}-\beta) + \lambda||\beta||_1$
+
+Assuming $X^TX=I$, $\hat\beta^{ridge} = argmin_\beta (\hat\beta^{(OLS)}-\beta)^T(\hat\beta^{(OLS)}-\beta) + \lambda||\beta||_1 = argmin_\beta (\hat\beta_1^{(OLS)}-\beta_1)^2 + \lambda ||\beta_1||_1 + \sum_{j=1, j\ne 1}^{p}[(\hat\beta_j^{(OLS)}-\beta_j)^2 + \lambda ||\beta_j||_1]$
+
+Looking at this function in 1 dimension of $\beta_i$, this looks like a soft-threshold function.
+
+This can be looked at as $\hat\beta_i^{(Lasso)} = argmin_{\beta_{i}} (\hat\beta_i^{(OLS)} - \beta_i)^2 + \lambda |\beta_i|$
+
+Let us assume $\beta_i = 0$. Differentiating wrt $\beta$: $-2(\hat\beta_j^{(OLS)}-\beta) + \lambda = 0$
+
+- $\hat\beta_j^{(Lasso)} = \hat\beta_j^{(OLS)}-\lambda/2$ if $\hat\beta^{(OLS)} > \lambda/2$
+- $\hat\beta_j^{(Lasso)} = 0$ if $|\hat\beta^{(OLS)}| < \lambda/2$
+- $\hat\beta_j^{(Lasso)} = \hat\beta_j^{(OLS)}+\lambda/2$ if $\hat\beta^{(OLS)} < -\lambda/2$
+
+Coordinate descent: apply gradient descent on one $\beta$ axis at a time.

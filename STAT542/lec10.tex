@@ -1,0 +1,145 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Lecture 10},
+            pdfauthor={Naveen Mathew Nathan S.},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Lecture 10}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Naveen Mathew Nathan S.}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{9/20/2019}
+
+
+\begin{document}
+\maketitle
+
+\hypertarget{choosing-knots-in-spline}{%
+\subsection{Choosing knots in spline}\label{choosing-knots-in-spline}}
+
+Knots should be data adaptive. Infinite knots =\textgreater{} model if
+fit perfectly, but very high degrees of freedom. Degrees of freedom = p
+= number of knots.
+
+Let us put knots at all observed \(X_i\)s in NCS. Since degrees of
+freedom is same as number of points = n, we will have a design matrix in
+terms of the matrix that is \(F_{n\times n}\)
+
+Updated loss function:
+\(||Y-F_{n \times n}\beta|| + \lambda \beta^T\Omega\beta\), where
+\(\lambda \beta^T\Omega\beta\) is a penalty. It becomes identical to
+ridge penalty if \(Omega = I\). Let us examine this loss function:
+
+\(argmin_{g\in W^2(a,b)}\sum_{i=1}^{n} (y_i - g(x_i))^2 + \lambda \int_{a}^{b}[g''(x)]^2 dx\)
+is used to penalize the second order derivative
+
+Let us define a Sobolev space such that
+\(g \in W^2(a, b); W^2(a, b) = \{g, g'\ are\ continuous, \int_{a}^{b}\rho^2(g'')dx < \infty\).
+This is a different view of model complexity compared to regularization
+in linear regression: in linear regression as \(\lambda \to \infty\),
+\(\beta \to 0\) which leads to a constant function estimate. Whereas, in
+.
+
+Let us consider \(\tilde g\) to be a NCS such that
+\(\tilde g(X_i) = g(X_i) \forall i\) and
+\(\int_{a}^{b} (\tilde g'')^2 dx \le \int_{a}^{b} (g'')^2 dx\).
+Evaluating this statement: Natural cubic spline has the same values at
+the points \(g(X_i) = \tilde g(X_i)\), but has lower penalty term than
+any function g chosen from the Sobolev space defined above. But these
+functions are not equal at all X values. Therefore, let us consider the
+difference \(h(x) = g(x) - \tilde g(x)\). Therefore, \(h(x_i) = 0\) and
+\(\int_a^b \tilde g''^2 + \int_a^bh''^2 + 2\int_a^b \tilde g'' h''\)
+
+Let us examine the third term:
+\(\int_a^b \tilde g'' h'' = \int_a^b\tilde gdh' = \tilde g''h'|_a^b - \int_a^b h' \tilde g^{3'}dx\)
+
+Let us examine the first term. For NCS the function is linear at the
+boundaries. Therefore, \(h'(a) = h'(b) = 0\). Let us examine the second
+term: \(\int_a^b h'\tilde g^{3'}\). Since the function \(\tilde g\) is a
+NCS it is a sum of cubic terms between knots (first and second order
+derivatives continuous, coefficient of third order term may be
+different). Therefore the second term is \$\sum\_\{i=1\}\^{}\{n-1\}
+\tilde g\textsuperscript{\{3'\}\int\emph{\{x\_i\}\^{}\{x\_i+1\}h'(x)dx =
+\sum}\{i=1\}}\{n-1\}\tilde g\^{}\{3'\}(X\_i+){[}h(X\_\{i+1\})-h(X\_i){]}
+\$
+
+Therefore,
+\(g''(x) = \sum_{i=1}^{n} \beta_iN'_i(x) = \int_a^b[sum_{i=1}^n \beta_i N''_i(x)]^2dx = \sum_{i,j} \beta_i\beta_j N''_i(x) = \beta^T\Omega\beta\)
+where \(\Omega\) is a positive definite matrix
+
+
+\end{document}

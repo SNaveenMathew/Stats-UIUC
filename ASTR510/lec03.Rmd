@@ -106,7 +106,7 @@ Equivalent to taking FTCS and diffusing away the tendency of FTCS to blow up. Di
 
 - Consistency: Define local truncation error by using Taylor expansion. If lowest order terms are $O(\Delta x^p, \Delta t^p)$, the difference operator is said to be locally p-th order
 - Stability: Method is stable if as $\Delta x, \Delta t \to 0$, the method produces a result that tends towards some finite limit.
-- Convergence:
+- Convergence: If the global error of a solution (defined in some fashion) goes to zero as fast as $O(\Delta x^p, \Delta t^p)$, the method is p-th order convergent.
 - Lax Equivalence Theorem: If and only if a method is consistent and stable, it is convergent.
 
 ## Diffusion equation

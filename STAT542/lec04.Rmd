@@ -1,0 +1,42 @@
+---
+title: "Lecture 04"
+author: "Naveen Mathew Nathan S."
+date: "9/4/2019"
+output: pdf_document
+---
+
+# Optimization
+
+Example: Linear regression: $\hat \beta = argmin_\beta ||y-x\beta||^2_2$
+
+Convex function: f is a convex function if $f(x) < f(x_1) + \frac{(x-x_1)}{x_2-x_1} \times (f(x_2)-f(x_1)) \forall x_1, x_2 \in Domain(X); x \in (min(x_1, x_2), max(x_1, x_2))$
+
+Convex domain: Domain is said to be convex if moving in direction opposite to gradient leads to global minimizer. For example, f(x) = x^2 for $x \in (-\infty, -1) \cup (1, \infty)$ does not have a convex domain.
+
+Therefore, for a convex function f, $f(\alpha\beta_1 + (1-\alpha)*\beta_2) \le \alpha f(\beta_1) + (1-\alpha)*f(\beta_2)$
+
+This can be derived from Jensen's inequality: $f(E(X)) \le E(f(X))$ when $X = \{\beta_1\ w.p.\ \alpha\ or\ \beta_2\ w.p.\ (1-\alpha)\}$
+
+Also, for a convex function it can be noted that for any arbitrary point $\beta$ in domain, $f(\beta^*) \ge f(\beta) + (\beta^* - \beta) \times \nabla f(\beta)$
+
+First order property: If there exists a point $\beta$ such that $\nabla f(\beta) = 0$, then there can be no better point $\beta$ that has lower value of $f(\beta)$, $\implies \beta = \beta^*$
+
+Second order property:
+
+$f(\beta^*) = f(\beta) + \nabla f(\beta)^T (\beta^* - \beta) + \frac{1}{2}(\beta^* - \beta)^T H(\beta) (\beta^* - \beta) + HOT$
+
+Taking derivative wrt $\beta^*$ and removing higher order terms, we get: $\frac{\partial f(\beta^*)}{\partial \beta^*} = 0 + \nabla f(\beta) + H(\beta)(\beta^* - \beta)$
+
+$\implies H(\beta)(\beta^* - \beta) = -\nabla f(\beta) \implies \beta^* = \beta - H^{-1}(\beta)\nabla f(\beta)$
+
+This can be a computationally expensive operation: $O(p^3)$ operation to invert H. Let us ignore the correlation between the betas and use $H^{-1} = \delta I$. Therefore, $\beta^* = \beta - \delta \nabla f(\beta)$. This is gradient descent.
+
+BFGS: Hessian is calculated as difference of gradients at 2 points of a first order move over the change in $\beta$, assuming the updates to be small. The error in calculation of Hessian grows over time because the point after k steps may not be in neighborhood of $\beta$, but it is still going to perform better than approximating $H^{-1} = \delta I$. Also called quasi-Newton-Raphson and is useful when closed form solution for H doesn't exist.
+
+$f(\beta) = \frac{1}{2}(y - x\beta)^T(y-x\beta) \implies \nabla f(\beta) = X^T(y-x\beta)$
+
+Gradient descent works for linear regression as the error function is well behaved when the X matrix is full rank. It may not work well for regularized linear regression (eg: L1 penalty)
+
+## Coordinate descent
+
+$f(\beta_j) = \frac{1}{2}||(y - x_j\beta_j -x_{(-j)}\beta_{(-j)})||_2^2$. Now optimize this as a function of $\beta_j$. Repeat for j = 1, 2, ... This is useful for solving Lasso

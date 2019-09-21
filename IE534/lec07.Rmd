@@ -1,0 +1,83 @@
+---
+title: "Lecture 07"
+author: "Naveen Mathew Nathan S."
+date: "9/17/2019"
+output: pdf_document
+---
+
+# Multi-layer convolution network
+
+- Input image: $X \in R^{d \times d \times C^0}$
+- l-th convolution layer contains $C^l$ feature maps
+- Number of feature maps $C^l$ is often called "number of channels" for layer l
+- l-th hidden layer is $H^l \in R^{d_y^l \times d_x^l \times C^l}$. First feature map $H^0 = X$
+- Filter for l-th layer: $K^l \in R^{k_y^l \times k_x^l \times C^l \times C^{l-1}}$
+
+$H^l_{i,j,k} = \sigma(\sum_{p'=0}^{C^{l-1}-1}\sum_{m=0}^{k^l_y-1}\sum_{n=0}^{k^l_x-1} K^l_{m,n,p,p'}H^{l-1}_{i+m,j+n,p'})$
+
+$d_y^l = d_y^{l-1} - k_y^l + 1$
+
+$d_l^l = d_l^{l-1} - k_l^l + 1$
+
+Therefore the number of dimensions of convolved image decreases as the number of layers increases. This is tacked by padding each filtered image.
+
+## Padding
+
+Expand $H^{l-1}_{:, :, p}$ by adding P zeros on all sides to form larger tensor
+
+$\hat H^{l-1}_{i,j,p}=\sigma(\sum_{p'=0}^{C^{l-1}-1}\sum_{m=0}^{k^l_y-1}\sum_{n=0}^{k^l_x-1} K^l_{m,n,p,p'}\hat H^{l-1}_{i+m,j+n,p'})$
+
+Therefore $dim(H^l) = (d_y^{l-1}-k_y^l+2P+1) \times (d_x^{l-1}-k_x^l+2P+1) \times C^l$
+
+## Strides
+
+Stride s = 1 for previous cases. For a general stride s:
+
+$H^l_{i,j,p} = \sigma(\sum_{p'=0}^{C^{l-1}-1}\sum_{m=0}^{k^l_y-1}\sum_{n=0}^{k^l_x-1} K^l_{m,n,p,p'} H^{l-1}_{is+m,js+n,p'})$
+
+$dim(H^l) = (\lfloor \frac{d_y^{l-1}-k_y^l}{s}+1 \rfloor) \times (\lfloor \frac{d_x^{l-1}-k_x^l}{s}+1 \rfloor) \times C^l$
+
+It is a form of downsampling - reduces model complexity.
+
+### Padding + Strides
+
+$\hat H^l_{i,j,p} = \sigma(\sum_{p'=0}^{C^{l-1}-1}\sum_{m=0}^{k^l_y-1}\sum_{n=0}^{k^l_x-1} K^l_{m,n,p,p'}\hat H^{l-1}_{is+m,js+n,p'})$
+
+$dim(\hat )$
+
+## Pooling + Strides
+
+A form of downsampling. Also some invariance to local translation.
+
+Average pooling: $V_{i,j,p} = \frac{1}{h^2}\sum_{m=0}^{h-1}\sum_{n=0}^{h-1} H_{is+m, js+n, p}$
+
+Max pooling: $V_{i,j,p} = max_{0 \le m, n \le h} H_{is+m, js+n, p}$
+
+- Overlapping pooling: s = 2, h = 3
+- Non-overlapping pooling: s = 2, h = 2
+- Pooling layer input: $d_y \times d_x \times C$
+- Pooling layer output: $(\lfloor \frac{d_y-h}{s} \rfloor + 1) \times (\lfloor \frac{d_x-h}{s} \rfloor + 1) \times C$
+
+
+## 3-d convolutions:
+
+An image given by $R^{d_y \times d_x \times d_z}$ with $d_z$ color dimensions can be convolved with a filter $K \in R^{k_y \times k_x \times k_z}$
+
+
+# Optimization methods for deep neural networks
+
+$\theta^{(k+1)} = \theta^{(k)} - \alpha^{(k)} \nabla_\theta L(\theta^{(k)})$
+
+Neural network loss function is non-convex, but usually continuous. Areas with large gradient: use small learning rate, areas with small gradient: use large learning rate.
+
+Can we adapt a different learning rate for each parameter?
+
+## RMSprop
+
+Gradient based methods use first order Taylor approximation to take steps in $\theta$. However, gradient is reliable only in a small neighborhood of the current $\theta^{(k)}$
+
+- $r = \rho r + (1-\rho)g \odot g; g = \nabla_\theta L(\theta); r_i$ is an estimate of $[\nabla_{\theta_i} L(\theta)]^2$: weighted average of $gradient^2$. Here, $0 < \rho < 1$. PyTorch uses large $\rho \sim 0.99$. We don't have the actual value of gradient g. We use the estimate $g = \frac{1}{m} \nabla_\theta \sum_{j=1}^{m} \rho(f(x^j; \theta), y^j)$
+
+- $\Delta \theta = -\frac{\eta^{(k)}}{\sqrt{\delta + r}}\odot g; \delta \sim 10^{-6};$ used to avoid division by 0, $\eta^{(k)}$ is the learning rate in k-th iteration. Usual gradient descent update: $\Delta\theta = -\eta^{(k)} g$
+
+- $\theta = \theta + \Delta \theta$

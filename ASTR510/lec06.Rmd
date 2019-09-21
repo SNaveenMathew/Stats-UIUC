@@ -1,0 +1,65 @@
+---
+title: "Lecture 06"
+author: "Naveen Mathew Nathan S."
+date: "9/12/2019"
+output: pdf_document
+---
+
+$a_p = -G\sum_{q\neq p,q=1}^{N}\frac{m_q(x_p-x_q)}{|x_p-x_q|^3}$
+
+- Particle-particle: $O(N^3)$ - direct sum of each particle-particle force
+- Particle mesh: $O(N lnN)$ - map particles to mesh density, solve Poisson equation there, difference, map accelerations back. However, 2 particles within same grid will not feel full force, but only a softened version of the force
+- Tree: $O(N lnN)$ - use tree structure to organize (group) particles. do particle-particle for nearby neighbors, multipole moments for distant ones
+
+## Mesh mapping
+
+First problem is to estimate mesh density: kernel density estimation.
+
+$\rho_{ijk} = \frac{1}{\nabla V}\sum_{p=1}^{N}m_pW(x_{ijk}-x_p)$
+
+- Nearest grid point: Find nearest grid point and assign all mass to it. Assignment of W over x looks like uniform density.
+- Cloud in cell: Uniform density cloud associated with each particle. Overlap with cell gives mass assigned to it. Assignment of W over x looks like a triangular density.
+- Triangle shape cloud: Assumes linear triangle shaped cloud. Overlap with cell gives mass assigned to it. Assignment of W over x looks like a quadratic (similar to normal, but truncated) density.
+
+
+$a_p = -\sum_{ijk}(\nabla \phi)_{ijk}W(x_{ijk}-x_p)$
+
+Having an approximation for a point mass creates a radial and a tangential gravitational force. The tangential gravitational force increases as the distance between particles decreases. Check *radial force anisotropy*.
+
+Solution: Use AMR. Use fine grid where there are more particles. However, a particle may have a rectangular shape with half rectangle in fine mesh and half in coarse mesh. The effect is negligible when the number of particles is small.
+
+## $P^3$M - particle-particle-particle mesh
+
+Combine mesh calculation with short range force calculation.
+
+- Compute long range mesh force $F_{PM}$ using PM
+- Difference between desired force F(r) and $F_{PM}(r)$ is the short range force $F_{sr}(r)$
+- For each particle add short range force due to nearby particles to mesh force to get total force
+
+To find nearby particles, use a chaining mesh: very coarse mesh
+
+CPU time $\tau = \alpha N_p + \beta N_g^3 lnN_g^3 + \gamma (\frac{r_e}{\Delta})^3()$
+
+## Treecodes
+
+- Store particles in oct tree data structure (divides region into 4 parts by x (2) and y (2))
+- 
+
+Advantages:
+
+- No grid to limit resolution. Must introduce force softening explicitly
+- Scales to N ln N
+- Must tighten MAC as $N \to \infty$
+
+Disadvantages:
+
+- Error properties harder to analyze
+- Periodic boundaries must be introduced via Ewald summation
+
+### Multipole acceptance criteria
+
+- Barnes-Hut MAC: grid size (s), Euclidean distance from centre of mass (r): use multipole iff $s/r < \theta; 0.7 < \theta < 1$
+- Min-distance MAC: r is minimum $L_\infty$ norm of distance of grid from point
+- $b_{max}$ is max distance of CM from edge of grid.
+
+Best algo to use depends on $t_{simulation}/t_{dynamical}$, collisions (Y/N), number of particles and problem.

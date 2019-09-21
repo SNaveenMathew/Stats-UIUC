@@ -1,0 +1,26 @@
+---
+title: "Lecture 10"
+author: "Naveen Mathew Nathan S."
+date: "9/20/2019"
+output: pdf_document
+---
+
+## Choosing knots in spline
+
+Knots should be data adaptive. Infinite knots => model if fit perfectly, but very high degrees of freedom. Degrees of freedom = p = number of knots.
+
+Let us put knots at all observed $X_i$s in NCS. Since degrees of freedom is same as number of points = n, we will have a design matrix in terms of the matrix that is $F_{n\times n}$
+
+Updated loss function: $||Y-F_{n \times n}\beta|| + \lambda \beta^T\Omega\beta$, where $\lambda \beta^T\Omega\beta$ is a penalty. It becomes identical to ridge penalty if $Omega = I$. Let us examine this loss function:
+
+$argmin_{g\in W^2(a,b)}\sum_{i=1}^{n} (y_i - g(x_i))^2 + \lambda \int_{a}^{b}[g''(x)]^2 dx$ is used to penalize the second order derivative
+
+Let us define a Sobolev space such that $g \in W^2(a, b); W^2(a, b) = \{g, g'\ are\ continuous, \int_{a}^{b}\rho^2(g'')dx < \infty$. This is a different view of model complexity compared to regularization in linear regression: in linear regression as $\lambda \to \infty$, $\beta \to 0$ which leads to a constant function estimate. Whereas, in .
+
+Let us consider $\tilde g$ to be a NCS such that $\tilde g(X_i) = g(X_i) \forall i$ and $\int_{a}^{b} (\tilde g'')^2 dx \le \int_{a}^{b} (g'')^2 dx$. Evaluating this statement: Natural cubic spline has the same values at the points $g(X_i) = \tilde g(X_i)$, but has lower penalty term than any function g chosen from the Sobolev space defined above. But these functions are not equal at all X values. Therefore, let us consider the difference $h(x) = g(x) - \tilde g(x)$. Therefore, $h(x_i) = 0$ and $\int_a^b \tilde g''^2 + \int_a^bh''^2 + 2\int_a^b \tilde g'' h''$
+
+Let us examine the third term: $\int_a^b \tilde g'' h'' = \int_a^b\tilde gdh' = \tilde g''h'|_a^b - \int_a^b h' \tilde g^{3'}dx$
+
+Let us examine the first term. For NCS the function is linear at the boundaries. Therefore, $h'(a) = h'(b) = 0$. Let us examine the second term: $\int_a^b h'\tilde g^{3'}$. Since the function $\tilde g$ is a NCS it is a sum of cubic terms between knots (first and second order derivatives continuous, coefficient of third order term may be different). Therefore the second term is $\sum_{i=1}^{n-1} \tilde g^{3'}\int_{x_i}^{x_i+1}h'(x)dx = \sum_{i=1}^{n-1}\tilde g^{3'}(X_i+)[h(X_{i+1})-h(X_i)] $
+
+Therefore, $g''(x) = \sum_{i=1}^{n} \beta_iN'_i(x) = \int_a^b[sum_{i=1}^n \beta_i N''_i(x)]^2dx = \sum_{i,j} \beta_i\beta_j N''_i(x) = \beta^T\Omega\beta$ where $\Omega$ is a positive definite matrix
