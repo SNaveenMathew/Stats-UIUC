@@ -1,0 +1,32 @@
+---
+title: "Lecture 11"
+author: "Naveen Mathew Nathan S."
+date: "9/23/2019"
+output: pdf_document
+---
+
+# Non-parametric methods (Kernel)
+
+K-nn can be rewritten as: $\hat f(x^*) = \frac{1}{K}\sum_{i \in N_k(x)}Y_i = \frac{\sum_{i=1}^{n} I(x \in A(X_i))Y_i}{\sum_{i=1}^{n} I(x \in A(X_i))} = \frac{\sum_{i=1}^{n} K(x^*, X_i)Y_i}{\sum_{i=1}^{n} K(x^*, X_i)}$. We observe that the prediction is a weighted sum. The function is jumpy for K = 1. Instead of choosing K-nn kernel let us choose a uniform kernel. $K(x^*, X_i) = \frac{1}{2\lambda} I[|x^*-X_i| < \lambda]$ is a fixed width kernel of width = $\lambda$ on both sides of $x^*$. We observe that the function is still going to be jumpy.
+
+## Continuous kernel
+
+### Nadaraya-Watson kernel
+
+Using local values will have lower bias. Can we come up with smooth, low-bias estimator?
+
+$K(x^*, X_i) = \frac{1}{\sqrt{2\pi\lambda^2}}e^{-\frac{(x^*-X_i)^2}{2\lambda^2}}$
+
+This shows that $K(x^*, X_i) = K(X_i, x^*)$ although their interpreations are different. In first case we center at $x^*$ and then weight the neigboring points. In second case we center at $X_i$ and then weight the neighboring points. Kernel function is usually written as a density such that $\int_{-\infty}^{\infty} K(u)du = 1$ and $\int_{-\infty}^{\infty} K(u)udu = 0$: ideally the kernel should be symmetric. Points on the boundary will have biased esimates even though the kernel is symmetric on both directions of x.
+
+### Local polynomai
+
+- Solves the issue with bias by using a linear, quadratic or higher order polynoals in linear regssion
+
+$\sum_{i=1}^{n} (y - X\beta_0 - X_{i,beta}^2 K(x^*, X_i))^2= (y-\beta*X)^TK(y-\beta*X)$
+
+Differentiating and equation vt. $P=(X^TXK)^{-1}X^TKy$
+
+Local linear reduces the bias compared to large number of representatives
+
+$$MSE = \sum_{i=1}^{n}(y_i - )^2$$

@@ -27,7 +27,9 @@ For ridge: $\hat y = X(X^TX+\lambda I)^{-1}X^Ty = \sum_{j=1}^{p}u_j\frac{d_j^2}{
 
 # Lasso
 
-$Loss = \hat\beta^{(Lasso)} = argmin_\beta ||y-x\beta||_2^2 + \lambda ||\beta||_1$
+$Loss = ||y-x\beta||_2^2 + \lambda ||\beta||_1$
+
+$\hat\beta^{(Lasso)} = argmin_\beta ||y-x\beta||_2^2 + \lambda ||\beta||_1$
 
 Let us assume $X^TX = I$
 
@@ -46,6 +48,15 @@ Assuming $X^TX=I$, $\hat\beta^{ridge} = argmin_\beta (\hat\beta^{(OLS)}-\beta)^T
 Looking at this function in 1 dimension of $\beta_i$, this looks like a soft-threshold function.
 
 This can be looked at as $\hat\beta_i^{(Lasso)} = argmin_{\beta_{i}} (\hat\beta_i^{(OLS)} - \beta_i)^2 + \lambda |\beta_i|$
+
+\begin{equation}
+\hat\beta_j^{(Lasso)} = 
+\begin{cases}
+    \hat\beta_j^{(OLS)}-\lambda/2& \text{if } \hat\beta^{(OLS)} > \lambda/2\\
+    0 & \text{if }|\hat\beta^{(OLS)}| \le \lambda/2\\
+    \hat\beta_j^{(OLS)}+\lambda/2 & \text{if }\hat\beta^{(OLS)} < -\lambda/2
+\end{cases}
+\end{equation}
 
 Let us assume $\beta_i = 0$. Differentiating wrt $\beta$: $-2(\hat\beta_j^{(OLS)}-\beta) + \lambda = 0$
 

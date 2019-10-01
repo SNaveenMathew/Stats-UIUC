@@ -1,0 +1,34 @@
+---
+title: "Lecture 13"
+author: "Naveen Mathew Nathan S."
+date: "9/27/2019"
+output: pdf_document
+---
+
+# Kernel density estimation
+
+$\hat f(x) = \frac{1}{n}\sum_{i=1}^{n}\frac{1}{\lambda} K(\frac{x-x_i}{\lambda})$
+
+$E_X[f(x)] = f(x) + \frac{\lambda^2}{2}f''(x)\sigma^2_K + HOT$ goes to f(x) at the rate of $\lambda^2$: unbiasedness
+
+$\sigma_K^2 = \int_{-\infty}^{\infty} K(t)t^2dt$
+
+$var(\frac{1}{n}\sum_{i=1}^{n}\frac{1}{\lambda} K(\frac{x-x_i}{\lambda})) = \frac{1}{n}var(\frac{1}{\lambda}K(\frac{x-x_i}{\lambda}))$ goes to 0 at the rate of $\frac{1}{\lambda}$: consistency?
+
+$\frac{1}{n}\big[\int_{-\infty}^{\infty}\frac{1}{\lambda^2}K^2(\frac{x-x_i}{\lambda})f(x_i)dx - [f(x)+\frac{\lambda^2}{2}f''(x)\sigma^2_K]^2\big]$
+
+Let $t = \frac{x-x_i}{\lambda}$ $ = \frac{1}{n}[\int_{-\infty}^{\infty} \frac{1}{\lambda} K^2(t)f(x-\lambda t)dt - term_2]$. Using Taylor expansion on $f(x - t\lambda) = f(x) - t\lambda f'(x) + O(\lambda^2)$
+
+$= \frac{f(x)}{n\lambda}\int_{-\infty}^{\infty}K^2(t)dt$
+
+Therefore, $Bias(x) = \frac{\lambda}{2}f''(x)\sigma^2_K$, $var(x) = \frac{f(x)}{n\lambda}\int_{-\infty}^{\infty}K^2(t)dt$
+
+$\int_{-\infty}^{\infty} Bias^2(x)dx = \frac{\lambda^4}{4}\sigma_K^4\int_{-\infty}^{\infty}(f''(x))^2dx$
+
+$\int_{-\infty}^{\infty}var(x)dx = \frac{\int_{-\infty}^{\infty}K^2(t)dt}{n\lambda}$
+
+Integrated square error: $ISE = \int_{-\infty}^{\infty}Bias^2(x)dx + \int_{-\infty}^{\infty}var(x)dx = \frac{\lambda^4}{4}\sigma^4_K\int[f''(x)]^2dx + \frac{\int K^2(t)dt}{n\lambda}$
+
+ISE is minimized when $\lambda = (\frac{\int K^2(t)dt}{n\sigma^4_K \int [f'']^2dx})^{1/5} = O(n^{-1/5}) = O(n^{-\frac{4}{4+d}})$ for d dimensional input
+
+If K ~ N and f ~ N, we are assuming that original density (f) is normal and the kernel (K) used to estimate the normal is also normal $\lambda = 1.06 \hat\sigma_x n^{-1/5}$

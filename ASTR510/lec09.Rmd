@@ -1,0 +1,32 @@
+---
+title: "Lecture 09"
+author: "Naveen Mathew Nathan S."
+date: "9/24/2019"
+output: pdf_document
+---
+
+# Verification and validation
+
+- Verification: Process of determining that model implementation accurately represents developer's conceptual description of model and solution of model (AIAA). Equivalent to "solving the equations right"
+- Validation: Process of determining degree to which model is an accurate representation of real world from perspective of intended use of model. Equivalent to "solving the right equations"
+
+Nature > Model > Code
+
+In some cases experimentation is difficult, whereas simulation is easier and produces much clearer results. In such cases we may have only a few data points from the experiment for verification.
+
+# Convergence testing
+
+- L2 norm of solution
+- Use a quantity that is not explicitly conserved by the equations. Sometimes the quantity may not have analytical form, therefore it is estimated with the finest grid and the results of the experiment (arbitrary grid size) is tested with the value with finest grid to check for convergence
+
+Learn: [Mach stem](https://en.wiktionary.org/wiki/Mach_stem), Gaussian process vs linear regression
+
+# Visualization
+
+- Slicing
+    - Eg: identifying shocks: Plot pressure and volume vs linear/radial distance; discontinuities in pressure but continuous density shows shocks
+    - Can be done in 3d by choosing a plane and it's orthogonal direction. Orthogonal direction to plane should be chosen beforehand
+- Projection
+    - Solution can be projected into a plane
+- Binning
+    - Eg: histogram. Caveat: For a 2-d case correlation may make the plot look like uni/multi modal while they may not show same modality after removing the correlation/trend

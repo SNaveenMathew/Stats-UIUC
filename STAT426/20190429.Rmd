@@ -25,7 +25,7 @@ $\hat\beta = ln(\frac{n_{21}}{n_{12}})$ when exists. $SE = \sqrt{\frac{1}{n_{21}
 
 Remember: population averaged effect: $ln(\frac{p_{+1}/p_{+2}}{p_{1+}/p_{2+}})$
 
-Alternative: $\alpa_i$s are random effects (random variable) => generalized linear mixed model
+Alternative: $\alpha_i$s are random effects (random variable) => generalized linear mixed model
 
 ## Matched case-control studies
 
@@ -55,4 +55,4 @@ Y^* =
 \end{cases}
 \end{equation}
 
-For each inependent variable we have $Y^*_i, (X_1, X_2)$. The corresponding no intercept logistic regression model: $logit(\pi(x_{i1}, x_{i2})) = \beta(x_{i2}-x_{i1})$. MLE has explicit form: $\hat\beta = ln(\frac{n_{21}}{n_{12}}). Validity of models is limited to logit link - other links don't work.
+For each inependent variable we have $Y^*_i, (X_1, X_2)$. The corresponding no intercept logistic regression model: $logit(\pi(x_{i1}, x_{i2})) = \beta(x_{i2}-x_{i1})$. MLE has explicit form: $\hat\beta = ln(\frac{n_{21}}{n_{12}})$. Validity of models is limited to logit link - other links don't work.

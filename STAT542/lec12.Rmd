@@ -1,0 +1,21 @@
+---
+title: "Lecture 12"
+author: "Naveen Mathew Nathan S."
+date: "9/25/2019"
+output: pdf_document
+---
+
+# Non-parametric methods
+
+$\hat f(x^*) = \frac{\sum_{i}K_i x_i}{\sum_i K_i}$
+
+For example if we use Gaussian kernel: $K(x^*, x_i) = e^{-\frac{1}{2}(x^*-x)^T\Sigma^{-1}(x^*-x)}$
+
+Kernel regression is a local average. It does not compute model parameters
+
+# Density estimation
+
+Interested in estimating the pdf of X. We approximate the pdf with $\hat f(X)$
+
+- Histogram: Put point mass on each observed data. Histogram adds the number of points together in equal width bins to create the visualization.
+- Can we change the point mass to probability distribution? We can assume the point is realization of mean of a normal distribution with mean = the observed point. We don't define the variance here! If we add the densities for each x, we will have a smooth value of density estimated at each x. $\hat f(x_0) = \frac{1}{n}\sum_{i=1}^{n} K(x_0,x_i)$

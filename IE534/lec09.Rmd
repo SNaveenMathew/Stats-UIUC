@@ -1,0 +1,59 @@
+---
+title: "Lecture 09"
+author: "Naveen Mathew Nathan S."
+date: "9/24/2019"
+output: pdf_document
+---
+
+# Batch normalization
+
+For tanh or sigmoid the gradient will be small if $|Z^l|$ is large. Asymptotically the gradient goes to zero for both functions. The unit becomes saturated if this happens. This leads to very small updates during gradient descent. Therefore, the training time will be large. This is called the vanishing gradient problem.
+
+Simple example: Multi-layer neural network with $b^l = 0$ and $W^l = 1/2$. Input dimension $d = 1$, $\rho(z,y) = (z-y)^2$
+
+Then $|\frac{\partial \rho}{\partial W^l}| = C2^{l-1}$
+
+ReLU helps partially with vanishing gradient as the gradient is constant for positive z $\sigma'(z) = 1$ if $z \ge 0$, $\sigma'(z) = 0$ if $z < 0$
+
+Batch normalization: normalization learned during training.
+
+$H^l = \sigma(BN_\theta(Z^l))$ depends on $\theta$ at iteration k
+
+$\hat Z^l = BN_\theta(Z^l) = \frac{Z_i^l-E_X[Z_i^l]}{\sqrt{var(Z_i^l)}}$ such that $E_X[\hat Z^l] = 0$, $Var_X[\hat Z^l] = 1$, this computation makes the forward pass expensive as the mean, variance calculation and scaling are extra steps. Backprop is even more expensive: $E_x[Z_i] = \frac{1}{N}\sum_{i=1}^{N}z_i^{l,j}$. There is a dependence on rest of the data set when this is calculated. This destroys the idea of using SGD or mini-batch gradient descent. Instead we will estimate the mean and standard deviation on the mini-batch using $\mu_B = \frac{1}{M}\sum_{i=1}^{M}Z^{l,j}$, $\sigma^2_B = \frac{1}{M}\sum_{i=1}^{M}(Z^{l,i} - \mu_{B,i})^2$. To add more flexibility to BN, we use $BN_\theta(Z^l) = \gamma \odot Z^l + \beta$ where $\gamma, \beta$ are additional parameters. Training will learn best weights and best normalization for the network. It is not possible to know the best normalization beforehand. There is no way to know where saturation will occur. Therefore, it is better to apply BN on all layers. Estimating the mean and variance in each mini-batch also corrects covariate shift problem for downstream layers - therefore the downstream layers don't have to relearn from scratch for the shifted covariates.
+
+# Parameter initialization
+
+Let $d^l$ be number of hidden units in l-th layer. $W^l_{i,j}$ can be initialized to $\frac{C}{\sqrt{d^{l-1}}}U_{i,j}$, where U can be independent uniform or standard normal.
+
+$Z_i = \sum_{j=0}^{d^{l-1}-1}\frac{}{}U_{i,j}H_j^{l-1}$; $U_{i, j}~Uniform[0,1], C=1 \implies E[Z_i] = 0, var[Z_i] = 1$
+
+# Data augmentation
+
+Do some operations on raw data that does not affect the outcome logically and append to the original data. This leads to more training examples, therefore less overfitting.
+
+- Randomly flip images
+- Randomly rotate images
+- Random crop/resize (i.e) rescale
+- Randomly adjust brightness or contrast
+
+# Transfer learning
+
+- Data set A: very large data set, data set B: smaller data set for which we want to build a predictive model
+- Transfer learning: (pre)train model on data set A, then "fine-tune" on data set B
+- Helps building large models on small data with less overfitting. Also leverages knowledge gained from data set A
+
+# Regularization
+
+- Dropout
+- Data augmentation
+- Transfer learning
+- $l^2$ penalty: parameters are large => complex model
+- Ensembles
+- Early stopping
+
+# Second order optimization scheme
+
+Use the Hessian along with gradient. Eg: Newton's method: $\theta^{l+1} = \theta^l - (H^{(l+1)})^{-1}g^{(l)}$. Second order methods build a quadratic model for the local loss landscape. First order methods build linear model. Therefore, second order methods can take larger steps.
+
+- Gradient descent: $L(\theta) \approx L(\theta^l) + \nabla_\theta L(\theta^l)(\theta - \theta^l)$
+- Second order methods: $L(\theta) = L(\theta^l) + \nabla_\theta L(\theta)(\theta - \theta^l) + \frac{1}{2}(\theta - \theta^l)^TH(\theta - \theta^l)$. Taking partial derivative wrt $\theta$: $0 = \nabla_\theta L(\theta^l) + H^l(\theta - \theta^l) \implies \theta = \theta^l-(H^l)^{-1}\nabla_\theta L(\theta^l)$

@@ -1,0 +1,63 @@
+---
+title: "Lecture 14"
+author: "Naveen Mathew Nathan S."
+date: "9/30/2019"
+output: pdf_document
+---
+
+# Tree and Random Forest
+
+## Tree based methods
+
+CART:
+
+- Start with root node
+- Find the splitting rule: $1\{X^{(j)} < c\}$ and split the node
+- Recursively apply the procedure on each child node. Minimum number of examples in child node is a hyperparameter
+- Predict each terminal node using within-node average (for regression) and mode/average (for classification)
+
+There are other variants: such as Quinlan (C4.5, C5.0) - split node into multiple child nodes using multiple conditions that are mutually exclusive and exhaustive.
+
+Number of parameters = number of terminal nodes.
+
+Bagging:
+
+Create bootstrap sample, build CART, average the predictions of all models. This creates some randomization, therefore the ouput will be (slightly) random. $\hat E(Y|X = x_0) = \frac{1}{B}\sum_{b=1}^{B}\bar y(b)$
+
+### Splitting rule: regression
+
+- Exhaustively look at all predictors
+- Split: $1\{X^{(j)} \le c\}$
+    - Before split: null model
+    - After split: stump
+- Evaluate variance before split: $var(A) = \frac{1}{N}\sum_{i \in A} (y_i-\bar y_A)^2$
+- After split: wegihted variance reduction: $score_{reg}= var(A) - \bigg( \frac{N_{A_L}}{N_A}var(A_L) + \frac{N_{A_R}}{N_A}var(A_R) \bigg)$; $N_A$ is sample size of A
+
+### Splitting rule: classification
+
+- Gini index: $1-\sum_{k=1}^{K}\hat p_k^2$
+- Entropy: $\sum_{k=1}^{K} y_K log(\hat p_K)$
+
+## Random forest
+
+- Splitting rule
+- Stopping rule: nodesize
+- Random features: mtry
+- ...
+- Number of trees doesn't affect
+- Sample size of bootstrap sample doesn't affect
+
+### Splitting rule
+
+- Regression: variance reduction (residual variance after splitting)
+- Classification: gini index
+- Survival: log-rank test
+
+
+
+- Randomly choose bootstrap sample
+- Randomly choose subset of features
+- Construct trees
+- Get predictions and average
+
+Extremely randomized tree: randomly pick cutoff
