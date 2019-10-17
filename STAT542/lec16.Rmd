@@ -1,0 +1,33 @@
+---
+title: "Lecture 16"
+author: "Naveen Mathew Nathan S."
+date: "10/4/2019"
+output: pdf_document
+---
+
+# Random Forest
+
+Consider a kernel regression with nearly constant value over a large region. For a point $x^*$ in the 'flat region', we know the bias is small for a kernel with large / small bandwidth. However, large bandwidth leads to smaller variance - therefore it is a better choice. In kernel regression it is not possible to use adaptive kernel based on region: even in 1-D case this leads to large number of possibilities.
+
+Random forest can be considered as adaptive to sparsity and the local signal. It is not affected greatly by the curse of dimensionality.
+
+Bagging builds multiple trees on bootstrap samples. But it has issues: covariance between trees
+
+$\hat f(x_0) = \frac{1}{B}\sum_{b=1}^{B} \hat f_b(x_0)$
+
+If trees are identical, $var(\hat f(x_0)) = var(\hat f_i(x_b))$
+
+Assuming different variables are chosen at random to build trees, the covariance is 0. Therefore, $var(\hat f(x_0)) = \frac{1}{B} var(f(x_0))$. For lower mtry we know that rnnadm forest is similar to 1-NN.
+
+Out-of-bag prediction: Choose a point at random, pretend all that the models without using the point are aggregated and prection is made.
+
+Asymptotics:
+
+- $diam(A) \to 0$ is equivalent to saying bias = 0
+- $\frac{|A_nj|}{n} \to )$ is equivalent to saying variance = 0
+
+# Variable importance
+
+Consider the MSE: $Error = \frac{1}{n}\sum_{i=1}^{n}(\hat f(x_i) - y_i)^2$. Choose a variable $x^{(j)}$ and randomly permute the values by shuffling (permuted). Let us name this variable as $\tilde x^{(j)}$. This variable loses the information in the original variable.
+
+Consider the error $Error_j = \frac{1}{n}\sum_{i=1}^{n} (\hat f(x_i^{(1)}, x_i^{(2)}, ..., \tilde x_j^{(1)}, ..., x_i^{(p)}) - y_i)^2$ calculated on the out-of-bag samples (observations not in the bootstrap samples). Consider this operation being done on all variables. Feature importance is given by: $0$ if $Error_j < Error$

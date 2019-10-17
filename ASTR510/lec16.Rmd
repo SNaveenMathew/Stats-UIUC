@@ -1,0 +1,74 @@
+---
+title: "Lecture 16"
+author: "Naveen Mathew Nathan S."
+date: "10/17/2019"
+output: pdf_document
+---
+
+# Gravity
+
+Poisson equation
+
+Jacobi and Gauss-Siedel methods: spectral radius should be < 1 for convergence
+
+## Multipole method
+
+Matter distribution should be approximately spherical. In spherical harmonic space:
+
+$\frac{1}{|x-x'|} = 4\pi \sum_{l=0}^{\infty}\sum_{m=-l}^{l}\frac{1}{2l+1}\frac{r^l_<}{r^{l+1}_>}Y^*+{lm}...$
+
+Scaling: $O(l_{max}^2 N)$
+
+Boundary conditions: Relaxation method - set ghost zones similar to hydrodynamics
+
+Transform methods: Dirichlet case: $\phi'$ is unknown, so we calculate $\phi_0 + \phi_1$; $\phi_0 = \phi(0) -\frac{1}{2}\phi'\Delta x + O(\Delta x^2); \phi_1 = \phi(0) +\frac{1}{2}\phi'\Delta x + O(\Delta x^2)$
+
+Usually in astrophysics there are periodic boundary conditions or isolated boundary conditions. Eg: $lim_{x \to \infty} \phi(x) = 0$
+
+## Isolated boundary conditions
+
+Hockney's FFT:
+
+- Double mesh in all dimensions
+- Set $\rho$ = 0 in extra mesh cells
+- Solve FFT on this grid with modified Green's function
+
+Extra storage cost is quite high
+
+James' image-mass algo:
+
+- Solve $\nabla^2 \phi = \rho$ with Dirichlet boundary conditions $\to \phi_{zb}$
+- Let $\phi_{zb}=0$ everywhere outside the domain. Compute implied image source distribution:
+    -
+- Compute potential from image
+    - $\nabla^2\phi = \sigma_{im}(x_s) \delta[(x-x_s)n(x_s)]$
+
+## AMR multigrid using direct solvers
+
+- Solve separately on fine and coarse grid
+- Interpolate coarse grid to final gird
+
+Check for both types of convergenece: iterative and mesh. We set 0 boundary explicity
+
+## Coupling gravity and hydro
+
+- Reframing Euler equations for self-gravitating
+- Can also do energy conservation
+
+Sometimes: Take derivative of Poisson equation and combine with Euler equation to get desiered result
+
+# Cosmological simulations
+
+Zeroth order: Friedmann equation (expansion of the universe): $H^2 = (\frac{\hat a}{a})^2 = \frac{8 \pi G \rho}{3} - \frac{k}{a^2}$
+
+Types of mass-energy considered:
+
+- Non-relativistic matter (matter; v << c)
+- Relativistic matter (radiation; v ~ c)
+- Dark energy
+
+Possible simulation setting: ODE solver, calculate scale factor for next iteration
+
+Notes:
+
+- Consider solving the Poisson equation in large box so that the effects dissipate with distance

@@ -1,0 +1,26 @@
+---
+title: "Lecture 20"
+author: "Naveen Mathew Nathan S."
+date: "10/14/2019"
+output: pdf_document
+---
+
+# Self organizing map
+
+In k-means there is no way to know dissimilarity without defining distance between cluster centers. There is no geometric interpretation of centers or distances between centers.
+
+A manifold is a lower dimensional geometric representation of the data. Consider creating a random grid in original coordiates and projecting in the manifold. The grid edges are equivalent to 'cluster means'. Assume the grid is $p \times q$. Initialize $\{w_{ij}\}; i\in \{1, 2, ..., p\}; j\in \{1, 2, ..., q\}$. If the original feature space is $R^d$, then we have $w_{ij} \in R^d$. These are randomly initialized in $R^d$
+
+SOM is an online algorithm (requires one point at a time, unlike the batch algorithms that require a batch or mini-batch). Algorithm overview:
+
+- Sample an observation
+- Identify grid points that are close (Euclidean distance) to the observed point
+- 'Pull' the grid points closer to the observation by an amount determined by: 1) learning rate, 2)
+
+$w_{ij} = w_{ij} + \alpha h(w_*,w_{ij},r)(x_k - w_{ij})$
+
+# Random forest clustering
+
+Cluster usually forms when there is an underlying lower dimensional manifold. If the data is uniformly spread across x, there is no clustering.
+
+Label the original data set as 1. Is it possible to create a grid on 1 variable ($x_1$) such that the conditional distribution (conditioned on $x_1$ grid) is product of marginal distributions on other variables. Create proxy examples using the conditional distribution and label it as 0. Now build a random forest classification model. If two examples $x_{1*}$ and $x_{2*}$ fall in same terminal node, the points belong to same cluster.

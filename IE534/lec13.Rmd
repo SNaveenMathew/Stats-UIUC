@@ -1,0 +1,71 @@
+---
+title: "Lecture 13"
+author: "Naveen Mathew Nathan S."
+date: "10/8/2019"
+output: pdf_document
+---
+
+# RNN
+
+It can be viewed as a very deep networks where the number of layers is T (or $\tau$ for TBPTT)
+
+Breaking a computational graph: limit the window before which gradients = 0
+
+## Backprop
+
+$\hat Y_t = f_Y(X_t, S_{t-1}; \theta)$
+
+$\theta$ is shared for all time steps t = 1, 2, ... T
+
+Let $\theta \in \Theta$. We knot that $\theta = \theta_0 = \theta_1 = ... = \theta_T$; $G(\theta,\theta,\theta,...) = G(\theta_0,\theta_1,..., \theta_T)$; $\theta_t = g(\theta); g(z) = z$ t = 1, 2, ..., T
+
+Now this becomes a multi-layer feedforward network with weight constraints $\theta_t = \theta$
+
+$\nabla_\theta L(\theta) = \sum_{t = 1}^{T}\nabla_\theta \tilde L(\theta_1, ..., \theta_T)$
+
+Let us begin by taking gradient $\nabla_{\theta_\tau}L(\theta_1, ..., \theta_\tau) = \frac{\partial \rho}{\partial \hat Y}()$
+
+**For $\tau = T$:**
+
+**For $\tau < T$:**
+
+$\nabla_{\theta_\tau} \tilde L(\theta_1, ..., \theta_T) = \nabla_{\theta_\tau}\sum_{t=\tau}^{T}\rho(Y_t, \hat Y_t) = \frac{\partial \rho}{\partial \hat Y}(Y_\tau, \hat Y_\tau) \frac{\partial f_Y}{\partial \theta}(X_\tau, S_{\tau - 1}; \theta_tau + \nabla_{S_\tau}) something$
+
+**Combining both**
+
+Let $\delta^t = \nabla_{S_t}L(\theta_1, ..., \theta_T)$; Set $\delta^T = 0$
+
+GD update:
+
+- Calculate forward pass prediction and $S_t$
+- $\delta^T$ = 0, set gradients G
+- For t = T, T-1, ..., 1:
+    - Calculate $\delta^t$
+    - Accumulate gradients over time by adding
+- Take gradient descent step in the direction of -G
+
+## LSTM
+
+Consider $S_t = C \sigma(W(X_t, S_{t-1})$ is expected to remember previous hidden state $S_{t-1}$, but in practice it doesn't remember long history. Therefore, LSTM was proposed
+
+$F_t = \sigma(W^F(h_{t-1}, X_t) + b^F)$: forget gate. Usually sigmoid activation is used: $F_t \in [0,1]$
+
+$I_t = \sigma(W^I(h_{t-1}, X_t) + b^I)$: input gate. Usually sigmoid activation is used: $I_t \in [0,1]$
+
+$C_t = F_t \odot C_{t-1} + I_t \odot tanh(W^C(h_{t-1}, X_t) + b^C)$
+
+$O_t = \sigma(W^O(h_{t-1}, X_t) + b^O)$
+
+$h_t = O_t \odot tanh(C_t)$
+
+$\theta = (W^O, b^O, W^F, b^F, W^I, b^I, W^C, b^C)$
+
+## GRU
+
+Tries to remove some of the internal operations of LSTM and performs almost as good as LSTM
+
+$F_t = \sigma(W^F(S_{t-1}, X_t) + b^F)$: $F_t = 1 \implies$ forget
+
+$r_t = \sigma(W^r(S_{t-1}, X_t) + b^r)$: reset gate
+
+$S_t = (1-F_t)\odot S_t + F_t \odot tanh(W(r_t \odot S_{t-1}, X_t) + b)$

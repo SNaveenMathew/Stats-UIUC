@@ -1,0 +1,64 @@
+---
+title: "Lecture 12"
+author: "Naveen Mathew Nathan S."
+date: "10/3/2019"
+output: pdf_document
+---
+
+# Rarefaction
+
+Let's assume there's a piston that causes rarefaction. Rarefactions don't require supersonic flow. There are 3 flow regimes:
+
+- Flow unaffected by piston (characteristics unaffected)
+- Flow that interacts with piston
+- 
+
+In cases of shocks and rarefactions:
+
+- Pressure and velocity parallel to disturbance remains the same
+- Pressure and velocity perpendicular to disturbance is discontinuous
+
+# Contact discontinuity
+
+- Density changes discontinuously
+- Pressure and transverse velocity are continuous
+
+- Parallel velocity may be discontinuous
+
+# Riemann problem
+
+If there is an arbitrary finite jump in solution of a profile vs x, what is the discontinuity?
+
+Example: $\frac{\partial q}{\partial t} + \frac{\partial f(q)}{\partial x} = \frac{\partial q}{\partial t} + \frac{\partial f}{\partial q}\frac{\partial q}{\partial x} = 0$
+
+- Let us assume q(x, t) = w(x/t): this looks like a rarefaction fan
+- Let us assume w'/t = 0: q(x,t) = $q_L$ x < st, $q_R$ x > st. This looks like a shock
+
+## Analytical solution of Riemann problem for Euler equations
+
+- L region
+- L* region
+- *R region
+- R region
+
+- Use Rankine-Hugoniont conditions, entropy constraint and Riemann invariants to solve for jumps
+- Compute $u_*$
+- Compute $\rho_{*L}$ and $\rho_{*R}$ using Rankine-Hugoniont or entropy conservation
+- Compute non-linear wave speeds
+
+## Graphical interpretation
+
+Solution can be obtained as the intersection of Hugoniot adiabat that passes through the R and L states. Based on the intersection and direction of shock and rarefaction fans we can determine the actual direciton of shock and rarefaction fans. For weak shocks and rarefactions we can approximate the rarefaction as a shock moving in opposite direction to improve computational complexity
+
+# First order finite-volume methods for non-linear scalar advection
+
+- Reconstruction: approximate solution at zone edges: $q_i^R = \bar q_i^n$
+- Evolution: advect the constants forward through $\Delta t$
+- 
+
+
+- Donor cell (upwind): Determine based on the wave speed whether the information from left or right should be considered. Second order in time, first order in space
+- Lax-Friedrichs method: FTCS + diffusive term
+- Local Lax-Friedrichs method: Figure out local diffusive term
+- Godunov's method: Assume there is a Riemann problem at every cell interface. Calculate f(Riemann problem evaluated at the point; $\frac{x}{t} = 0$. Smears off discontinuity at shock, but has an entropy glitch where the dissipation vanishes numerically
+- Extensions: Inviscid Burger's equations: $f(q) = \frac{1}{2}q^2$. Local Lax-Friedrichs is cheaper than Godunov's but gives reasonably good solution

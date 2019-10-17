@@ -1,0 +1,77 @@
+---
+title: "Lecture 15"
+author: "Naveen Mathew Nathan S."
+date: "10/15/2019"
+output: pdf_document
+---
+
+# Deep Reinforcement Learning
+
+- State of system: $X_t$
+- Action: $A_t$
+- Reward: $R_t$
+- $X_{t+1} = h(X_t, A_t) + \epsilon_X$ unknown transition function h possibly random
+- $R_t = f(X_t, A_t) + \epsilon_R$ (unknown reward function f, possibly random)
+
+At a time t, we selection action $A_t = a$ that maximizes $E[\sum_{\tau = t}^{T} R_\tau | X_{t' \le t}, A_{t' \le t}, R_{t' < t}]$
+
+If time horizon is infinite, we use discounted reward: $E[\sum_{\tau = t}^{T} \gamma^{t-\tau}R_\tau | X_{t' \le t}, A_{t' \le t}, R_{t' < t}]$
+
+Assuming Markov: $E[\sum_{\tau = t}^{T} R_\tau | X_t, A_t=a]$ for finite time horizon or $E[\sum_{\tau = t}^{T} \gamma^{t-\tau}R_\tau | X_t, A_t=a]$ for infinite time horizon
+
+## Policy gradient method
+
+Consider T = 0: $E[R | X, A]$ where $R = f(X, A)$ (unknown, deterministic reward):
+
+- Let A $\in A = \{a_1, a_2, ..., a_K\}$ and $X \in R^d$
+- Let $p(a, x; \theta)$ be our model for action A
+- For example $p(a, x; \theta)$ is a neural network with softmax final layer
+- Objective: $max_\theta E_{A, X}[f(X, A)]$
+- $P[A = a|X] = p(a, X; \theta)$
+
+Calculate gradient of $E[R | X, A]$ wrt $\theta$: leads to $E[\sum f(X,a)\nabla_\theta p(a, X; \theta)] = E[\sum f(X,a) \frac{\nabla_\theta p(a, X; \theta)}{p(a, X; \theta)}p(a, X; \theta)] = E[E[R \frac{\nabla_\theta p(a, X; \theta)}{p(a, X; \theta)}| X]]$: policy gradient on single sample
+
+Continuous action space: Mixture of Gaussian model: $p(a, x; \theta) = \sum_{i=1}^{M} c_i\frac{1}{\sqrt{2\pi \sigma^2}}exp(-\frac{(a-\mu_i(x; \theta_i))^2}{2\sigma^2})$ where $(c_1, ..., c_M)$ is a convex combination: $\sum_{i=1}^{M} c_i = 1$. More generally $p(a, x; \theta) = \sum_{i=1}^{M} c_i(x; \nu)\frac{1}{\sqrt{2\pi \sigma^2}}exp(-\frac{(a-\mu_i(x; \theta_i))^2}{2\sigma^2})$. Expectation: summation is replaced with integral. Tower property is applied again. The update looks identical to discrete action case.
+
+Update: $\theta = \theta + \alpha g$
+
+### Multi-period extension
+
+For t = 0, ..., T:
+
+- Observe $X_t$
+- Select $A_t \sim p(a, X_t;\theta)$
+- Observe $R_t$
+
+Take SGD:
+
+- Set G = 0
+- For t = 0, 1, ..., T:
+    - $G = G + \tilde R + \frac{\nabla_\theta p(A_t, X_t; \theta)}{p(A_t, X_t; \theta)}$, $\tilde R_t$ is cumulative reward after time t
+
+### Bellman equation
+
+$V(x, a) = r(x, a) + \gamma\sum_{z \in X} max_{a' \in A} V(z, a')p(z|x,a)$
+
+$V(x, a)$ is the expected reward of taking action a from state x given that we take the optimal action in all future steps. Problems with this equation: $p(z|x,a)$ is unknown. Also the state space may be too high dimensional for standard numerical methods to solve due to curse of dimensionality
+
+### Deep RL
+
+Approximate Bellman equation with a function approximator $Q(x, a; \theta)$ such as a (deep) neural network
+
+Q-learning algorithm: minimize $L(\theta) = \sum_{x, a \in X, A} [(Y(x, a) - Q(x, a; \theta))^2]\pi(x,a)$
+
+If $L(\theta) = 0$ then $Q(x, a;\theta)$ satisfies Bellman equation because $Q(x, a; \theta) = V(x, a)$
+
+Finally we have $a^*(x) = argmax_a Q(x, a; \theta)$
+
+## Q-learning
+
+Take gradient of $L(\theta)$ but treat Y as constant $\theta_{k+1} = \theta_k - \alpha \sum_{x, a}[(Y(x, a) - Q(x, a;\theta))]\nabla_\theta Q(x, a; \theta) \pi(x, a)$. Making this computationally efficient - use stochastic approximation:
+
+- $\theta_{k+1} = \theta_k - \alpha G_k$
+- $G_k = (r(x_k, a_k) + \gamma max_{a' \in A}Q(x_{k+1}, a'; \theta_k) - Q(x_{k}, a_'_k; \theta_k)) \times \nabla_\theta Q(x_k, a_k; \theta)$ is gradient of the Q network
+
+$G_k$ is not an unbiased estimate of the gradient direction
+
+$E[G_k | \theta_k, x_k, a_k] \ne \nabla_\theta E[]$ because we froze Y as constant wrt $\theta$

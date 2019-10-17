@@ -1,0 +1,32 @@
+---
+title: "Lecture 19"
+author: "Naveen Mathew Nathan S."
+date: "10/11/2019"
+output: pdf_document
+---
+
+# Dimensionality Reduction
+
+PCA is useful because it aligns with the directions of highest variance - therefore they are expected to be aligned along the direction of maximum separation (between classes or clusters).
+
+## Multidimensional scaling (PCoA - Principal Coordinate Analysis)
+
+$D = [d_{ij}]_{n \times n}$ for any arbitrary choice of $d_{ij}$: Manhattan, Euclidean, etc. Assume that we no longer have the original data ($Z_i$). How do we 'plot' the coordinates of points? Can we come up with a coordinate system such that $||X_i-X_j|| = ||Z_i-Z_j|| = d_{ij}$. The solution is non-unique because arbitrarily shifting the center of the new coordinate system does not change the distance between points. Therefore, we assume that the new coordinate system is centered to make it unique: $\sum_{i=1}^{n}X_{ik} = 0 \forall k \in \{1, 2, ..., p'\}$. Let us define a matrix B such that $B = XX^T = [b_{ij}]$
+
+$||X_i - X_j||^2 = d_{ij}^2 = X_i^TX_i + X_j^TX_j - 2X_iX_j = b_{ii} + b_{jj} - 2b_{ij}$
+
+$\implies b_{ij} = -\frac{1}{2}(d_{ij}^2 - b_{ii} - b_{jj})$
+
+$\sum_{i=1}^{n} d_{ij}^2 = \sum_{i=1}^{n} b_{ii} + \sum_{i=1}^{n} b_{jj} - 2\sum_{i=1}^{n} b_{ij}; \sum_{i=1}^{n} b_{ii} = T \implies \sum_{i=1}^{n} d_{ij}^2 = T + n b_{jj} - 2 \sum_{i=1}^{n} X_i^TX_j$
+
+$\implies \sum_{i=1}^{n} d_{ij}^2 = T + n b_{jj} - 2 \sum_{i=1}^{n}\sum_{k=1}^{p'}X_{ik}X_{jk} = T + n b_{jj} - 2 \sum_{k=1}^{p'}\sum_{i=1}^{n}X_{ik}X_{jk} = T + n b_{jj} - 2\sum_{k=1}^{p'}X_{jk}\sum_{i=1}^{n}X_{ik} = T + n b_{jj}$ because $\sum_{i=1}^{n}X_{ik} = 0$: centering
+
+Similarly, $\sum_{j=1}^{n} d_{ij}^2 = T + n b_{ii}$; $\sum_{i=1}^{n}\sum_{j=1}^{n} d_{ij}^2 = 2nT$
+
+Therefore, all the terms of B can be written in terms of elements of D
+
+$\implies b_{ij} = -\frac{1}{2}(d_{ij}^2-\frac{1}{n}\sum_{j=1}^n d_{ij}^2-\frac{1}{n}\sum_{i=1}^n d_{ij}^2 +\frac{1}{n^2}\sum_{j=1}^n\sum_{i=1}^n d_{ij}^2)$
+
+This simplifies to $B = -\frac{1}{2}JD^2J; J = I - \frac{1}{n}11^T$ This is called double centering: center with respect to column, center with respect to row and center with respect to global mean.
+
+Now B can be written as $B = U\Lambda V^T; X = U\Lambda^{1/2}$

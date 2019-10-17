@@ -1,0 +1,103 @@
+---
+title: "Lecture 11"
+author: "Naveen Mathew Nathan S."
+date: "10/1/2019"
+output: pdf_document
+---
+
+# Hydrodynamics
+
+Euler (conservation) equations: Assuming no external factors such as gravity play a role, inviscid
+
+- Continuity: $\frac{\partial \rho}{\partial t} + \nabla.(\rho u) = 0$
+- Momentum: $\frac{\partial \rho u}{\partial t} + \nabla.(\rho \mathbf{uu}) + \nabla P = 0$
+- Total energy: $\frac{\partial \rho E}{\partial t} + \nabla.((\rho E+P)u) = 0$
+
+
+Two views:
+
+- Eulerian: stand and watch the fluid move
+- Lagrangian: move with the fluid
+
+$\frac{D}{Dt} = \frac{\partial }{\partial t} + u.\nabla$
+
+Lagrangian version of continuity equation: $\frac{D \rho}{Dt} = -\rho\nabla.u$
+
+Some of the equations are better written in Lagrangian form. Example: star mass movement: total mass remains almost constant but mass gets distributed
+
+Complex behaviors such as turbulence occur because of non-linear terms such as $\mathbf{(u.\nabla)u}$
+
+- Number of variables: u: 3, $\rho$: 1, E: 1, P: 1. Total: 6
+- Number of equations: 5
+
+Perfect gas is 'perfect' when their kinetic energy and degrees of freedom can be considered independent of their potential. Potential plays a role (instantaneously) only when the particles collide (very rare)
+
+Additional required equation: Equation of state:
+
+$\rho \epsilon = \frac{P}{\gamma - 1} = \frac{n k_B T}{\gamma - 1} = \rho C_VT$
+
+$\gamma = 1 + \frac{2}{d}$
+
+- Isothermal case: $\gamma = 1$: $P \propto \rho; \gamma \to \infty$
+- Polytopic case: $s = constant \implies P \propto \rho^\gamma$
+- Small $\gamma$: soft equation of state
+- Large $\gamma$: stiff equation of state: adiabatic compression leads to large pressure increase
+
+Navier-Stokes equation:
+
+Euler equation with viscosity
+
+- Continuity: $\frac{\partial \rho}{\partial t} + \nabla.(\rho u) = 0$
+- Momentum: $\frac{\partial \rho u}{\partial t} + \nabla.(\rho \mathbf{uu - \pi}) + \nabla P = 0$
+- Total energy: $\frac{\partial \rho E}{\partial t} + \nabla.((\rho E+P)u - \mathbf{\pi.u + F}) = 0$
+
+Viscous stress tensor: $\pi_{ij} = \mu D_{ij}$; D is rate of strain tensor
+
+$D_{ij} = \frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i} - \frac{2}{3}\delta_{ij}\nabla.u$
+
+Conductive head flux: $F = -\kappa \nabla T$, $\kappa$ is coefficient of thermal conductivity
+
+There can be situations where these equations are elliptical, parabolic and hyperbolic respectively. Therefore, one size fits all does not work in astronomy.
+
+Relative importance of terms (dimensionless quantities):
+
+- Mach number: $M = \frac{|u|}{a}$; $a^2 = \frac{\partial P}{\partial \rho}$
+- Reynold's number: $\frac{|\nabla.(\rho uu)|}{|\nabla.\pi|} ~ \frac{\rho U^2/L}{\rho U//L^2} = \frac{UL}{\nu} = Re$
+    - Kinematic viscosity: $\nu = \mu/\rho ~ ma/\rho\sigma = a/n\sigma = a\lambda_{mfp}$
+- Prandtl number: ratio of kinematic viscosity $\nu$ to thermal diffusivity $\chi$
+    - $Pr = \frac{\nu}{\chi}; \chi = \frac{\kappa}{\rho C_p}$
+- Peclet number: ratio of advection and conduction terms in energy equation:
+    - $\frac{|\nabla.[(\rho\epsilon + P)u]|}{|\nabla.F|} \sim \frac{\rho C_p TU/L}{\kappa T/L^2} = \frac{\rho UL}{\kappa/C_p} = \frac{UL}{\chi} = Pe$
+
+## Primitive form
+
+$\frac{\partial Q}{\partial t} + A(Q).\frac{\partial Q}{\partial x} = 0$
+
+- $Q = [\rho; u; P]$, $A(Q) = [[u; \rho; 0]; [0; u; 1/\rho]; [0; \rho a^2; u]]$
+
+Converted equation: $K^{-1} \frac{\partial Q}{\partial t} + \Lambda K^{-1}.\frac{\partial Q}{\partial x} = 0$
+
+Consider small perturbations around $Q_0 = constant$: $\frac{\partial \delta Q}{\partial t} + \Lambda_0\frac{\partial \delta Q}{\partial x} = 0$
+
+Riemann invariants $J_{\pm} = u \pm \int\frac{\partial P}{\rho a}$ are kept constant, not Q(x). These Riemann invariants are the values conserved along characteristics that travel with speeds u-a, u and u+a
+
+- - characteristic: $J_-(x-(u-a)t) = constant$
+- 0 characterist: $J_-(x-(u)t) = constant$
+- + characteristic: $J_+(x-(u+a)t) = constant$
+
+But this assumes sound speed is constant for all densities. But this is not the case. Curve steepens because for ideal gas: $a = \sqrt{\frac{\partial P}{\partial \rho}}$. Therefore, for a sine wave the peaks will catch up with the troughs. This creates a saw-tooth like structure. If Euler equations are true (no viscosity), sound waves will form weak shocks. If there is high viscosity, sound waves will dissipate quickly and become heat energy.
+
+### Shocks
+
+We assume that the characteristics are integrable perpendicular to the shock. Weak form of Euler equations can be derived
+
+For perfect gas:
+
+- $\frac{u_1}{u_2} = \frac{\rho_2}{\rho_1}$
+- $\frac{P_2}{P_1} = \frac{(\gamma+1)\rho_2-(\gamma-1)\rho_1}{(\gamma-1)\rho_1-(\gamma-1)\rho_2}$
+- $\frac{\rho_2}{\rho_1} = \frac{u_1}{u_2} = \frac{(\gamma+1)}{(\gamma-1)}\frac{M^2}{M^2+2}$. For arbitrarily large mach number $M \to \infty$ for $\gamma = 5/3$ this cannot exceed 4
+- $\frac{P_2}{P_1} = \frac{2\gamma M^2 - (\gamma - 1)}{\gamma+1}$
+
+In observational astronomy: metallicity and temperature. These can be used to differentiate contact discontinuities and shocks
+
+ALE can switch between Lagrangian and Eulerian. They are better to implement in 1D. In higher dimensions it is computationally expensive to reconstruct/remapping the mesh

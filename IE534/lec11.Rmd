@@ -1,0 +1,40 @@
+---
+title: "Lecture 11"
+author: "Naveen Mathew Nathan S."
+date: "10/1/2019"
+output: pdf_document
+---
+
+## Asynchronous GD
+
+- Copy model $\theta$ from master to multiple worker nodes
+- Compute gradient asynchronously
+- Send gradients back to master and compute update as soon as the asynchronous call completes & update weights
+- If there is a slow worker, the weights in master will be updated multiple times before the gradient is sent to master from the slow worker. This leads to biased estimate of gradient: noisy update!
+- Communication cost: O(N), synchronous gradient descent communication cost: O(log(N))
+
+Distributed methods in DL have low efficiency
+
+# Recurrent Neural Networks
+
+- Sequential or temporal dependence
+- Goal: estimate a model $F_t(X_{s\le t};\theta)$ to predict $Y_t$ for all times t
+- Speech and text recognition
+- Using fully-connected network instead: number of parameters will be a function of t, may lead to vanishing gradient, model can overfit easily
+
+- $\hat Y_t = f_Y(X_t, S_{t-1}; \theta)$
+- $S_t = f_S(X_t, S_{t-1}; \theta)$; $X_t \in R^d$ is input at time t, $\hat Y_t \in R^K$ is prediction for $Y_t$, $S_t \in R^{d_s}$ is internal state of model, $f_Y: R^d \to R$
+- $S_{t-1}$ is a nonlinear representation of previous data $X_{t-1}, X_{t-2}, ..., X_1$
+- $f_S(.; \theta)$ and $f_Y(.; \theta)$ are neural networks
+- Parameters $\theta$ are shared across times t = 1, 2, ..., T
+- $S_1, ..., S_T$ dependes on $\theta$ in a complicated way
+- Backprop complexity is O(T) where T is number of samples. $\hat Y_T$ dependes on all previous time steps
+    - In practice: truncated backprop through time
+    - $L^k(\theta^k) = \sum_{t=\tau k+1}^{(k+1)\tau}\rho(Y_t, \hat Y_t)$, $\tau << T$. Usually $\tau \in \{20, 50, 100\}$. In NLP $\tau <$ sentence length
+    - $\hat Y_t = f_Y(X_t, S_{t-1}; \theta^{(k)}); \tau k +1 \le t \le (k+1)\tau$
+    - $\hat S_t = f_S(X_t, S_{t-1}; \theta^{(k)}); \tau k +1 \le t \le (k+1)\tau$
+    - $S_{\tau k} = g(\theta^{(k-1)})$: parameters for the variables before the k-th subsequence = constant (gradient = 0). Therefore, this gradient is biased. Still this method works well in practice
+    - Information from previous subsequences is still passed to later subsequences.
+    - SGD update: $\theta^{(k+1)} = \theta^{(k)} - \alpha^{(k)}\nabla_{\theta^{(k)}}L^k(\theta^{(k)})$
+    - This makes the order of complexity $O(\tau)$
+- Objective function: $L(\theta) = \sum_{t=1}^{T}\rho(Y_t, \hat Y_t)$

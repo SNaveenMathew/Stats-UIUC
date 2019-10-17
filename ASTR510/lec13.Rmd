@@ -1,0 +1,44 @@
+---
+title: "Lecture 13"
+author: "Naveen Mathew Nathan S."
+date: "10/8/2019"
+output: pdf_document
+---
+
+# Summary of last lecture
+
+Draw the pressure-velocity curve and trace the states from initial to final. Note: The trace of entropy-violating shock looks like a rarefaction wave. Sodd problem and Sedov problem are cases where the initial conditions lead to shock and rarefaction wave.
+
+## Scalar advection
+
+In order to know q we need a future value of f. This is a chicken-and-egg problem. We approximate f: 1) spatially: distribution of solution, 2) across time: how the solution evolves
+
+- Reconstruction: Approximate $q_i^{Right} = \bar q_i^n$
+- Evolution: $\Delta area_{t+1/2} = f(q_i^R)\Delta t$: approximation of time advanced flux [Linear methods: 1) upwinding, 2) Lax-Friedrichs: central difference with diffusive flux, 3) Local Lax-Friedrichs: central difference with diffusion limited to a local area; Non-linear method: 1) Godunov method: assumes each piece-wise constants as Riemann problem and tries to solve the Riemann problem to calculate the value at the cell interface]
+- 
+
+## Performance of first order methods on scalar advection
+
+Inviscid Burger's equation example: $f(q) = \frac{1}{q^2}$
+
+Godunov method produces errors that don't disappear at the shock even on reducing the grid size
+
+Generalizing Godunov method to higher order is difficult. Second order schemes approximate the solution as piece-wise linear (not piece-wise constant). LW is good for smooth flows than LF, but it creates oscillations in slope around discontinuities like shock. Therefore, Riemann problem should be solved. Godunov's method flattens out at the discontinuity. Other options: Minmod limiter, mononotonized central difference
+
+## MUSCL schemes
+
+Generalization of Godunov methods to second order:
+
+- Reconstruction to slope: slope limiting
+- Characteristic tracing:
+- Riemann problem: Use mid-point approximation for fluxes
+
+Therefore more computations per zone. But fewer zones can be used. This is especially useful in 3D case
+
+## Third order: Piecewise parabolic method
+
+Piece-wise quadratic instead of piece-wise linear. Very similar to MUSCL. Additional: Extremum removal: limit quadratic coefficient, second order time integration (assume constant characteristic speed)
+
+# Finite volume methods for Euler equations
+
+Characteristic equations are of matrix form. The flux has to be approximated 

@@ -1,0 +1,35 @@
+---
+title: "Lecture 21"
+author: "Naveen Mathew Nathan S."
+date: "10/16/2019"
+output: pdf_document
+---
+
+# Model based clustering
+
+Let us assumed that the data comes from a mixture of distributions. $\phi_\mu(x) \sim N(\mu, 1); \theta = \{\mu_1, \mu_2, \pi\}$ such that we define the density as $(1-\pi) N(\mu_1, 1) + \pi N(\mu_2, 1)$
+
+$P(X | \theta) = (1-\pi)\phi_{\mu_1}(x) + \pi\phi_{\mu_2}(x) \implies l(\mathbf{x}|\theta) = \sum_{i=1}^{n}log[(1-\pi)\phi_{\mu_1}(x) + \pi\phi_{\mu_2}(x)]$
+
+Let $z_i \sim Bernoulli(\pi)$ be latent variables such that it does not affect the MLE of $\theta$ such that $P(X,Z|\theta) = P(X|Z,\theta) P(Z|\theta)$
+
+$\implies l(x,z,\theta) = \sum_{i=1}^{n}(1-z_i)log\phi_{\mu_1}(x_i) + z_ilog\phi_{\mu_2}(x) + \sum_{i=1}^{n}[z_i log \pi + (1-z_i) log(1-\pi)]$
+
+EM algorithm:
+
+- Use $P(Z|x, \theta)$ to calculate $E[Z|X, \theta]$
+- Once this is observed, the remaining step is to just estimate the statistical model parameters: MLE of $\theta = \{\mu_1, \mu_2, \pi\}$
+
+$Z_i \in \{0, 1\}; st\ P(Z_i = 1 | X, \theta) \sim \frac{P(Z_i = 1, X| \theta)}{P(Z_i, X| \theta)} = \frac{P(Z_i = 1, X| \theta)}{P(Z_i = 1, X| \theta) + P(Z_i = 0, X| \theta)}$
+
+We know that $X_i$s are independent. Therefore, $P(Z_i = 1 | X, \theta) \sim \frac{P(Z_i = 1, X| \theta)}{P(Z_i = 1, X_i| \theta) + P(Z_i = 0, X_i| \theta)} = \frac{\phi_{\mu_2}(x_i) \pi}{\phi_{\mu_2}(x_i) \pi + \phi_{\mu_1}(x_i) (1-\pi)}$
+
+Therefore, the expectation step can be rewritten as:
+
+$\sum_{i=1}^{n}[(1-p_i)log\phi_{\mu_1}(x_i) + p_ilog\phi_{\mu_2}(x_i)] + \sum_{i=1}^{n}[p_ilog \pi + (1-p_i)log(1-\pi)]$
+
+$\frac{\partial l}{\partial \pi} = 0 \implies 0 = \sum_{i=1}^{n}\frac{p_i}{\pi} + \sum_{i=1}^{n}\frac{(1-p_i)}{1-\pi} = 0$
+
+The maximization can be rewritten as: $\sum_{i=1}^{n}(1-p_i)log(\frac{1}{z}) - \frac{1}{2}(X_i-\mu_1)^2$
+
+If $p_i$ is replaced by the label with most probability, it is same as k-means: all points are assigned exactly to 1 cluster. Then M step estimates the mean

@@ -1,0 +1,24 @@
+---
+title: "Lecture 16"
+author: "Naveen Mathew Nathan S."
+date: "10/17/2019"
+output: pdf_document
+---
+
+# NLP
+
+## Word2vec
+
+Prediction based method
+
+CBOW: predictors - $w_{t-k}, w_{t-k+1}, ..., w_{t-1}, w_{t+1}, ..., w_{t+k}$ to predict $w_{t}$
+Skip gram: predictor $w_t$ to predict $w_{t-k}, w_{t-k+1}, ..., w_{t-1}, w_{t+1}, ..., w_{t+k}$
+
+## GloVe
+
+GloVe: Global vector: count based method: count number of times word j occurred in context of word i. Estimate $P(j|i) = \frac{X_{ij}}{\sum_kX_{ik}}$
+
+$w_i * w_j = log(P(i|j))$ with vector differences: $w_x * (w_a-w_b) = log(P(X|a)/p(X|b))$
+
+Log-linear model in GloVe: $J = \sum_{i,j=1}^{V} f(X_{ij})(w_i^T\tilde w_j + b_i + \tilde b_j - log(X_{ij}))^2$
+

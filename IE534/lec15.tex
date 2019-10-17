@@ -1,0 +1,236 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Lecture 15},
+            pdfauthor={Naveen Mathew Nathan S.},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Lecture 15}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Naveen Mathew Nathan S.}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{10/15/2019}
+
+
+\begin{document}
+\maketitle
+
+\hypertarget{deep-reinforcement-learning}{%
+\section{Deep Reinforcement
+Learning}\label{deep-reinforcement-learning}}
+
+\begin{itemize}
+\tightlist
+\item
+  State of system: \(X_t\)
+\item
+  Action: \(A_t\)
+\item
+  Reward: \(R_t\)
+\item
+  \(X_{t+1} = h(X_t, A_t) + \epsilon_X\) unknown transition function h
+  possibly random
+\item
+  \(R_t = f(X_t, A_t) + \epsilon_R\) (unknown reward function f,
+  possibly random)
+\end{itemize}
+
+At a time t, we selection action \(A_t = a\) that maximizes
+\(E[\sum_{\tau = t}^{T} R_\tau | X_{t' \le t}, A_{t' \le t}, R_{t' < t}]\)
+
+If time horizon is infinite, we use discounted reward:
+\(E[\sum_{\tau = t}^{T} \gamma^{t-\tau}R_\tau | X_{t' \le t}, A_{t' \le t}, R_{t' < t}]\)
+
+Assuming Markov: \(E[\sum_{\tau = t}^{T} R_\tau | X_t, A_t=a]\) for
+finite time horizon or
+\(E[\sum_{\tau = t}^{T} \gamma^{t-\tau}R_\tau | X_t, A_t=a]\) for
+infinite time horizon
+
+\hypertarget{policy-gradient-method}{%
+\subsection{Policy gradient method}\label{policy-gradient-method}}
+
+Consider T = 0: \(E[R | X, A]\) where \(R = f(X, A)\) (unknown,
+deterministic reward):
+
+\begin{itemize}
+\tightlist
+\item
+  Let A \(\in A = \{a_1, a_2, ..., a_K\}\) and \(X \in R^d\)
+\item
+  Let \(p(a, x; \theta)\) be our model for action A
+\item
+  For example \(p(a, x; \theta)\) is a neural network with softmax final
+  layer
+\item
+  Objective: \(max_\theta E_{A, X}[f(X, A)]\)
+\item
+  \(P[A = a|X] = p(a, X; \theta)\)
+\end{itemize}
+
+Calculate gradient of \(E[R | X, A]\) wrt \(\theta\): leads to
+\(E[\sum f(X,a)\nabla_\theta p(a, X; \theta)] = E[\sum f(X,a) \frac{\nabla_\theta p(a, X; \theta)}{p(a, X; \theta)}p(a, X; \theta)] = E[E[R \frac{\nabla_\theta p(a, X; \theta)}{p(a, X; \theta)}| X]]\):
+policy gradient on single sample
+
+Continuous action space: Mixture of Gaussian model:
+\(p(a, x; \theta) = \sum_{i=1}^{M} c_i\frac{1}{\sqrt{2\pi \sigma^2}}exp(-\frac{(a-\mu_i(x; \theta_i))^2}{2\sigma^2})\)
+where \((c_1, ..., c_M)\) is a convex combination:
+\(\sum_{i=1}^{M} c_i = 1\). More generally
+\(p(a, x; \theta) = \sum_{i=1}^{M} c_i(x; \nu)\frac{1}{\sqrt{2\pi \sigma^2}}exp(-\frac{(a-\mu_i(x; \theta_i))^2}{2\sigma^2})\).
+Expectation: summation is replaced with integral. Tower property is
+applied again. The update looks identical to discrete action case.
+
+Update: \(\theta = \theta + \alpha g\)
+
+\hypertarget{multi-period-extension}{%
+\subsubsection{Multi-period extension}\label{multi-period-extension}}
+
+For t = 0, \ldots{}, T:
+
+\begin{itemize}
+\tightlist
+\item
+  Observe \(X_t\)
+\item
+  Select \(A_t \sim p(a, X_t;\theta)\)
+\item
+  Observe \(R_t\)
+\end{itemize}
+
+Take SGD:
+
+\begin{itemize}
+\tightlist
+\item
+  Set G = 0
+\item
+  For t = 0, 1, \ldots{}, T:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \(G = G + \tilde R + \frac{\nabla_\theta p(A_t, X_t; \theta)}{p(A_t, X_t; \theta)}\),
+    \(\tilde R_t\) is cumulative reward after time t
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{bellman-equation}{%
+\subsubsection{Bellman equation}\label{bellman-equation}}
+
+\(V(x, a) = r(x, a) + \gamma\sum_{z \in X} max_{a' \in A} V(z, a')p(z|x,a)\)
+
+\(V(x, a)\) is the expected reward of taking action a from state x given
+that we take the optimal action in all future steps. Problems with this
+equation: \(p(z|x,a)\) is unknown. Also the state space may be too high
+dimensional for standard numerical methods to solve due to curse of
+dimensionality
+
+\hypertarget{deep-rl}{%
+\subsubsection{Deep RL}\label{deep-rl}}
+
+Approximate Bellman equation with a function approximator
+\(Q(x, a; \theta)\) such as a (deep) neural network
+
+Q-learning algorithm: minimize
+\(L(\theta) = \sum_{x, a \in X, A} [(Y(x, a) - Q(x, a; \theta))^2]\pi(x,a)\)
+
+If \(L(\theta) = 0\) then \(Q(x, a;\theta)\) satisfies Bellman equation
+because \(Q(x, a; \theta) = V(x, a)\)
+
+Finally we have \(a^*(x) = argmax_a Q(x, a; \theta)\)
+
+\hypertarget{q-learning}{%
+\subsection{Q-learning}\label{q-learning}}
+
+Take gradient of \(L(\theta)\) but treat Y as constant
+\(\theta_{k+1} = \theta_k - \alpha \sum_{x, a}[(Y(x, a) - Q(x, a;\theta))]\nabla_\theta Q(x, a; \theta) \pi(x, a)\).
+Making this computationally efficient - use stochastic approximation:
+
+\begin{itemize}
+\tightlist
+\item
+  \(\theta_{k+1} = \theta_k - \alpha G_k\)
+\item
+  \(G_k = (r(x_k, a_k) + \gamma max_{a' \in A}Q(x_{k+1}, a'; \theta_k) - Q(x_{k}, a_'_k; \theta_k)) \times \nabla_\theta Q(x_k, a_k; \theta)\)
+  is gradient of the Q network
+\end{itemize}
+
+\(G_k\) is not an unbiased estimate of the gradient direction
+
+\(E[G_k | \theta_k, x_k, a_k] \ne \nabla_\theta E[]\) because we froze Y
+as constant wrt \(\theta\)
+
+
+\end{document}

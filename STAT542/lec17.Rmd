@@ -1,0 +1,30 @@
+---
+title: "Lecture 17"
+author: "Naveen Mathew Nathan S."
+date: "10/7/2019"
+output: pdf_document
+---
+
+# Random forest
+
+## Variable importance
+
+Assume that the feature $x_j$ is randomly scarambled. Then $VI_j = \frac{cov(y(x_{j, scrambled}), y)}{cov(\hat y, y)} - 1$
+
+## Kernel interpretation
+
+Consider the set of all terminal nodes: $\{A_u\}_{u \in U}$; $X = [0, 1]^p = \cup_{u \in U} A_u$; $A_i \cap A_j = \phi \forall i,j \in U$
+
+So for each test observation $x_i$ we have $\sum_{u \in U}I(x_i \in A_u) = 1$ and the kernel weight will be $\sum_{u \in U}I(x_i \in A_u)I(x_0 \in A_u)$. We have $\hat f(x_i) = \frac{\sum_{u \in U}I(x_i \in A_u)I(x_0 \in A_u)y_i}{\sum_{u \in U}I(x_i \in A_u)I(x_0 \in A_u)}$
+
+Random forest can be viewed as a kernel method that chooses on 1 (or few) variable at a time. A regular kernel method gives equal weight to all variables. Therefore, the bias is similar to that of kernel methods. But the number of data points in the terminal nodes will be higher for kernel with smaller number of variables (random forest) than for kernel that with all variables (typical kernels). Therefore random forest can have same bias but lower variance than kernel methods in high dimensional problems.
+
+Using mtry = 1 is similar to non-adaptive histogram estimator.
+
+# Clustering
+
+Separate into groups such that the groups are similar within each other and dissimilar between each other. This can be considered as: $C(.) = \{1,2,...,n\} \to \{1,2,...,K\}$
+
+$W(c) = \frac{1}{2}\sum_{k=1}^{k}\sum_{C(i) = C(i') = k}d(x_i, x_{i'})$
+
+$T = \frac{1}{2}\sum_{i,j} d(x_i, x_{i'}) = \frac{1}{2}\sum_{i}[\sum_{C(i) = C(i')}d(x_i,x_{i'}) + \sum_{C(i) \neq C(i')}d(x_i,x_{i'})] = W(C) + \frac{1}{2}\sum_i [\sum_{C(i) \neq C(i')}d(x_i,x_{i'})]$

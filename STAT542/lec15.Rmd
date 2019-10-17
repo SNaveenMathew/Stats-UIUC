@@ -1,0 +1,26 @@
+---
+title: "Lecture 15"
+author: "Naveen Mathew Nathan S."
+date: "10/2/2019"
+output: pdf_document
+---
+
+# Cubic Partitioning Tree
+
+Theorem 4.2 Dev
+
+For a continuous variable consider partitioning by median at each split. Consider a continuous outcome variable
+
+Looks like histogram regression with data adaptive splits. The problem can be simplified as:
+
+$S = \{0, 1\}^p$, where p is the depth of the tree, each variable can be reused for splitting later in the tree
+
+Conditions for (universal) consistency:
+
+- Consider the diameter of the split set A: $lim_{n \to \infty} max_{A_j \cap S \ne \phi} diameter(A_{nj}) \to 0$. This is true for this tree because the width of each of the terminal nodes becomes half on splitting by a variable.
+
+- $\mu(A_{nj}) \sim lim_{n \to \infty} \frac{|j = A_j \cap S|}{n} \to 0$: each terminal node contains infinite samples
+
+Prediction:
+
+$\hat f(x_0) = \frac{\sum Y_i I(x_0 \in A_{nj})I(x_i \in A_{nj})}{\sum I(x_0 \in A_{nj})I(x_i \in A_{nj})} = \sum w(x_0, x_i)Y_i$ looks like a kernel
