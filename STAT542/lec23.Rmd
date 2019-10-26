@@ -1,0 +1,38 @@
+---
+title: "Lecture 24"
+author: "Naveen Mathew Nathan S."
+date: "10/23/2019"
+output: pdf_document
+---
+
+# Support Vector Machine
+
+Hyperplane that maximizes 'distance' between the plane and nearest points in different classes.
+
+Consider $f(x) = X^T\beta + \beta_0 = 0$, therefore the projection of x on $\beta$ when removed from x will be orthogonal to $\beta$
+
+Consider $X_0$ such that $f(X_0) = X^T\beta + \beta_0$, therefore $\forall X$ distance from X to $X: f(X) = 0$
+
+$(X - X_0)^T\frac{\beta}{||\beta||} = X^T\frac{\beta}{||\beta||} - X_0^T\frac{\beta}{||\beta||} = \frac{X^T\beta + \beta_0}{||\beta||} = f(X)$
+
+We define the input classes as:
+
+Classifiation rule: $C(x) = sign(f(x))$
+
+We observe that for linearly separable case, $y_i(X_i^T\beta + \beta_0) \ge M||\beta||$: for negative $y_i$ we will have $X_i^T\beta + \beta_0 < 0$, for positive $y_i$ we will have $X_i^T\beta + \beta_0 > 0$
+
+The optimization problem is $max_{\beta, \beta_0} M$
+
+Such that $y_i(X_i^T\beta + \beta_0) \ge M$
+
+This translates to $\frac{1}{2}min_{\beta, \beta_0} ||\beta||^2$ such that $y_i(X_i^T\beta + \beta_0) \ge 1$ where $M||\beta|| = 1$
+
+Lagrangian multipliers: $min (g(\theta))$ such that $h(\theta) = 0$ translates to $L = g(\theta) + \lambda h(\theta)$. The optimal value of $g(\theta)$ is obtained at the same point as $\frac{\partial L}{\partial \theta} = 0$. The solution can be obtained by: $min_\theta max_{\alpha \ge 0} L(\theta, \alpha)$. This is the primal problem.
+
+Let us examine the condition: $y_i(X_i^T\beta + \beta_0) \ge 1 \implies -(y_i - X_i^T\beta - \beta_0 - 1) \le 0$
+
+Dual problem: $min_{\alpha\ge 0} max_\theta L(\theta, \alpha)$
+
+If $g(\theta)$ and the space of $h(\theta)$ are convex, the primal and dual form lead to the same solution
+
+$L = \frac{1}{2}||\beta||^2 - \sum_{i=1}^{n} \alpha_i(y_i(X_i^T\beta+\beta_0)-1)$

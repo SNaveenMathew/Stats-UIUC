@@ -1,0 +1,20 @@
+---
+title: "Lecture 17"
+author: "Naveen Mathew Nathan S."
+date: "10/22/2019"
+output: pdf_document
+---
+
+# Layer normalization
+
+Normalize within hidden layers 1, 2, ....
+
+$A^{l+1} = W^{l+1}H^l$
+
+$\bar A^{l+1} = \gamma^{l+1} \odot \frac{A^{l+1}-\mu^{l+1}}{\beta^{l+1}}$
+
+$H^{l+1} = \sigma(\bar A^{l+1}+b^{l+1})$
+
+$\mu^{l+1} = \frac{1}{d_H}\sum_{i=1}^{d_H}A_i^{l+1}$
+
+$\beta^{l+1} = \sqrt{\frac{1}{d_H}\sum_{i=1}^{d_H}(A_i^{l+1}-\mu^{l+1})}$

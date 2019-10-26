@@ -1,0 +1,45 @@
+---
+title: "Lecture 18"
+author: "Naveen Mathew Nathan S."
+date: "10/24/2019"
+output: pdf_document
+---
+
+# Characteristics of ideal MHD equations
+
+Adiabatic, linear perturbations about a static, homogeneous state:
+
+$\rho = \rho_0(1+\delta), \mathbf{u} = \mathbf{u}, P = P_0(1 + \gamma \delta), \mathbf{B} = B_0(\mathbf{\hat n + b})$
+
+Alfven speed $v^2_A = \frac{B_0^2}{4\pi\rho_0}$: substituting this the MHD equations simplify to a vector equation in terms of k (slide 13). We observe that the solution depends on magnitude and **direction** of perturbation.
+
+Types of waves from the equation:
+
+- Alfven waves: $u_x = u_y = 0, u_z \neq 0$
+- Fast MHD waves: $u_z=0, u_x, u_z \neq 0$: magnetic tension waves. Correspond to the positive sign in MHD wavae dispersion relation. When $cos \theta = 0$ these are purely compressional magnetosonic waves.
+- Slow MHD waves: correspond to the negative sign of MHD wave dispersion relation.
+
+## Ensuring $\nabla. B = 0$
+
+What if $\nabla. B \neq 0$
+
+$\nabla.(BB) = B\nabla.B + (B.\nabla)B$
+
+## Vector potential methods
+
+Calculating Lorentz force is difficult (involves second derivative: can be noisy, error prone based on the grid used for computing the derivative)
+
+## Constrained transport methods
+
+Stoke's equation, magnetic flux for a region (may not be the whole grid):
+
+$\frac{d \phi_{S(t)}}{dt} = \frac{d}{dt}\int_{S(t)}\mathbf{B}.\mathbf{\hat n} dS = -\epsilon$, where $\epsilon$ is the electromotive force (EMF)
+
+Therefore, adding up the fluxes across all faces of the region will lead to 0. Writing this in terms of centered difference leads to an equation that looks like $\nabla.B=0$. This maintains $\nabla.B = 0$ throughout if it is true in the initial case.
+
+Time forward step is done using Lax-Friedrichs / Upwind / Riemann solver.
+
+## Elliptic projection method
+
+Also called divergence cleaning. $B = \nabla \phi + \nabla \times A \implies \nabla.B = \nabla^2 \phi$
+

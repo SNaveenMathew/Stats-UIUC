@@ -1,0 +1,20 @@
+---
+title: "Lecture 22"
+author: "Naveen Mathew Nathan S."
+date: "10/18/2019"
+output: pdf_document
+---
+
+# Hidden Markov Model
+
+Think of a casino. $Z \in \{0, 1\}$ where 0 is fair die, 1 is loaded die (Eg: P(6) = 1/2, P(x) = 1/10 for x = 1, 2, 3, 4, 5).
+
+Emission probability matrix: $E_{ij} = P(outcome = j | Z = i)$, transition probability matrix: $T_{ij} = P(Z_{t+1} = j | Z_{t} = i)$
+
+Assumptions:
+
+- Memoryless: $P(X,Z | \theta) = P(X_1, ..., X_n, Z_1, ..., Z_n | \theta) = P(Z_1 | \theta)\prod_{t=1}^{n}P(X_t|Z_t, \theta)\prod_{t=1}^{n-1} P(Z_{t+1}|Z_t, \theta) \implies log(P(X,Z|\theta) = log(W(z_1)) + \sum_{t=1}^{n}log B(Z_t,X_t) + \sum_{t=1}^{n-1}log A(Z_t, Z_{t+1})$
+
+$\gamma_t(i, j) = P(Z_t = i, Z_{t+1} = j|X,\theta); \gamma_t(i) = P(Z_t = i|\theta)$
+
+Equations in screenshot after this.

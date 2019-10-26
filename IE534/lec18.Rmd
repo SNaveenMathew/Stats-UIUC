@@ -1,0 +1,46 @@
+---
+title: "Lecture 18"
+author: "Naveen Mathew Nathan S."
+date: "10/24/2019"
+output: pdf_document
+---
+
+## Replay buffer
+
+Correlation between $X_{t-1}$ and $X_t$ can slow the convergence. Store subset of observations from previous times. At training iteration k select an observation at random from the replay buffer.
+
+Update parameters like Q learning: $\theta_{k+1} = \theta_k + \alpha_k(R_j + \gamma max_{a'}Q(x_{j+1}, a', \theta_k)-Q(x_j, a_j, \theta_k))\nabla_\theta Q(x_j,a_j;\theta_k)$. This breaks the correlation between consecutive updates of parameters.
+
+Mini-batch generalization:
+
+Draw at random: $j^{(1)}, j^{(2)}, ..., j^{(m)}$ from {1, 2, ..., k}
+
+$\theta_{k+1} = \theta_k + \frac{\alpha_k}{M}\sum_{j=j^{(1)}, j^{(2)}, ..., j^{(m)}} (R_j + \gamma max_{a'}Q(x_{j+1}, a'; \theta_k)-Q(x_k, a_j; \theta_k))\nabla_\theta Q(x_j, a_j; \theta_k)$
+
+Select $A_k$ with epsilon greedy to move from $x_k, A_k$ to $x_{k+1}, R_k$
+
+# Double Q-learning
+
+DQN uses: $\tilde J(\theta_t) = (Y_t - Q(X_t, A_t; \theta_t))^2$, $Y_t = R(X_t,A_t) + \gamma Q(X_{t+1}, argamax_a Q(X_{t+1}, a, \theta_t); \theta_t)$
+
+In DDQN we replace $\theta$ with $\theta_{t_-}$: $\tilde J(\theta_t) = (Y_t - Q(X_t, A_t; \theta_t))^2$, $Y_t = R(X_t,A_t) + \gamma Q(X_{t+1}, argamax_a Q(X_{t+1}, a, \theta_t); \theta_{t_-})$
+
+# Analysis of SGD
+
+$min_\theta L(\theta) = min_\theta E_V[F(\theta, V)]$ where V = (X, Y).
+
+Let us define projection operator as $Proj_\Theta(\theta) = argmin_{\theta' \in \Theta} ||\theta - \theta'||_2$
+
+Projected SGD algorithm: $\tilde \theta_{j+1} = \theta_j - \gamma_jG(\theta_j, V_j)$
+
+$\theta_{j+1} = Proj_\Theta(\tilde \theta_{j+1})$ where $G(\theta, v) = \nabla_\theta F(\theta, v)$
+
+Let us assume that:
+
+- $L(\theta)$ is strongly convex
+- $\theta$ is convex, bounded domain
+- Global minimum $\theta^*$ is in the interior of $\theta$
+- Data $V_j$ is iid
+- $E||G(\theta_j, V)||^2 \le M^2$
+
+Define distance: $A_k = \frac{1}{2}||\theta_j - \theta^*||^2$, $a_j = E[A_j]$. Based on the assumptions: $||Proj_\Theta(\theta)-Proj_\Theta(\theta')|| \le ||\theta - \theta'||$
