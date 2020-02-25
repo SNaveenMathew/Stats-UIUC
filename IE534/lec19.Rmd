@@ -1,0 +1,30 @@
+---
+title: "Lecture 19"
+author: "Naveen Mathew Nathan S."
+date: "10/29/2019"
+output: pdf_document
+---
+
+# SGD
+
+## For convex:
+
+Define $A_j = \frac{1}{2}||\theta_j - \theta^*||^2; a_j = E[A_j]$. Let $\gamma_j = \frac{\alpha}{j}$
+
+$A_{j+1} = \frac{1}{2}||\theta_{j+1}-\theta^*||^2=\frac{1}{2}||Proj_\theta(\theta_j-\gamma_jG(\theta_j,V_j)-\theta^*)||\le \frac{1}{2}||\theta_j-\gamma_jG(\theta_j, V_j)-\theta^*||$
+
+$g(\theta) = \nabla_\theta L(\theta) = E[\nabla_\theta F(\theta, V)] = E[G(\theta, V)|\theta]$
+
+$E[(\theta_j-\theta^*)^TG(\theta_j,V_j)] = E[E[(\theta_j-\theta^*)^TG(\theta_j,V_j)|\theta]] = E[(\theta_j-\theta^*)^TE[G(\theta_j,V_j)|\theta]] = E[(\theta_j-\theta^*)^Tg(\theta_j)]$
+
+Also using the convexity property of f: $f(\theta') \ge f(\theta) + (\theta'-\theta)^T\nabla f(\theta) + \frac{1}{2}c||\theta_j - \theta^*||_2^2$
+
+...
+
+The best achievable convergence is $a_j \le \frac{K}{j}$ for $\alpha > \frac{1}{2c}$
+
+## For non-convex:
+
+$\theta^{l+1}=\theta^{l}-\alpha^{(l)}[G_{GD}] + \alpha^{(l)}[G_{GD} - G_{SGD}]$
+
+To converge to stationary point, the dynamics must asymptotically follow descent direction of GD. Noise term will vanish if $\alpha^{(l)}$ goes to 0 as $l \to \infty$

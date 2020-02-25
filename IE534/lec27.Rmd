@@ -1,0 +1,26 @@
+---
+title: "Lecture 27"
+author: "Naveen Mathew Nathan S."
+date: "11/5/2019"
+output: pdf_document
+---
+
+# Asymptotic convergence to global minimum for NN
+
+Let the model be: $g^{N_H}(x; \theta) = \sum_{i=1}^{N_H}C^i\sigma(W^ix)$, where $\theta = (C^1, C^2, ..., C^{N_H}, W_1, ..., W^{N_H}); C^i \in R, W^i \in R^d$; $L(\theta) = \sum_{j=0}^{m}(y^j-g^{N_H}(x^j; \theta))^2$ is non-convex. Therefore, GD and SGD may converge to local minima. Consider Xavier initialization instead of the g mentioned above: $g^{N_H}(x; \theta) = \frac{1}{N_H}\sum_{i=1}^{N_H}C^i\sigma(W^ix)$. If $C^i, W^i$ are iid with finite moments such that $E[C] = 0$. If we consider $\sigma(.)=1, C^i = 1$, the $g^{N_H}$ still diverges. But combining with $E[C] = 0; var[C] < \infty$, we have $g^{N_H} \to Gaussian(0,1)$ by CLT. This gives a valid starting point to apply (S)GD.
+
+$C^i_{k+1} = C_k^{i} + \frac{\alpha^{N_H}}{\sqrt{N_H}}(y_k-g_k^{N_H}(x_k))\sigma(W^i_kx_k)$
+
+Assume that the activation function is twice continuously differentiable, bounded. ...
+
+Consider the vector of outputs for the mini-batch after k SGD steps: $(g_k^{N_H}(x^1), g_k^{N_H}(x^2), ..., g_k^{N_H}(x^m))$
+
+We define empirical measure $\nu_k^{N_H} = \frac{1}{N_H}\sum_{i=1}^{N_H}\delta_{C^i, W^i}$, where $\nu_k^{N_H}(dc, dw)$ is the fraction of $(C^i_k, W_k^i)_{i=1}^{N_H}$ in the interval $(c, c + dc) \times (w, w + dw)$. Therefore we have $\int f(c,w) \delta_{C^i_k, W^i_k}(dc, dw) = f(C^i_k, W^i_k)$. Fraction of $(C^i_k, W^i_k) \in A = <I_{(C,W) \in A}, \nu_k^{N_H}> = \int_A\nu_k^{N_H}(dc, dw) = \frac{1}{N_H}\sum_{i=1}^{N_H}I_{C^i_k, W^i_k \in A}$
+
+Therefore, $g^{N_H}_k(x) = <c\sigma(w.x), \sqrt{N_H}\nu_k^{N_H}>$; As $N_H \to \infty$ and $x \in D$ we have $g_0^{N_H}(x) \to_d G(x); G(x) \in R^M$ is Gaussian
+
+Let us defined scaled processes $h_t^{N_H} = g_{\lfloor N_t \rfloor}^{N_H}; \mu_t^{N_H} = \nu_{\lfloor N_t \rfloor}^{N_H}$, where $g_k^{N_H} = (g_k^{N_H}(x^{(1)}),g_k^{N_H}(x^{(2)}),...,g_k^{N_H}(x^{(M)}))$, $h^{N_H}_t = (h_t^{N_H}(x^{(1)}),h_t^{N_H}(x^{(2)}), ..., h_t^{N_H}(x^{(M)}))$
+
+$g_{k+1}^{N_H}(x) = g_{k}^{N_H}(x) + \frac{1}{\sqrt{N_H}}\sum_{i=1}^{N_H}C^i_{k+1}\sigma(W^i_{k+1}x) - \frac{1}{\sqrt{N_H}}\sum_{i=1}^{N_H}C^i_k\sigma(W_i^kx)$. Therefore, the updates can be written in terms of inner product and empirical measure. Substitute to get $h_t^{N_H}$ in terms of empirical measure. Rewrite $\frac{1}{N_H}\sum_{i=1}^{N_H}$ as a Riemann interval.
+
+Choosing $\alpha_{N_H} = \frac{\alpha}{N_H}$

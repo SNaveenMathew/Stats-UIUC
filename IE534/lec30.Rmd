@@ -1,0 +1,42 @@
+---
+title: "Lecture 30"
+author: "Naveen Mathew Nathan S."
+date: "11/19/2019"
+output: pdf_document
+---
+
+# Second order optimization
+
+## Adaptive algorithm for second order optimization
+
+Let us define $B_\lambda = B + \lambda I$, solve for the equations $B_\lambda^{(k)} = -g^{(k)}$; $\theta_{k+1} = \theta_k + \delta$
+
+Large $\lambda$: $\delta = -\frac{g}{\lambda}$ looks like gradient descent step. Small $\lambda$: $\delta \approx [B^{(k)}]^{-1}g$
+
+If $L(\theta_{k+1}) < L(\theta_k): \lambda = \frac{\lambda}{c}$; else $\lambda = c\lambda$; c > 1
+
+$B_\lambda \in R^{d\times d}$, therefore it is hard to calculate and invert. Instead we use conjugate gradient method.
+
+Conjugate gradient:
+
+$\delta_{k+1} = \delta_k + \alpha_k p_k$
+
+$r_{k+1} = r_k - \alpha_kB_\lambda p_k$
+
+$p^TBp = \sum_{i=1}^{N}p^T(g_f^i)^T \nabla_{zz} \rho(f(x^i;\theta_0), y^i)g_f^ip$
+
+This can be done in computationally easier way by taking Jacobian vector product: $V^i_{K \times 1} = g_f^ip$, Hessian vector product $U^i = \nabla_{zz}\rho(f(x^i;\theta), y^i)V^i$, Jacobian vector product $T^i = (g^i_f)^TU^i$, vector dot product $p^TT^i$
+
+# Automatic differentiation
+
+## Numerical differentiation:
+
+$\frac{\partial f}{\partial \theta_i} = \frac{f(\theta + \Delta e_i) - f(\theta - \Delta e_i)}{2 \Delta}$: Requires 2*d computations for each sample. Computationally inefficient.
+
+## Symbolic differentiation:
+
+Follows chain rule and other basic formulae to give analytical form of partial derivatives. Still computationally inefficient.
+
+## Automatic differentiation:
+
+Forward mode, reverse mode (backprop)

@@ -1,0 +1,22 @@
+---
+title: "Lecture 29"
+author: "Naveen Mathew Nathan S."
+date: "11/13/2019"
+output: pdf_document
+---
+
+# Personalized Medicine
+
+Let us define $f(X, A=1)=X^T\alpha_1$, $f(X, A=-1)=X^T\alpha_2$. Adding: $X^T(\frac{\alpha_1 + \alpha_2}{2}) = \frac{f(X, A=-1) + f(X, A=1)}{2}$; $X^T(\frac{\alpha_1 - \alpha_2}{2}) = \frac{f(X, A=1) - f(X, A=-1)}{2}$
+
+Let $\alpha_1-\alpha_2 = \gamma$, then $f(X, A=1) = X^T\beta + \frac{X^T\gamma}{2}$, $f(X, A=-1) = X^T\beta - \frac{X^T\gamma}{2}$
+
+This can be simplified as $f(X,A) = X^T\beta + A[\frac{X^T\gamma}{2}]$
+
+Let us consider a randomized trial: $A\perp X; A = 1\ wp\ 0.5, -1\ wp\ 0.5$, $E[Af(X,A)] = E[AX^T\beta] + E[A^2\frac{X^T \gamma}{2}] = E[A]E[X^T\beta] + E_A[\frac{X^T\gamma}{2}] = \frac{X^T\gamma}{2}$: This is a linear regression model which directly estimates the difference of treatments without estimating $\beta$. In practice: virtual twin.
+
+## Outcome weighted learning
+
+Let us consider $E[R|X,A] = h_1(X_1) + h_2(X_2, A)$. Let us define $d(x): R \to \{1, -1\}$. We need to maximize $\hat d(x)= argmax_{d(x)}E[R|X = x, A = d(x)]$. Let us instead consider the decision function $\hat d = argmax_{d \in D}E_X[E[R|X = x, A = d(x)]]$, where d(x) is a strategy. $V^d = E_X[E[R|X = x, A = d(x)]]$ is the value function. It is known that $V^d = \int R dp^d$, where $p^d \in (R, X, A = d(x))$: measure over restricted space. However, the distribution from which the solution is computed is in $P \in (R, X, A)$. Applying Radon-Nicyldm theorem: $V^d = \int R \frac{dp^d}{dp} dp$, where $\frac{dp^d}{dp} = \frac{I(A=d(x))}{P(A|X)}$. This simplifies to $argmax_d \frac{1}{n} \sum_{i=1}^{n}R_i \frac{I(A_i=d(x_i))}{P(A_i|X_i)}$
+
+This is same as propensity weighted classification model (weighting misclassification error $I(A_i=d(x_i))$ by propensity factor $\frac{R_i}{P(A_i|X_i)}$)

@@ -1,0 +1,10 @@
+---
+title: "Lecture 28"
+author: "Naveen Mathew Nathan S."
+date: "11/6/2019"
+output: pdf_document
+---
+
+# Gradient Boosting
+
+AdaBoost works only for classification. Gradient boosting extends AdaBoost for other ML problems such as regression. Suppose $\beta_{t-1}$ is the sum of all models aggregated till $t-1$. Task is to find $\gamma_t$ such that $Loss = L(y, F_t(x))$, where $F_t(x) = \beta_{t-1}^Tx + \gamma_t^Tx$

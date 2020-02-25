@@ -1,0 +1,41 @@
+---
+title: "Lecture 24"
+author: "Naveen Mathew Nathan S."
+date: "10/23/2019"
+output: pdf_document
+---
+
+# Boosting
+
+$F_T(x) = \sum_{t=1}^{T}f_t(x)$
+
+Models $f_t$ are built sequentially. Example: AdaBoost, Lasso (adds one variable at a time in coordinate descent starting from $Y = \beta^Tx + \epsilon$, that leads to sequential estimation of $\beta_j$ such that $e_j = (0, ..., 1_j, ..., 0); Y = (\beta\odot\epsilon)^Tx + \epsilon$)
+
+## AdaBoost
+
+Let the data be $\{x_i, y_i\}; st\ y\in \{-1,1\}$; Start with weights $w_i^{(0)} = \frac{1}{n}; i = 1,2,...,n$
+
+- t from 1 to T:
+    - Find $f_t(x) \in \{-1, 1\}$ based on weighted samples
+    - Classification error: $\epsilon_t = \sum_{i=1}^{n}w_i^{(t)}I\{y_i \neq f_t(x_i)\}$
+    - $\alpha_t = \frac{1}{2}log(\frac{1-\epsilon_t}{\epsilon_t})$
+    - $w_i^{(t+1)}=\frac{w_i^{(t)}}{z_t}exp(-\alpha_t y_i f_t(x_i))$, where $z_t = \sum_{i=1}^{n}w_i^{(t)}exp(-\alpha_t y_i f_t(x_i))$
+- $F_T(x_i) = \sum_{t=1}^{T}\alpha_tf_t(x_i)$
+- $\hat y_i = sign(F_t(x_i))$
+
+Intuition:
+
+- Assumption: $\epsilon_t < \frac{1}{2}$
+- $\alpha_t > 0$ from above assumption
+- $exp(-\alpha_t y_i f_t(x_i)) \le exp(-\alpha_t) < 1$ if correctly classified: $y_i f(x_i) = 1$
+- $exp(-\alpha_t y_i f_t(x_i)) \le exp(\alpha_t) > 1$ if wrongly classified: $y_i f(x_i) = -1$
+- $w_i^{(t)} = \frac{w_i^{(t-1)}}{z_t z_{t-1}}\prod_{k=t-1}^{t}exp(-\alpha_ky_if_k(x_i)) = \frac{\frac{1}{n}}{z_1z_2...z_t}\prod_{k=1}^{t}exp(-\alpha_k y_i f_k(x_i))$
+- $z_1z_2...z_t = \frac{1}{n}\sum_{i=1}^{n}exp(-y_i\sum_{k=1}^{t}f_k(x_i)\alpha_k) > error_misclassification$
+- $\sum_{i=1}^{n}w_i^{(t)} = 1 = \frac{\frac{1}{n}}{z_1z_2...z_t}\sum_{i=1}^{n}exp(-y_i\sum_{k=1}^{t}\alpha_kf_k(x_i))$
+- $\implies z_t = \sum_{y_i = f_t(x_i)} w_i^{(t)}exp(-\alpha_ty_if_t(x_i)) + \sum_{y_i \neq f_t(x_i)} w_i^{(t)}exp(-\alpha_ty_if_t(x_i)) = exp(-\alpha_t) \sum_{y_i=f_t(x_i)} w_i^{(t)} + exp(\alpha_t) \sum_{y_i=f_t(x_i)} w_i^{(t)}$
+- To have error going to 0, we should have $z_t < 1$, such that $\prod_{k=1}^{t}z_k \to 0$
+- So far we have $z_t = exp(-\alpha_t)(1-\epsilon_t) + exp(\alpha_t)\epsilon_t$
+- Differentiating wrt $\alpha_t$ and setting to 0: $0 = -(1-\epsilon_t)exp(-\alpha_t) + \epsilon_texp(\alpha_t) \implies \alpha_t = \frac{1}{2}log(\frac{1-\epsilon_t}{\epsilon_t})$
+- Minimum value of $z_t = 2\sqrt{(1-\epsilon_t)\epsilon_t} \le 1 \forall \epsilon_t$. However, we assumed that $\epsilon_t < \frac{1}{2}$. Therefore, we are guaranteed to have $z_t < 1$
+
+Consider a weak learner given by decision stumps. As t increases the number of distinct 'knot' increases and model starts to overfit. One solution: decrease number of iterations t. Another solution: shrink the exponential loos: Eg: $exp(-y_i\sum_{k=1}^{t}\alpha_kf_k(x)) < 0$
